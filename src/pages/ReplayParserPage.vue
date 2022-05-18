@@ -209,6 +209,7 @@ export default defineComponent({
       barRef.start()
       try {
         const url = urlText.value
+        remarksText.value = ''
         const replayJSON = await fetch(url + '.json')
         const data = await replayJSON.json()
         const parsed = parseReplay(data)
