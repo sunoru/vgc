@@ -1,6 +1,5 @@
-import { Config, ParsedBattle, ParsedBattles } from './models'
-
-export const useLocalStorage = true
+import { ParsedBattle, ParsedBattles } from './models'
+import { LocalConfigs } from './config'
 
 const databaseName = 'vgc'
 const databaseVersion = 1
@@ -45,7 +44,7 @@ export const getAllSavedBattles = async (
   force = false
 ): Promise<ParsedBattles> => {
   if (force || _cachedBattles === null) {
-    if (useLocalStorage) {
+    if (LocalConfigs.useLocalStorage) {
       _cachedBattles = await _getBattlesFromIDB()
     } else {
       throw new Error('Not implemented')
@@ -65,7 +64,7 @@ export const getSavedBattle = async (
 export const saveBattle = async (
   battle: ParsedBattle
 ): Promise<ParsedBattle> => {
-  if (useLocalStorage) {
+  if (LocalConfigs.useLocalStorage) {
     const db = await getIDB()
     const transaction = db.transaction(['battles'], 'readwrite')
     const battleStore = transaction.objectStore('battles')
@@ -86,7 +85,7 @@ export const saveBattle = async (
 export const saveBattles = async (
   battles: ParsedBattles
 ): Promise<ParsedBattle[]> => {
-  if (useLocalStorage) {
+  if (LocalConfigs.useLocalStorage) {
     const db = await getIDB()
     const transaction = db.transaction(['battles'], 'readwrite')
     const battleStore = transaction.objectStore('battles')
@@ -104,36 +103,6 @@ export const saveBattles = async (
       })
     )
   } else {
-    throw new Error('Not implemented')
-  }
-}
-
-let _cachedConfig: Config | null = null
-
-export const getConfig = async (force = false): Promise<Config> => {
-  if (force || _cachedConfig === null) {
-    if (useLocalStorage) {
-      const saved = localStorage.getItem('config')
-      _cachedConfig =
-        saved === null
-          ? {
-              myUsernames: [],
-            }
-          : (JSON.parse(saved) as Config)
-    } else {
-      // TODO
-      throw new Error('Not implemented')
-    }
-  }
-  return _cachedConfig
-}
-
-export const saveConfig = async (config: Config) => {
-  if (useLocalStorage) {
-    localStorage.setItem('config', JSON.stringify(config))
-    _cachedConfig = config
-  } else {
-    // TODO
     throw new Error('Not implemented')
   }
 }

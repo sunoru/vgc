@@ -41,6 +41,7 @@
 import { defineComponent, ref, watch } from 'vue'
 import EssentialLink from 'components/EssentialLink.vue'
 import { useQuasar } from 'quasar'
+import { LocalConfigs } from 'src/utils/config'
 
 const linksList = [
   {
@@ -79,11 +80,15 @@ export default defineComponent({
   setup() {
     const leftDrawerOpen = ref(false)
     const $q = useQuasar()
-    const inDarkMode = ref($q.dark.isActive)
+    const inDarkMode = ref(LocalConfigs.useDarkMode)
+    $q.dark.set(inDarkMode.value)
 
     watch(
       () => inDarkMode.value,
-      (v) => $q.dark.set(v)
+      (v) => {
+        LocalConfigs.useDarkMode = v
+        $q.dark.set(v)
+      }
     )
 
     return {

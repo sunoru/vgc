@@ -117,8 +117,8 @@ const parseReplay = async (
   const config = await getConfig()
   const url = `https://replay.pokemonshowdown.com/${id}${
     password ? `-${password}` : ''
-  }.json`
-  const replayJSON = await fetch(url)
+  }`
+  const replayJSON = await fetch(url + '.json')
   console.log(replayJSON)
   const data = await replayJSON.json()
   const { uploadtime, p1, p2, format, log } = data
