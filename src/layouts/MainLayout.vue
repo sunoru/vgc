@@ -11,25 +11,17 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title>
-          VGC Tools
-        </q-toolbar-title>
+        <q-toolbar-title> VGC Tools </q-toolbar-title>
 
-        <div>By <a class="text-cyan-1" target="_blank" href="https://github.com/sunoru">Sunoru</a></div>
+        <q-toggle label="Dark Mode" v-model="inDarkMode" color="black" />
+
+        <q-btn flat stretch disable icon="login" label="Sign in" />
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      elevated
-    >
+    <q-drawer v-model="leftDrawerOpen" show-if-above elevated>
       <q-list>
-        <q-item-label
-          header
-        >
-          Pages
-        </q-item-label>
+        <q-item-label header> Pages </q-item-label>
 
         <EssentialLink
           v-for="link in essentialLinks"
@@ -46,49 +38,62 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import EssentialLink from 'components/EssentialLink.vue';
+import { defineComponent, ref, watch } from 'vue'
+import EssentialLink from 'components/EssentialLink.vue'
+import { useQuasar } from 'quasar'
 
 const linksList = [
   {
-    title: 'Replay Parser',
+    title: 'Replay Importer',
     caption: 'Parse & import Pokemon Showdown replays',
     icon: 'video_library',
-    link: '/replays'
+    link: '/replays',
   },
   {
     title: 'Battles',
-    caption: 'Manage saved battles',
+    caption: 'Manage & analyze saved battles',
     icon: 'view_list',
-    link: '/battles'
+    link: '/battles',
+  },
+  {
+    title: 'Settings',
+    icon: 'settings',
+    link: '/settings',
   },
   {
     title: 'Source Code',
     caption: 'https://github.com/sunoru/vgc',
     icon: 'code',
     href: 'https://github.com/sunoru/vgc',
-    target: '_blank'
-  }
-];
+    target: '_blank',
+  },
+]
 
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
-    EssentialLink
+    EssentialLink,
   },
 
-  setup () {
+  setup() {
     const leftDrawerOpen = ref(false)
+    const $q = useQuasar()
+    const inDarkMode = ref($q.dark.isActive)
+
+    watch(
+      () => inDarkMode.value,
+      (v) => $q.dark.set(v)
+    )
 
     return {
       essentialLinks: linksList,
       leftDrawerOpen,
-      toggleLeftDrawer () {
+      toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value
-      }
+      },
+      inDarkMode,
     }
-  }
-});
+  },
+})
 </script>
-wer

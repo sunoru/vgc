@@ -8,11 +8,15 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: () => import('pages/IndexPage.vue') },
       {
         path: 'replays',
-        component: () => import('pages/ReplayParserPage.vue'),
+        component: () => import('src/pages/ReplayImporterPage.vue'),
       },
       {
         path: 'battles',
         component: () => import('pages/BattlesPage.vue'),
+      },
+      {
+        path: 'settings',
+        component: () => import('pages/SettingsPage.vue'),
       },
     ],
   },
