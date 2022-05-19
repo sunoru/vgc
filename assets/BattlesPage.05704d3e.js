@@ -1,0 +1,1 @@
+import{Q as t}from"./QPage.2ccaab82.js";import{_ as s,Q as a,r,R as o,S as n,T as c,a7 as _}from"./index.fca2a0f3.js";const f=a({name:"BattlesPage",setup:()=>({battles:r([])})}),i=_("div",{class:"text-h3"},"WIP.",-1);function l(e,p,d,m,u,x){return o(),n(t,{class:"row items-center justify-evenly"},{default:c(()=>[i]),_:1})}var P=s(f,[["render",l]]);export{P as default};
