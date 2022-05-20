@@ -1,8 +1,11 @@
+import Immutable from 'immutable'
+
 export interface Pokemon {
   id: string
   ability?: string
   item?: string
   moves: string[]
+  sentOutNumber: number
 
   [otherKey: string]: unknown
 }
@@ -23,6 +26,7 @@ export interface ParsedBattle {
   p1: string
   p2: string
   format: string
+  rating: number
 
   timeParsed: number
   winner: PlayerNumber
@@ -37,6 +41,14 @@ export interface ParsedBattle {
   userPlayer: PlayerNumber
 
   log?: string
+}
+
+export type Team = Immutable.Set<string>
+
+export interface BattlePlayer {
+  name: string
+  team: Team
+  sentOut: Pokemon[]
 }
 
 export type ParsedBattles = {

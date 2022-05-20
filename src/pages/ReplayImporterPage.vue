@@ -22,6 +22,7 @@
           color="primary"
           label="Import All"
           type="submit"
+          :loading="isImporting"
         />
       </q-form>
     </div>
@@ -40,12 +41,8 @@ import {
   PlayerNumber,
   Pokemon,
 } from '../utils/models'
-import {
-  getConfig,
-  getSavedBattle,
-  saveBattles,
-  saveConfig,
-} from '../utils/storage'
+import { getSavedBattle, saveBattles } from '../utils/storage'
+import { getConfig, saveConfig } from '../utils/config'
 
 const getPokeInTeam = (team: Pokemon[], poke: string): Pokemon => {
   for (const p of team) {
@@ -53,7 +50,7 @@ const getPokeInTeam = (team: Pokemon[], poke: string): Pokemon => {
       return p
     }
   }
-  const p: Pokemon = { id: poke, moves: [] }
+  const p: Pokemon = { id: poke, sentOutNumber: team.length, moves: [] }
   team.push(p)
   return p
 }
@@ -97,12 +94,7 @@ const getUserPlayer = async (
   if (myUsernames.includes(p2)) {
     return PlayerNumber.Player2
   }
-  const p = await selectDialog(
-    'Which is your username?',
-    'Neither',
-    p1,
-    p2
-  )
+  const p = await selectDialog('Which is your username?', 'Neither', p1, p2)
   if (p !== 0 && config !== undefined) {
     myUsernames.push(p === 1 ? p1 : p2)
     await saveConfig(config)
@@ -121,7 +113,7 @@ const parseReplay = async (
   const replayJSON = await fetch(url + '.json')
   console.log(replayJSON)
   const data = await replayJSON.json()
-  const { uploadtime, p1, p2, format, log } = data
+  const { uploadtime, p1, p2, format, log, rating } = data
   const logs = log.split('\n')
   let isWinnerP1 = false
   const team1: string[] = []
@@ -198,6 +190,7 @@ const parseReplay = async (
     p1,
     p2,
     format,
+    rating,
     timeParsed: Math.floor(Date.now() / 1000),
     winner: isWinnerP1 ? PlayerNumber.Player1 : PlayerNumber.Player2,
     team1,
@@ -255,7 +248,8 @@ const importAll = async (
     }
     const { id, password, remarks: inlineRemarks } = m.groups
     console.log(`Importing ${id}...`)
-    currentBattle = id in battles ? battles[id] : await getSavedBattle(id)
+    // currentBattle = id in battles ? battles[id] : await getSavedBattle(id)
+    currentBattle = null
     if (currentBattle === null) {
       currentBattle = await parseReplay(id, password)
     }
@@ -285,6 +279,7 @@ export default defineComponent({
   setup: () => {
     const textInput = ref('')
     const bar = ref<QAjaxBar>()
+    const isImporting = ref(false)
 
     const parse = async () => {
       const barRef = bar.value
@@ -292,6 +287,7 @@ export default defineComponent({
         return
       }
       barRef.start(0)
+      isImporting.value = true
       try {
         const input = textInput.value.trim()
         if (input === '') {
@@ -307,6 +303,7 @@ export default defineComponent({
         showDialog('Something went wrong.', 'negative')
       } finally {
         barRef.stop()
+        isImporting.value = false
       }
     }
 
@@ -314,6 +311,7 @@ export default defineComponent({
       textInput,
       bar,
       parse,
+      isImporting,
     }
   },
 })

@@ -1,34 +1,79 @@
-import { ParsedBattle, Pokemon, PlayerNumber } from './models'
+import Immutable from 'immutable'
+import { RestrictedPokemons } from './const'
+import { ParsedBattle, PlayerNumber, BattlePlayer } from './models'
 
-export const getTeam = (
-  battle: ParsedBattle,
-  isPlayer2: boolean
-): Pokemon[] => {
-  const pokes: Pokemon[] = []
-  const sentOut: string[] = []
-  for (const poke of isPlayer2 ? battle.team2SentOut : battle.team1SentOut) {
-    pokes.push(poke)
-    sentOut.push(poke.id)
-  }
-  for (const poke of isPlayer2 ? battle.team2 : battle.team1) {
-    let o = false
-    for (const each of sentOut) {
-      if (
-        (poke.endsWith('*') && each.startsWith(poke.slice(0, -1))) ||
-        sentOut.includes(poke)
-      ) {
-        o = true
-        break
-      }
-    }
-    if (!o) {
-      pokes.push({ id: poke, moves: [] })
-    }
-  }
-  return pokes
+// Only cover some common cases
+export const normalizeName = (name: string): string => {
+  if (!name.includes('-')) return name
+  if (['Necrozma-', 'Calyrex-', 'Kyurem-'].some((x) => name.startsWith(x)))
+    return name
+  if (name.endsWith('-Gmax')) name = name.slice(0, -5)
+  const tmp = name.split('-', 2)
+  return tmp.length === 1 ? name : `${tmp[0]}-*`
 }
 
-export const getOpponentTeam = (battle: ParsedBattle): Pokemon[] =>
+export const compareName = (a: string, b: string) =>
+  normalizeName(a) === normalizeName(b)
+
+export const makePokemonSet = (
+  pokes: string[] | Immutable.Set<string>
+): Immutable.Set<string> =>
+  Immutable.Set(Array.isArray(pokes) ? pokes.map(normalizeName) : pokes)
+
+export const getPlayer = (
+  battle: ParsedBattle,
+  nameOrIsPlayer2: string | boolean | PlayerNumber
+): BattlePlayer => {
+  const isPlayer2 =
+    typeof nameOrIsPlayer2 === 'boolean'
+      ? nameOrIsPlayer2
+      : typeof nameOrIsPlayer2 === 'string'
+      ? nameOrIsPlayer2 === battle.p2
+      : nameOrIsPlayer2 === PlayerNumber.Player2
+
+  return {
+    name: isPlayer2 ? battle.p2 : battle.p1,
+    team: Immutable.Set(
+      (isPlayer2 ? battle.team2 : battle.team1).map(normalizeName)
+    ),
+    sentOut: isPlayer2 ? battle.team2SentOut : battle.team1SentOut,
+  }
+}
+
+export const getOpponent = (battle: ParsedBattle): BattlePlayer =>
   battle.userPlayer === PlayerNumber.None
-    ? []
-    : getTeam(battle, battle.userPlayer === PlayerNumber.Player1)
+    ? { name: '', team: Immutable.Set([]), sentOut: [] }
+    : getPlayer(battle, battle.userPlayer === PlayerNumber.Player1)
+
+export const hasPokes = (
+  player: BattlePlayer,
+  pokes: string[] | Immutable.Set<string>
+): boolean => player.team.equals(makePokemonSet(pokes))
+
+export const sentOutPokes = (
+  player: BattlePlayer,
+  pokes: string[] | Immutable.Set<string>
+): boolean =>
+  makePokemonSet(player.sentOut.map((x) => x.id)).equals(makePokemonSet(pokes))
+
+export const getRestrictedPokes = (
+  player: BattlePlayer
+): Immutable.Set<string> => {
+  return player.team.filter((x) => RestrictedPokemons.includes(x))
+}
+
+export const categorize = <TKey, T>(
+  items: T[],
+  getKey: (item: T) => TKey
+): Immutable.Map<TKey, T[]> => {
+  let data = Immutable.Map<TKey, T[]>()
+  for (const item of items) {
+    const key = getKey(item)
+    const list = data.get(key) || []
+    list.push(item)
+    if (!data.has(key)) {
+      data = data.set(key, list)
+    }
+  }
+  return data
+}

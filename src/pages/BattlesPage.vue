@@ -2,9 +2,17 @@
   <q-page class="row items-top justify-evenly">
     <div class="q-pa-md col" style="max-width: 1600px">
       <!-- TODO -->
+      <div class="row">
+        <div class="col">
+          <script-input :script-snippets="filterScripts" />
+        </div>
+        <div class="col q-ml-md">
+          <script-input :script-snippets="analyzerScripts" />
+        </div>
+      </div>
       <q-table
         title="Battles (WIP)"
-        class="battle-table"
+        class="battle-table q-mt-md"
         table-header-class="battle-table-header"
         :rows="rows"
         :columns="columns"
@@ -18,7 +26,11 @@
         <template v-slot:body="props">
           <q-tr :props="props">
             <q-td key="id" :props="props">
-              <a style="color: inherit; text-decoration: none;" :href="props.row.url" target="_blank">
+              <a
+                style="color: inherit; text-decoration: none"
+                :href="props.row.url"
+                target="_blank"
+              >
                 {{ props.row.id }}
               </a>
             </q-td>
@@ -33,13 +45,15 @@
 import { ParsedBattle } from '../utils/models'
 import { getAllSavedBattles } from '../utils/storage'
 import { defineComponent, onMounted, ref } from 'vue'
-import { QTableColumn } from 'quasar'
+import { QTableProps } from 'quasar'
+import ScriptInput from '../components/ScriptInput.vue'
+import { defaultAnalyzers, defaultFilters } from '../utils/scripts'
 
-const DefaultColumns: QTableColumn[] = [
+const DefaultColumns: QTableProps['columns'] = [
   {
     name: 'id',
     label: 'ID',
-    field: 'id'
+    field: 'id',
   },
 ]
 
@@ -51,14 +65,19 @@ export default defineComponent({
     onMounted(async () => {
       rows.value = Array.from(Object.values(await getAllSavedBattles()))
     })
+    const filterScripts = ref(defaultFilters)
+    const analyzerScripts = ref(defaultAnalyzers)
     return {
       columns,
       rows,
       pagination: ref({
         rowsPerPage: 0,
       }),
+      filterScripts,
+      analyzerScripts,
     }
   },
+  components: { ScriptInput },
 })
 </script>
 
