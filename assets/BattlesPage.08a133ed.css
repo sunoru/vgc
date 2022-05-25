@@ -1,0 +1,1 @@
+.battle-table{max-height:720px}.battle-table-header{position:sticky;z-index:1;top:0}.battle-table>div:nth-child(1),.battle-table-header{background-color:#fff}.body--dark .battle-table>div:nth-child(1),.body--dark .battle-table-header{background-color:#121212}

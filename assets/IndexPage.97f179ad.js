@@ -1,1 +1,0 @@
-import{Q as e}from"./QPage.2ccaab82.js";import{_ as a,Q as t,R as s,S as o,T as n,a7 as r}from"./index.fca2a0f3.js";const c=t({name:"IndexPage"}),_=r("div",null,"Hello.",-1);function d(i,f,l,p,m,u){return s(),o(e,{class:"row items-center justify-evenly"},{default:n(()=>[_]),_:1})}var g=a(c,[["render",d]]);export{g as default};
