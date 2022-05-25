@@ -1,15 +1,36 @@
 <template>
-  <q-page class="row items-top justify-evenly">
+  <page-base class="row items-top justify-evenly" title="Battles">
     <div class="q-pa-md col" style="max-width: 1600px">
       <!-- TODO -->
       <div class="row">
-        <div class="col">
-          <script-input :script-snippets="filterScripts" />
-        </div>
-        <div class="col q-ml-md">
-          <script-input :script-snippets="analyzerScripts" />
-        </div>
+        <q-splitter v-model="splitterModel" style="height: 480px; width: 100%">
+          <template v-slot:before>
+            <q-tabs v-model="tab" vertical>
+              <q-tab name="filters" icon="filter_alt" label="Filters" />
+              <q-tab name="analytics" icon="analytics" label="Analytics" />
+            </q-tabs>
+          </template>
+          <template v-slot:after>
+            <q-tab-panels
+              v-model="tab"
+              animated
+              swipeable
+              vertical
+              transition-prev="jump-up"
+              transition-next="jump-up"
+            >
+              <q-tab-panel name="filters">
+                <script-input :script-snippets="filterScripts" />
+              </q-tab-panel>
+
+              <q-tab-panel name="analytics">
+                <script-input :script-snippets="analyzerScripts" />
+              </q-tab-panel>
+            </q-tab-panels>
+          </template>
+        </q-splitter>
       </div>
+
       <q-table
         title="Battles (WIP)"
         class="battle-table q-mt-md"
@@ -38,16 +59,19 @@
         </template>
       </q-table>
     </div>
-  </q-page>
+  </page-base>
 </template>
 
 <script lang="ts">
-import { ParsedBattle } from '../utils/models'
-import { getAllSavedBattles } from '../utils/storage'
 import { defineComponent, onMounted, ref } from 'vue'
 import { QTableProps } from 'quasar'
-import ScriptInput from '../components/ScriptInput.vue'
+
+import { ParsedBattle } from '../utils/models'
+import { getAllSavedBattles } from '../utils/storage'
 import { defaultAnalyzers, defaultFilters } from '../utils/scripts'
+
+import PageBase from '../layouts/PageBase.vue'
+import ScriptInput from '../components/ScriptInput.vue'
 
 const DefaultColumns: QTableProps['columns'] = [
   {
@@ -75,9 +99,11 @@ export default defineComponent({
       }),
       filterScripts,
       analyzerScripts,
+      splitterModel: ref(20),
+      tab: ref('filters'),
     }
   },
-  components: { ScriptInput },
+  components: { ScriptInput, PageBase },
 })
 </script>
 

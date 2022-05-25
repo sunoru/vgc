@@ -1,5 +1,5 @@
 <template>
-  <q-page class="row items-center justify-evenly">
+  <page-base class="row items-center justify-evenly" title="Settings">
     <div class="q-pa-md col" style="max-width: 720px">
       <div class="text-h3">Settings</div>
       <q-form class="q-mt-md" @submit="save">
@@ -13,12 +13,13 @@
         <q-btn class="q-mt-md" type="submit" label="Save" />
       </q-form>
     </div>
-  </q-page>
+  </page-base>
 </template>
 
 <script lang="ts">
-import { getConfig, saveConfig, useLocalStorage } from '../utils/storage'
+import { getConfig, saveConfig, LocalConfigs } from '../utils/config'
 import { defineComponent, onMounted, ref } from 'vue'
+import PageBase from '../layouts/PageBase.vue'
 
 export default defineComponent({
   name: 'SettingsPage',
@@ -39,8 +40,9 @@ export default defineComponent({
     return {
       textMyUsernames,
       save,
-      useLocalStorage,
+      useLocalStorage: ref(LocalConfigs.useLocalStorage),
     }
   },
+  components: { PageBase },
 })
 </script>

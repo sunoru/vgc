@@ -1,15 +1,6 @@
 <template>
-  <q-item
-    clickable
-    tag="a"
-    :to="link"
-    :href="href"
-    :target="target"
-  >
-    <q-item-section
-      v-if="icon"
-      avatar
-    >
+  <q-item clickable tag="a" :to="link" :href="href" :target="target" exact>
+    <q-item-section v-if="icon" avatar>
       <q-icon :name="icon" />
     </q-item-section>
 
@@ -21,40 +12,40 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'EssentialLink',
   props: {
     title: {
       type: String,
-      required: true
+      required: true,
     },
 
     caption: {
       type: String,
-      default: ''
+      default: '',
     },
 
     link: {
       type: String,
-      default: undefined
+      default: undefined,
     },
 
     href: {
       type: String,
-      default: undefined
+      default: undefined,
     },
 
     icon: {
       type: String,
-      default: ''
+      default: '',
     },
 
     target: {
       type: String,
-      default: ''
-    }
-  }
-});
+      default: '',
+    },
+  },
+})
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="row items-center justify-evenly">
+  <page-base class="row items-center justify-evenly" title="Replay Importer">
     <q-ajax-bar
       ref="bar"
       position="top"
@@ -26,14 +26,14 @@
         />
       </q-form>
     </div>
-  </q-page>
+  </page-base>
 </template>
 
 <script lang="ts">
 import { QAjaxBar } from 'quasar'
 import { defineComponent, ref } from 'vue'
-import { showDialog, selectDialog } from '../utils/dialog'
 
+import { showDialog, selectDialog } from '../utils/dialog'
 import {
   Config,
   ParsedBattle,
@@ -41,8 +41,10 @@ import {
   PlayerNumber,
   Pokemon,
 } from '../utils/models'
-import { getSavedBattle, saveBattles } from '../utils/storage'
+import { saveBattles } from '../utils/storage'
 import { getConfig, saveConfig } from '../utils/config'
+
+import PageBase from '../layouts/PageBase.vue'
 
 const getPokeInTeam = (team: Pokemon[], poke: string): Pokemon => {
   for (const p of team) {
@@ -276,6 +278,9 @@ const importAll = async (
 
 export default defineComponent({
   name: 'ReplayImporterPage',
+  components: {
+    PageBase,
+  },
   setup: () => {
     const textInput = ref('')
     const bar = ref<QAjaxBar>()

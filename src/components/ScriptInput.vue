@@ -1,17 +1,30 @@
 <template>
   <q-form>
     <q-form @submit="exec" class="q-mt-md">
-      <q-select v-model="selected" :options="options" emit-value />
-      <q-input
-        outlined
-        v-model="script.code"
+      <q-select
+        v-model="selected"
         label="Scripts"
-        type="textarea"
+        :options="options"
+        emit-value
+        map-options
+        use-input
+        hide-selected
+        fill-input
+        input-debounce="0"
+        @new-value="createScript"
+      />
+      <!-- @filter="filterFunc" -->
+
+      <codemirror
+        v-model="script.code"
+        :placeholder="placeholder || 'Code goes here...'"
+        :style="{ height: '200px' }"
+        :autofocus="true"
+        :indent-with-tab="true"
+        :tabSize="2"
+        :extensions="codemirrorExtensions"
         @keydown="onKeyDown"
       />
-      <pre>
-        <code class="language-javascript">{{ script.code }}</code>
-      </pre>
       <q-btn
         class="q-mt-sm"
         color="primary"
@@ -35,17 +48,23 @@
 </template>
 
 <script setup lang="ts">
-import hljs from 'highlight.js'
 import { computed, ref, watch } from 'vue'
+import { Codemirror } from 'vue-codemirror'
+import { javascript } from '@codemirror/lang-javascript'
+import { oneDark } from '@codemirror/theme-one-dark'
+import { QSelectProps } from 'quasar'
 
 export interface ScriptSnippet {
   name: string
   code: string
 }
 
+const codemirrorExtensions = [javascript(), oneDark]
+
 const props = defineProps<{
   scriptSnippets: ScriptSnippet[]
   submitString?: string
+  placeholder?: string
 }>()
 
 const emit = defineEmits<{
@@ -53,13 +72,23 @@ const emit = defineEmits<{
   (e: 'execute', script: ScriptSnippet, args: unknown): void
 }>()
 
-const options = computed(() =>
-  props.scriptSnippets.map((snippet, i) => ({
+const newScriptName = ref('')
+const allOptions = computed(() => {
+  const os = props.scriptSnippets.map((snippet, i) => ({
     label: snippet.name,
     value: i,
   }))
-)
-const selected = ref(0)
+  if (newScriptName.value) {
+    os.push({
+      label: newScriptName.value,
+      value: -1,
+    })
+  }
+  return os
+})
+
+const options = ref(allOptions)
+const selected = ref<number | null>(null)
 const script = ref<ScriptSnippet>({
   name: '',
   code: '',
@@ -69,7 +98,12 @@ const args = ref('')
 watch(
   () => selected.value,
   (v) => {
+    console.log(v)
+    if (v === null || v < 0) return
     script.value = props.scriptSnippets[v]
+    if (!script.value.code.endsWith('\n')) {
+      script.value.code += '\n'
+    }
   }
 )
 
@@ -80,20 +114,12 @@ const onKeyDown = (e: KeyboardEvent) => {
   }
 }
 
-watch(
-  () => script.value.code,
-  () => {
-    hljs.highlightAll()
-  }
-)
-
 const isSaving = ref(false)
 
 const save = async () => {
   if (isSaving.value) return
   try {
     isSaving.value = true
-    console.log(script.value)
     if (script.value === undefined) return
     await emit('save', script.value)
   } finally {
@@ -102,9 +128,22 @@ const save = async () => {
 }
 
 const exec = () => {
-  console.log(script.value)
   if (script.value === undefined) return
   const t = args.value.trim()
   emit('execute', script.value, t === '' ? undefined : JSON.parse(args.value))
+}
+
+// const filterFunc: QSelectProps['onFilter'] = (val, update) => {
+//   update(() => {
+//     const needle = val.toLowerCase()
+//     options.value = allOptions.value.filter(
+//       (v) => v.label.toLowerCase().indexOf(needle) > -1
+//     )
+//   })
+// }
+const createScript: QSelectProps['onNewValue'] = (val, done) => {
+  if (!val) return
+  newScriptName.value = val
+  selected.value = -1
 }
 </script>

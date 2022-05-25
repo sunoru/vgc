@@ -1,43 +1,15 @@
 import { ParsedBattle, ParsedBattles } from './models'
 import { LocalConfigs } from './config'
-
-const databaseName = 'vgc'
-const databaseVersion = 1
-let _db: IDBDatabase | null = null
-export const getIDB = (): Promise<IDBDatabase> =>
-  new Promise((resolve, reject) => {
-    if (_db !== null) return resolve(_db)
-    const request = indexedDB.open(databaseName, databaseVersion)
-    request.onerror = (event) => reject(event)
-    request.onupgradeneeded = (event) => {
-      const db = request.result
-      const _battleStore = db.createObjectStore('battles', { keyPath: 'id' })
-    }
-    request.onsuccess = (_) => {
-      _db = request.result
-      _db.onerror = (event) => {
-        console.error('Database error:', event)
-      }
-      resolve(_db)
-    }
-  })
+import { getDB } from './db'
 
 let _cachedBattles: ParsedBattles | null = null
 const _getBattlesFromIDB = async (): Promise<ParsedBattles> => {
-  const db = await getIDB()
-  const transaction = db.transaction(['battles'], 'readonly')
-  const battleStore = transaction.objectStore('battles')
-  const request = battleStore.getAll()
-  return new Promise((resolve, reject) => {
-    request.onerror = (event) => reject(event)
-    request.onsuccess = () => {
-      _cachedBattles = {}
-      for (const battle of request.result) {
-        _cachedBattles[battle.id] = battle
-      }
-      resolve(_cachedBattles)
-    }
-  })
+  const db = getDB()
+  _cachedBattles = {}
+  for (const battle of await db.battles.toArray()) {
+    _cachedBattles[battle.id] = battle
+  }
+  return _cachedBattles
 }
 
 export const getAllSavedBattles = async (
@@ -65,44 +37,29 @@ export const saveBattle = async (
   battle: ParsedBattle
 ): Promise<ParsedBattle> => {
   if (LocalConfigs.useLocalStorage) {
-    const db = await getIDB()
-    const transaction = db.transaction(['battles'], 'readwrite')
-    const battleStore = transaction.objectStore('battles')
-    const request = battleStore.put(battle)
-    return new Promise((resolve, reject) => {
-      request.onerror = (event) => reject(event)
-      request.onsuccess = async () => {
-        const battles = await getAllSavedBattles()
-        battles[battle.id] = battle
-        resolve(battle)
-      }
-    })
+    const db = getDB()
+    await db.battles.put(battle)
   } else {
     throw new Error('Not implemented')
   }
+  const battles = await getAllSavedBattles()
+  battles[battle.id] = battle
+  return battle
 }
 
 export const saveBattles = async (
   battles: ParsedBattles
 ): Promise<ParsedBattle[]> => {
+  const items = Object.values(battles)
   if (LocalConfigs.useLocalStorage) {
-    const db = await getIDB()
-    const transaction = db.transaction(['battles'], 'readwrite')
-    const battleStore = transaction.objectStore('battles')
-    return Promise.all(
-      Object.values(battles).map((battle) => {
-        const request = battleStore.put(battle)
-        return new Promise<ParsedBattle>((resolve, reject) => {
-          request.onerror = (event) => reject(event)
-          request.onsuccess = async () => {
-            const battles = await getAllSavedBattles()
-            battles[battle.id] = battle
-            resolve(battle)
-          }
-        })
-      })
-    )
+    const db = getDB()
+    await db.battles.bulkPut(items)
   } else {
     throw new Error('Not implemented')
   }
+  const saved = await getAllSavedBattles()
+  for (const item of items) {
+    saved[item.id] = item
+  }
+  return items
 }

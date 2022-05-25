@@ -46,28 +46,6 @@ export const defaultFilters: ScriptSnippet[] = [
   },
 ]
 
-const teamWinningPercentage = (
-  battles: ParsedBattle[],
-  getTeam: (p: BattlePlayer) => Team = (p) => p.team
-) => {
-  const data = categorize(battles, (battle) => getTeam(getOpponent(battle)))
-  return [...data]
-    .map(([team, bs]) => {
-      const win = bs.filter((b) => b.winner === b.userPlayer).length
-      const total = bs.length
-      return {
-        key: team.toArray(),
-        win,
-        total,
-        winningPercentage: win / total,
-      }
-    })
-    .sort((a, b) => b.total - a.total)
-}
-
-const restrictedWinningPercentage = (battles: ParsedBattle[]) =>
-  teamWinningPercentage(battles, getRestrictedPokes)
-
 const teamSentOut = (
   battles: ParsedBattle[],
   onlyLeads = true,
@@ -85,7 +63,7 @@ const teamSentOut = (
       )
       return {
         key: team.toArray(),
-        win:
+        win: bs.filter((b) => b.winner === b.userPlayer).length,
         total: bs.length,
         sentOuts: [...data2]
           .map(([sentOut, bs2]) => ({
@@ -102,16 +80,6 @@ const restrictedSentOut = (battles: ParsedBattle[], onlyLeads = true) =>
   teamSentOut(battles, onlyLeads, getRestrictedPokes)
 
 export const defaultAnalyzers: ScriptSnippet[] = [
-  {
-    key: 'teamWinningPercentage',
-    name: 'Winning Percentage Against Different Teams',
-    code: teamWinningPercentage.toString(),
-  },
-  {
-    key: 'restrictedWinningPercentage',
-    name: 'Winning Percentage Against Different Restricted Pokes',
-    code: restrictedWinningPercentage.toString(),
-  },
   {
     key: 'teamSentOut',
     name: 'Sent Out Pokes of Different Teams',

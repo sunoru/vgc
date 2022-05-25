@@ -23,7 +23,7 @@
       <q-list>
         <q-item-label header> Pages </q-item-label>
 
-        <EssentialLink
+        <essential-link
           v-for="link in essentialLinks"
           :key="link.title"
           v-bind="link"
@@ -44,6 +44,11 @@ import { useQuasar } from 'quasar'
 import { LocalConfigs } from 'src/utils/config'
 
 const linksList = [
+  {
+    title: 'Home',
+    icon: 'home',
+    link: '/',
+  },
   {
     title: 'Replay Importer',
     caption: 'Parse & import Pokemon Showdown replays',
