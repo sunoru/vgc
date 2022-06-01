@@ -16,10 +16,12 @@
     "@codemirror/lang-javascript": "^0.20.0",
     "@codemirror/theme-one-dark": "^0.20.0",
     "@quasar/extras": "^1.0.0",
+    "@types/uuid": "^8.3.4",
     "dexie": "^3.2.2",
     "highlight.js": "^11.5.1",
     "immutable": "^4.0.0",
     "quasar": "^2.6.0",
+    "uuid": "^8.3.2",
     "vue": "^3.0.0",
     "vue-codemirror": "^5.0.1",
     "vue-router": "^4.0.0"

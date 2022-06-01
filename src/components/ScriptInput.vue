@@ -13,17 +13,17 @@
         input-debounce="0"
         @new-value="createScript"
       />
-      <!-- @filter="filterFunc" -->
 
       <codemirror
         v-model="script.code"
         :placeholder="placeholder || 'Code goes here...'"
         :style="{ height: '200px' }"
-        :autofocus="true"
-        :indent-with-tab="true"
+        autofocus
         :tabSize="2"
         :extensions="codemirrorExtensions"
+        :spellcheck="false"
         @keydown="onKeyDown"
+        @change="onChange"
       />
       <q-btn
         class="q-mt-sm"
@@ -49,19 +49,18 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { QSelectProps } from 'quasar'
 import { Codemirror } from 'vue-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { QSelectProps } from 'quasar'
+import { v4 as uuidv4 } from 'uuid'
 
-export interface ScriptSnippet {
-  name: string
-  code: string
-}
+import { ScriptSnippet } from '../utils/scripts'
 
 const codemirrorExtensions = [javascript(), oneDark]
 
 const props = defineProps<{
+  type: ScriptSnippet['type']
   scriptSnippets: ScriptSnippet[]
   submitString?: string
   placeholder?: string
@@ -90,6 +89,8 @@ const allOptions = computed(() => {
 const options = ref(allOptions)
 const selected = ref<number | null>(null)
 const script = ref<ScriptSnippet>({
+  type: props.type,
+  key: uuidv4(),
   name: '',
   code: '',
 })
@@ -141,9 +142,18 @@ const exec = () => {
 //     )
 //   })
 // }
-const createScript: QSelectProps['onNewValue'] = (val, done) => {
+const createScript: QSelectProps['onNewValue'] = (val) => {
   if (!val) return
+  const key = (script.value.key = uuidv4())
+  if (val === '@new') {
+    val = `New Script - ${key.slice(0, 8)}`
+  }
   newScriptName.value = val
   selected.value = -1
+}
+const onChange = () => {
+  if (!newScriptName.value) {
+    createScript('@new', () => void 0)
+  }
 }
 </script>

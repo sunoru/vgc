@@ -15,6 +15,10 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/BattlesPage.vue'),
       },
       {
+        path: 'damagecalc',
+        component: () => import('pages/DamageCalcPage.vue'),
+      },
+      {
         path: 'settings',
         component: () => import('pages/SettingsPage.vue'),
       },

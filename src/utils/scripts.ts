@@ -1,4 +1,5 @@
 import Immutable from 'immutable'
+import { v5 as uuidv5 } from 'uuid'
 
 import { BattlePlayer, ParsedBattle, PlayerNumber, Team } from './models'
 import {
@@ -13,81 +14,23 @@ import {
   categorize,
 } from './helpers'
 
+export type ScriptType = 'filter' | 'analyzer' | string
+export const ScriptNamespaceUUID = '5dc11aaf-fe4f-4848-8507-4e09f47a18a8'
+
 export interface ScriptSnippet {
+  type: ScriptType
   key: string
   name: string
   code: string
 }
 
-const myBattles = (battle: ParsedBattle) =>
-  battle.userPlayer !== PlayerNumber.None
-
-const myTeam = (battle: ParsedBattle, pokes: string[]) =>
-  hasPokes(getPlayer(battle, battle.userPlayer), pokes)
-
-const opponentTeam = (battle: ParsedBattle, pokes: string[]) =>
-  hasPokes(getOpponent(battle), pokes)
-
-export const defaultFilters: ScriptSnippet[] = [
-  {
-    key: 'myBattles',
-    name: 'My Battles',
-    code: myBattles.toString(),
-  },
-  {
-    key: 'myTeam',
-    name: 'My Team',
-    code: myTeam.toString(),
-  },
-  {
-    key: 'opponentTeam',
-    name: "Opponent's Team",
-    code: opponentTeam.toString(),
-  },
-]
-
-const teamSentOut = (
-  battles: ParsedBattle[],
-  onlyLeads = true,
-  getTeam: (p: BattlePlayer) => Team = (p) => p.team
-) => {
-  const data = categorize(battles, (battle) => getTeam(getOpponent(battle)))
-  return [...data]
-    .map(([team, bs]) => {
-      const data2 = categorize(bs, (b) =>
-        Immutable.Set(
-          getOpponent(b)
-            .sentOut.slice(0, onlyLeads ? 2 : 4)
-            .map((x) => x.id)
-        )
-      )
-      return {
-        key: team.toArray(),
-        win: bs.filter((b) => b.winner === b.userPlayer).length,
-        total: bs.length,
-        sentOuts: [...data2]
-          .map(([sentOut, bs2]) => ({
-            sentOut,
-            win: bs2.filter((b) => b.winner === b.userPlayer).length,
-            total: bs2.length,
-          }))
-          .sort((a, b) => b.total - a.total),
-      }
-    })
-    .sort((a, b) => b.total - a.total)
-}
-const restrictedSentOut = (battles: ParsedBattle[], onlyLeads = true) =>
-  teamSentOut(battles, onlyLeads, getRestrictedPokes)
-
-export const defaultAnalyzers: ScriptSnippet[] = [
-  {
-    key: 'teamSentOut',
-    name: 'Sent Out Pokes of Different Teams',
-    code: teamSentOut.toString(),
-  },
-  {
-    key: 'restrictedSentOut',
-    name: 'Sent Out Pokes of Different Restricted Pokes',
-    code: restrictedSentOut.toString(),
-  },
-]
+export const defineDefaultScripts = (
+  type: ScriptType,
+  funcs: Array<[string, (..._: never[]) => unknown]>
+): ScriptSnippet[] =>
+  funcs.map(([name, func]) => ({
+    type,
+    key: uuidv5(name, ScriptNamespaceUUID),
+    name,
+    code: func.toString(),
+  }))

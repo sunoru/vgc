@@ -62,6 +62,11 @@ const linksList = [
     link: '/battles',
   },
   {
+    title: 'Damage Calculator',
+    icon: 'view_list',
+    link: '/damagecalc',
+  },
+  {
     title: 'Settings',
     icon: 'settings',
     link: '/settings',

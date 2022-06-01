@@ -1,5 +1,5 @@
 <template>
-  <page-base class="row items-top justify-evenly" title="Battles">
+  <page-base class="row items-top justify-evenly" title="Battles (WIP)">
     <div class="q-pa-md col" style="max-width: 1600px">
       <!-- TODO -->
       <div class="row">
@@ -8,6 +8,18 @@
             <q-tabs v-model="tab" vertical>
               <q-tab name="filters" icon="filter_alt" label="Filters" />
               <q-tab name="analytics" icon="analytics" label="Analytics" />
+              <q-route-tab
+                href="https://github.com/sunoru/vgc/blob/main/src/utils/models.ts"
+                icon="source"
+                label="Model Reference"
+                target="_blank"
+              />
+              <q-route-tab
+                href="https://github.com/sunoru/vgc/blob/main/src/utils/helpers.ts"
+                icon="help_center"
+                label="Helper Functions"
+                target="_blank"
+              />
             </q-tabs>
           </template>
           <template v-slot:after>
@@ -20,11 +32,14 @@
               transition-next="jump-up"
             >
               <q-tab-panel name="filters">
-                <script-input :script-snippets="filterScripts" />
+                <script-input type="filter" :script-snippets="filterScripts" />
               </q-tab-panel>
 
               <q-tab-panel name="analytics">
-                <script-input :script-snippets="analyzerScripts" />
+                <script-input
+                  type="analyzer"
+                  :script-snippets="analyzerScripts"
+                />
               </q-tab-panel>
             </q-tab-panels>
           </template>
@@ -32,7 +47,7 @@
       </div>
 
       <q-table
-        title="Battles (WIP)"
+        title="Battles"
         class="battle-table q-mt-md"
         table-header-class="battle-table-header"
         :rows="rows"
@@ -68,7 +83,7 @@ import { QTableProps } from 'quasar'
 
 import { ParsedBattle } from '../utils/models'
 import { getAllSavedBattles } from '../utils/storage'
-import { defaultAnalyzers, defaultFilters } from '../utils/scripts'
+import { defaultAnalyzers, defaultFilters } from '../utils/default-scripts'
 
 import PageBase from '../layouts/PageBase.vue'
 import ScriptInput from '../components/ScriptInput.vue'
