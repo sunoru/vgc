@@ -16,6 +16,7 @@
     "@codemirror/lang-javascript": "^0.20.0",
     "@codemirror/theme-one-dark": "^0.20.0",
     "@quasar/extras": "^1.0.0",
+    "@types/jquery": "^3.5.14",
     "@types/uuid": "^8.3.4",
     "dexie": "^3.2.2",
     "highlight.js": "^11.5.1",

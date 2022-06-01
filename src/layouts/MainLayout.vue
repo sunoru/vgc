@@ -63,7 +63,7 @@ const linksList = [
   },
   {
     title: 'Damage Calculator',
-    icon: 'view_list',
+    icon: 'calculate',
     link: '/damagecalc',
   },
   {
