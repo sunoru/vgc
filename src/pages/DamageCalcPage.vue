@@ -73,17 +73,13 @@ onMounted(() => {
       if (wrapper) {
         wrapper.style.paddingTop = '20px'
       }
-      const footer = body.querySelector<HTMLDivElement>('.footer')
-      if (footer) {
-        footer.style.paddingBottom = '10px'
-      }
     }
     if (iframe.contentWindow) {
       damageCalc.value = iframe.contentWindow as DamageCalc
     }
     loaded.value = true
     asyncCall(
-      () => void (height.value = body ? body.scrollHeight + 'px' : 'auto')
+      () => void (height.value = body ? body.scrollHeight + 10 + 'px' : 'auto')
     )
   }
 })
