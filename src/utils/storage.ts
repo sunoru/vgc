@@ -1,4 +1,4 @@
-import { ParsedBattle, ParsedBattles } from './models'
+import { ParsedBattle, ParsedBattles } from 'vgc-base/src/models'
 import { LocalConfigs } from './config'
 import { getDB } from './db'
 

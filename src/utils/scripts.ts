@@ -1,18 +1,4 @@
-import Immutable from 'immutable'
 import { v5 as uuidv5 } from 'uuid'
-
-import { BattlePlayer, ParsedBattle, PlayerNumber, Team } from './models'
-import {
-  normalizeName,
-  compareName,
-  makePokemonSet,
-  getPlayer,
-  getOpponent,
-  hasPokes,
-  sentOutPokes,
-  getRestrictedPokes,
-  categorize,
-} from './helpers'
 
 export type ScriptType = 'filter' | 'analyzer' | string
 export const ScriptNamespaceUUID = '5dc11aaf-fe4f-4848-8507-4e09f47a18a8'
@@ -34,3 +20,20 @@ export const defineDefaultScripts = (
     name,
     code: func.toString(),
   }))
+
+export const defaultFilters = defineDefaultScripts('filter', [
+  ['My Battles', window.vgcScripts.defaultScripts.myBattles],
+  ['My Team', window.vgcScripts.defaultScripts.myTeam],
+  ['Opponent Team', window.vgcScripts.defaultScripts.opponentTeam],
+])
+
+export const defaultAnalyzers = defineDefaultScripts('analyzer', [
+  [
+    'Sent Out Pokes of Different Teams',
+    window.vgcScripts.defaultScripts.teamSentOut,
+  ],
+  [
+    'Sent Out Pokes of Different Restricted Pokes',
+    window.vgcScripts.defaultScripts.restrictedSentOut,
+  ],
+])

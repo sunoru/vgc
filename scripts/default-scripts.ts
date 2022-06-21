@@ -1,6 +1,9 @@
-import Immutable from 'immutable'
-
-import { BattlePlayer, ParsedBattle, PlayerNumber, Team } from './models'
+import {
+  BattlePlayer,
+  ParsedBattle,
+  PlayerNumber,
+  Team,
+} from '../src/utils/models'
 import {
   normalizeName,
   compareName,
@@ -12,24 +15,17 @@ import {
   getRestrictedPokes,
   categorize,
 } from './helpers'
-import { defineDefaultScripts } from './scripts'
 
-const myBattles = (battle: ParsedBattle) =>
+export const myBattles = (battle: ParsedBattle) =>
   battle.userPlayer !== PlayerNumber.None
 
-const myTeam = (battle: ParsedBattle, pokes: string[]) =>
+export const myTeam = (battle: ParsedBattle, pokes: string[]) =>
   hasPokes(getPlayer(battle, battle.userPlayer), pokes)
 
-const opponentTeam = (battle: ParsedBattle, pokes: string[]) =>
+export const opponentTeam = (battle: ParsedBattle, pokes: string[]) =>
   hasPokes(getOpponent(battle), pokes)
 
-export const defaultFilters = defineDefaultScripts('filter', [
-  ['My Battles', myBattles],
-  ['My Team', myTeam],
-  ['Opponent Team', opponentTeam],
-])
-
-const teamSentOut = (
+export const teamSentOut = (
   battles: ParsedBattle[],
   onlyLeads = true,
   getTeam: (p: BattlePlayer) => Team = (p) => p.team
@@ -59,10 +55,5 @@ const teamSentOut = (
     })
     .sort((a, b) => b.total - a.total)
 }
-const restrictedSentOut = (battles: ParsedBattle[], onlyLeads = true) =>
+export const restrictedSentOut = (battles: ParsedBattle[], onlyLeads = true) =>
   teamSentOut(battles, onlyLeads, getRestrictedPokes)
-
-export const defaultAnalyzers = defineDefaultScripts('analyzer', [
-  ['Sent Out Pokes of Different Teams', teamSentOut],
-  ['Sent Out Pokes of Different Restricted Pokes', restrictedSentOut],
-])

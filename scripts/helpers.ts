@@ -1,6 +1,5 @@
-import Immutable from 'immutable'
-import { RestrictedPokemons } from './const'
-import { ParsedBattle, PlayerNumber, BattlePlayer } from './models'
+import { RestrictedPokemons } from './consts'
+import { ParsedBattle, PlayerNumber, BattlePlayer } from '../src/utils/models'
 
 // Only cover some common cases
 export const normalizeName = (name: string): string => {

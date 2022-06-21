@@ -1,7 +1,7 @@
 import Dexie, { Table } from 'dexie'
 
-import { ParsedBattle } from './models'
-import { ScriptSnippet } from './scripts'
+import { ParsedBattle } from '@sunoru/vgc-base'
+import { ScriptSnippet } from '@sunoru/vgc-base'
 
 export class VGCDatabase extends Dexie {
   battles!: Table<ParsedBattle>

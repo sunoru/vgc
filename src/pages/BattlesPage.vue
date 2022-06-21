@@ -15,7 +15,7 @@
                 target="_blank"
               />
               <q-route-tab
-                href="https://github.com/sunoru/vgc/blob/main/src/utils/helpers.ts"
+                href="https://github.com/sunoru/vgc/blob/main/scripts/helpers.ts"
                 icon="help_center"
                 label="Helper Functions"
                 target="_blank"
@@ -80,10 +80,10 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue'
 import { QTableProps } from 'quasar'
-
 import { ParsedBattle } from '../utils/models'
+import { defaultAnalyzers, defaultFilters } from '../utils/scripts'
+
 import { getAllSavedBattles } from '../utils/storage'
-import { defaultAnalyzers, defaultFilters } from '../utils/default-scripts'
 
 import PageBase from '../layouts/PageBase.vue'
 import ScriptInput from '../components/ScriptInput.vue'

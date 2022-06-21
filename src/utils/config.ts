@@ -1,4 +1,4 @@
-import { Config } from './models'
+import { Config } from '@sunoru/vgc-base'
 
 const DefaultLocalConfigs = {
   useLocalStorage: true,

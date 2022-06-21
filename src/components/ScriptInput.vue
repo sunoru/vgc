@@ -99,7 +99,6 @@ const args = ref('')
 watch(
   () => selected.value,
   (v) => {
-    console.log(v)
     if (v === null || v < 0) return
     script.value = props.scriptSnippets[v]
     if (!script.value.code.endsWith('\n')) {
