@@ -88,8 +88,8 @@
     };
   };
   var getOpponent = (battle) => battle.userPlayer === 0 /* None */ ? { name: "", team: Immutable.Set([]), sentOut: [] } : getPlayer(battle, battle.userPlayer === 1 /* Player1 */);
-  var hasPokes = (player, pokes) => player.team.equals(makePokemonSet(pokes));
-  var sentOutPokes = (player, pokes) => makePokemonSet(player.sentOut.map((x) => x.id)).equals(makePokemonSet(pokes));
+  var hasPokes = (player, pokes) => player.team.isSuperset(makePokemonSet(pokes));
+  var sentOutPokes = (player, pokes) => makePokemonSet(player.sentOut.map((x) => x.id)).isSuperset(makePokemonSet(pokes));
   var getRestrictedPokes = (player) => {
     return player.team.filter((x) => RestrictedPokemons.includes(x));
   };
@@ -134,4 +134,5 @@
     defaultScripts: default_scripts_exports,
     helpers: helpers_exports
   };
+  Object.entries(helpers_exports).forEach(([key, value]) => void (window[key] = value));
 })();
