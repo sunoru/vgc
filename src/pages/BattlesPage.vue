@@ -463,11 +463,13 @@ const tableTitle = computed(() => {
   return `Battles (${rows.value.length}/${data.value.length})`
 })
 
-const searchFilter = (arr: unknown[]) => {
+const applySearch = (arr: unknown[]) => {
   if (!searching.value) return arr
+  const key = searching.value.trim().toLowerCase()
+  if (!key) return arr
   return arr.filter((x) =>
     Object.values(x as Record<string, unknown>).some((v) =>
-      String(v).toLowerCase().includes(searching.value.toLowerCase())
+      String(v).toLowerCase().includes(key)
     )
   )
 }
@@ -477,14 +479,14 @@ const rows = computed(() => {
     data.value
   )
   if (!analyzer.value) {
-    return searchFilter(filtered)
+    return applySearch(filtered)
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const analyzed = analyzer.value.func(filtered) as any
   if (Array.isArray(analyzed)) {
-    return searchFilter(analyzed)
+    return applySearch(analyzed)
   }
-  return searchFilter(
+  return applySearch(
     Object.keys(analyzed).map((key) => ({
       key,
       value: analyzed[key],
@@ -557,6 +559,7 @@ watch(
         await saveObjects('battles', battles)
       }
       showDialog('Import completed')
+      window.location.reload()
     }
     reader.readAsText(v)
   }
