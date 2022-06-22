@@ -5,13 +5,9 @@ import {
   Team,
 } from '../src/utils/models'
 import {
-  normalizeName,
-  compareName,
-  makePokemonSet,
   getPlayer,
   getOpponent,
   hasPokes,
-  sentOutPokes,
   getRestrictedPokes,
   categorize,
 } from './helpers'

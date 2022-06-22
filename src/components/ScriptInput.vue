@@ -2,6 +2,7 @@
   <q-form>
     <q-form @submit="exec" class="q-mt-md">
       <q-select
+        :disable="disable"
         v-model="selected"
         label="Scripts"
         :options="options"
@@ -16,8 +17,9 @@
 
       <codemirror
         v-model="script.code"
+        :disable="disable"
         :placeholder="placeholder || 'Code goes here...'"
-        :style="{ height: '200px' }"
+        :style="{ height: '500px' }"
         autofocus
         :tabSize="2"
         :extensions="codemirrorExtensions"
@@ -26,6 +28,7 @@
         @change="onChange"
       />
       <q-btn
+        :disable="disable"
         class="q-mt-sm"
         color="primary"
         label="Save"
@@ -36,8 +39,21 @@
           <q-spinner-dots />
         </template>
       </q-btn>
-      <q-input v-model="args" label="Arguments" />
       <q-btn
+        :disable="disable"
+        class="q-mt-sm q-ml-sm"
+        color="primary"
+        label="Delete"
+        @click="onDelete"
+        :loading="isSaving"
+      >
+        <template v-slot:loading>
+          <q-spinner-dots />
+        </template>
+      </q-btn>
+      <q-input v-model="args" label="Arguments" autocomplete />
+      <q-btn
+        :disable="disable"
         class="q-mt-sm"
         color="primary"
         :label="submitString ?? 'Execute'"
@@ -48,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { QSelectProps } from 'quasar'
 import { Codemirror } from 'vue-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
@@ -56,30 +72,35 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import { v4 as uuidv4 } from 'uuid'
 
 import { ScriptSnippet } from '../utils/scripts'
+import { confirmDialog } from '../utils/dialog'
+import { clone } from '../utils/utils'
 
 const codemirrorExtensions = [javascript(), oneDark]
 
 const props = defineProps<{
   type: ScriptSnippet['type']
   scriptSnippets: ScriptSnippet[]
+  defaultScript?: string
+  disable?: boolean
   submitString?: string
   placeholder?: string
 }>()
 
 const emit = defineEmits<{
   (e: 'save', script: ScriptSnippet): Promise<void>
-  (e: 'execute', script: ScriptSnippet, args: unknown): void
+  (e: 'delete', script: ScriptSnippet): Promise<void>
+  (e: 'execute', script: ScriptSnippet, args: unknown[]): Promise<void>
 }>()
 
-const newScriptName = ref('')
+const newScript = ref<ScriptSnippet>()
 const allOptions = computed(() => {
   const os = props.scriptSnippets.map((snippet, i) => ({
     label: snippet.name,
     value: i,
   }))
-  if (newScriptName.value) {
+  if (newScript.value) {
     os.push({
-      label: newScriptName.value,
+      label: newScript.value.name,
       value: -1,
     })
   }
@@ -87,30 +108,45 @@ const allOptions = computed(() => {
 })
 
 const options = ref(allOptions)
-const selected = ref<number | null>(null)
+const selected = ref(-1)
 const script = ref<ScriptSnippet>({
   type: props.type,
-  key: uuidv4(),
+  id: uuidv4(),
   name: '',
   code: '',
+  isDefault: true,
 })
 const args = ref('')
 
 watch(
-  () => selected.value,
-  (v) => {
-    if (v === null || v < 0) return
-    script.value = props.scriptSnippets[v]
-    if (!script.value.code.endsWith('\n')) {
-      script.value.code += '\n'
+  () => [selected.value, props.scriptSnippets.length] as const,
+  ([v], [oldV]) => {
+    if (v < 0) {
+      if (newScript.value) {
+        script.value = newScript.value
+      }
+      return
+    }
+    if (oldV === -1 && newScript.value) {
+      newScript.value = script.value
+    }
+    if (v < props.scriptSnippets.length) {
+      script.value = clone(props.scriptSnippets[v])
+      if (!script.value.code.endsWith('\n')) {
+        script.value.code += '\n'
+      }
     }
   }
 )
+onMounted(() => void (selected.value = 0))
 
 const onKeyDown = (e: KeyboardEvent) => {
   if (e.ctrlKey && e.key === 's') {
     e.preventDefault()
     save()
+  } else if (e.ctrlKey && e.key === 'e') {
+    e.preventDefault()
+    exec()
   }
 }
 
@@ -121,7 +157,29 @@ const save = async () => {
   try {
     isSaving.value = true
     if (script.value === undefined) return
-    await emit('save', script.value)
+    const toSave = clone(script.value)
+    toSave.isDefault = false
+    await emit('save', toSave)
+    newScript.value = undefined
+  } finally {
+    isSaving.value = false
+  }
+}
+
+const onDelete = async () => {
+  if (isSaving.value) return
+  try {
+    isSaving.value = true
+    if (script.value === undefined) return
+    if (!(await confirmDialog(`Sure to delete "${script.value.name}"?`))) return
+    const toDelete = clone(script.value)
+    if (script.value === newScript.value) {
+      newScript.value = undefined
+      selected.value = 0
+      return
+    }
+    await emit('delete', toDelete)
+    selected.value = 0
   } finally {
     isSaving.value = false
   }
@@ -130,28 +188,27 @@ const save = async () => {
 const exec = () => {
   if (script.value === undefined) return
   const t = args.value.trim()
-  emit('execute', script.value, t === '' ? undefined : JSON.parse(args.value))
+  emit('execute', script.value, t === '' ? [] : JSON.parse(`[${args.value}]`))
 }
 
-// const filterFunc: QSelectProps['onFilter'] = (val, update) => {
-//   update(() => {
-//     const needle = val.toLowerCase()
-//     options.value = allOptions.value.filter(
-//       (v) => v.label.toLowerCase().indexOf(needle) > -1
-//     )
-//   })
-// }
 const createScript: QSelectProps['onNewValue'] = (val) => {
+  val = val.trim()
   if (!val) return
-  const key = (script.value.key = uuidv4())
+  const key = (script.value.id = uuidv4())
   if (val === '@new') {
     val = `New Script - ${key.slice(0, 8)}`
   }
-  newScriptName.value = val
+  newScript.value = script.value
+  if (newScript.value.code.trim() === '') {
+    newScript.value.code = props.defaultScript || ''
+  }
+  newScript.value.isDefault = false
+  newScript.value.name = val
   selected.value = -1
 }
+
 const onChange = () => {
-  if (!newScriptName.value) {
+  if (script.value.isDefault && !newScript.value) {
     createScript('@new', () => void 0)
   }
 }

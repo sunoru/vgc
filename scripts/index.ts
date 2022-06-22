@@ -17,3 +17,9 @@ window.vgcScripts = {
   defaultScripts,
   helpers,
 }
+
+// For being eval-ed
+Object.entries(helpers).forEach(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ([key, value]) => void ((window as any)[key] = value)
+)

@@ -1,5 +1,10 @@
 import { RestrictedPokemons } from './consts'
-import { ParsedBattle, PlayerNumber, BattlePlayer } from '../src/utils/models'
+import {
+  ParsedBattle,
+  PlayerNumber,
+  BattlePlayer,
+  Team,
+} from '../src/utils/models'
 
 // Only cover some common cases
 export const normalizeName = (name: string): string => {
@@ -14,9 +19,7 @@ export const normalizeName = (name: string): string => {
 export const compareName = (a: string, b: string) =>
   normalizeName(a) === normalizeName(b)
 
-export const makePokemonSet = (
-  pokes: string[] | Immutable.Set<string>
-): Immutable.Set<string> =>
+export const makePokemonSet = (pokes: string[] | Team): Team =>
   Immutable.Set(Array.isArray(pokes) ? pokes.map(normalizeName) : pokes)
 
 export const getPlayer = (
@@ -46,18 +49,18 @@ export const getOpponent = (battle: ParsedBattle): BattlePlayer =>
 
 export const hasPokes = (
   player: BattlePlayer,
-  pokes: string[] | Immutable.Set<string>
-): boolean => player.team.equals(makePokemonSet(pokes))
+  pokes: string[] | Team
+): boolean => player.team.isSuperset(makePokemonSet(pokes))
 
 export const sentOutPokes = (
   player: BattlePlayer,
-  pokes: string[] | Immutable.Set<string>
+  pokes: string[] | Team
 ): boolean =>
-  makePokemonSet(player.sentOut.map((x) => x.id)).equals(makePokemonSet(pokes))
+  makePokemonSet(player.sentOut.map((x) => x.id)).isSuperset(
+    makePokemonSet(pokes)
+  )
 
-export const getRestrictedPokes = (
-  player: BattlePlayer
-): Immutable.Set<string> => {
+export const getRestrictedPokes = (player: BattlePlayer): Team => {
   return player.team.filter((x) => RestrictedPokemons.includes(x))
 }
 

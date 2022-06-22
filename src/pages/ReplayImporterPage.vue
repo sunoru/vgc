@@ -41,7 +41,7 @@ import {
   PlayerNumber,
   Pokemon,
 } from '../utils/models'
-import { saveBattles } from '../utils/storage'
+import { saveObjects } from '../utils/storage'
 import { getConfig, saveConfig } from '../utils/config'
 
 import PageBase from '../layouts/PageBase.vue'
@@ -113,7 +113,6 @@ const parseReplay = async (
     password ? `-${password}` : ''
   }`
   const replayJSON = await fetch(url + '.json')
-  console.log(replayJSON)
   const data = await replayJSON.json()
   const { uploadtime, p1, p2, format, log, rating } = data
   const logs = log.split('\n')
@@ -268,7 +267,7 @@ const importAll = async (
     skipped += updateRemarks(currentBattle, remarks)
   }
   console.log('Finished!')
-  await saveBattles(battles)
+  await saveObjects('battles', battles)
   console.log('Saved')
   return {
     battles,

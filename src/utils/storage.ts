@@ -1,65 +1,99 @@
-import { ParsedBattle, ParsedBattles } from 'vgc-base/src/models'
-import { LocalConfigs } from './config'
-import { getDB } from './db'
+import { Table } from 'dexie'
 
-let _cachedBattles: ParsedBattles | null = null
-const _getBattlesFromIDB = async (): Promise<ParsedBattles> => {
+import { LocalConfigs } from './config'
+import { getDB, TableNames, VGCDatabase } from './db'
+
+type ObjectType<T extends TableNames> = VGCDatabase[T] extends Table<infer R>
+  ? R
+  : never
+
+const _cachedObjects: Record<string, unknown> = {}
+
+const _getObjectsFromIDB = async <T extends TableNames>(
+  tableName: T
+): Promise<Record<string, ObjectType<T>>> => {
   const db = getDB()
-  _cachedBattles = {}
-  for (const battle of await db.battles.toArray()) {
-    _cachedBattles[battle.id] = battle
+  const cached: Record<string, ObjectType<T>> = (_cachedObjects[tableName] = {})
+  for (const x of await db[tableName].toArray()) {
+    cached[x.id] = x as ObjectType<T>
   }
-  return _cachedBattles
+  return cached
 }
 
-export const getAllSavedBattles = async (
+export const getAllSavedObjects = async <T extends TableNames>(
+  tableName: T,
   force = false
-): Promise<ParsedBattles> => {
-  if (force || _cachedBattles === null) {
+): Promise<Record<string, ObjectType<T>>> => {
+  if (force || !(tableName in _cachedObjects)) {
     if (LocalConfigs.useLocalStorage) {
-      _cachedBattles = await _getBattlesFromIDB()
+      await _getObjectsFromIDB(tableName)
     } else {
       throw new Error('Not implemented')
     }
   }
-  return _cachedBattles
+  return _cachedObjects[tableName] as Record<string, ObjectType<T>>
 }
 
-export const getSavedBattle = async (
+export const getSavedObject = async <T extends TableNames>(
+  tableName: T,
   id: string,
   force = false
-): Promise<ParsedBattle | null> => {
-  const battles = await getAllSavedBattles(force)
-  return id in battles ? battles[id] : null
+): Promise<ObjectType<T> | null> => {
+  const objects = await getAllSavedObjects(tableName, force)
+  return id in objects ? objects[id] : null
 }
 
-export const saveBattle = async (
-  battle: ParsedBattle
-): Promise<ParsedBattle> => {
+export const saveObject = async <T extends TableNames>(
+  tableName: T,
+  x: ObjectType<T> & { id: string }
+): Promise<ObjectType<T>> => {
   if (LocalConfigs.useLocalStorage) {
     const db = getDB()
-    await db.battles.put(battle)
+    await (db[tableName] as Table<ObjectType<T>>).put(x)
   } else {
     throw new Error('Not implemented')
   }
-  const battles = await getAllSavedBattles()
-  battles[battle.id] = battle
-  return battle
+  const cached = await getAllSavedObjects(tableName)
+  cached[x.id] = x
+  return x
 }
 
-export const saveBattles = async (
-  battles: ParsedBattles
-): Promise<ParsedBattle[]> => {
-  const items = Object.values(battles)
+export const saveObjects = async <T extends TableNames>(
+  tableName: T,
+  objects:
+    | Record<string, ObjectType<T> & { id: string }>
+    | (ObjectType<T> & { id: string })[]
+): Promise<ObjectType<T>[]> => {
+  const items = Object.values(objects)
   if (LocalConfigs.useLocalStorage) {
     const db = getDB()
-    await db.battles.bulkPut(items)
+    await (db[tableName] as Table<ObjectType<T>>).bulkPut(items)
   } else {
     throw new Error('Not implemented')
   }
-  const saved = await getAllSavedBattles()
+  const saved = await getAllSavedObjects(tableName)
   for (const item of items) {
     saved[item.id] = item
   }
   return items
+}
+
+export const deleteObject = async <T extends TableNames>(
+  tableName: T,
+  objectOrKey: (ObjectType<T> & { id: string }) | string
+): Promise<ObjectType<T> | undefined> => {
+  const key = typeof objectOrKey === 'string' ? objectOrKey : objectOrKey.id
+  const cached = await getAllSavedObjects(tableName)
+  if (!(key in cached)) {
+    return
+  }
+  const x = cached[key]
+  delete cached[key]
+  if (LocalConfigs.useLocalStorage) {
+    const db = getDB()
+    await (db[tableName] as Table<ObjectType<T>>).delete(key)
+  } else {
+    throw new Error('Not implemented')
+  }
+  return x
 }

@@ -30,3 +30,9 @@ export const selectDialog = (
     }
     const dismiss = Notify.create(opts)
   })
+
+export const confirmDialog = async (
+  message: string,
+  yes = 'Yes',
+  no = 'No'
+): Promise<boolean> => (await selectDialog(message, yes, no)) === 0

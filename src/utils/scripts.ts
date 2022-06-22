@@ -1,13 +1,14 @@
 import { v5 as uuidv5 } from 'uuid'
 
-export type ScriptType = 'filter' | 'analyzer' | string
+export type ScriptType = 'filter' | 'analyzer'
 export const ScriptNamespaceUUID = '5dc11aaf-fe4f-4848-8507-4e09f47a18a8'
 
 export interface ScriptSnippet {
   type: ScriptType
-  key: string
+  id: string
   name: string
   code: string
+  isDefault: boolean
 }
 
 export const defineDefaultScripts = (
@@ -16,9 +17,10 @@ export const defineDefaultScripts = (
 ): ScriptSnippet[] =>
   funcs.map(([name, func]) => ({
     type,
-    key: uuidv5(name, ScriptNamespaceUUID),
+    id: uuidv5(name, ScriptNamespaceUUID),
     name,
     code: func.toString(),
+    isDefault: true,
   }))
 
 export const defaultFilters = defineDefaultScripts('filter', [

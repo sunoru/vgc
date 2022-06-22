@@ -1,17 +1,19 @@
 import Dexie, { Table } from 'dexie'
 
-import { ParsedBattle } from '@sunoru/vgc-base'
-import { ScriptSnippet } from '@sunoru/vgc-base'
+import { ParsedBattle } from './models'
+import { ScriptSnippet } from './scripts'
+
+export type TableNames = 'battles' | 'scripts'
 
 export class VGCDatabase extends Dexie {
   battles!: Table<ParsedBattle>
-  scriptSnippets!: Table<ScriptSnippet>
+  scripts!: Table<ScriptSnippet>
 
   constructor() {
     super('vgc')
-    this.version(2).stores({
+    this.version(3).stores({
       battles: 'id',
-      scriptSnippets: 'key',
+      scripts: 'id',
     })
   }
 }
