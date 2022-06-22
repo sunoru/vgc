@@ -118,17 +118,72 @@
         v-model:pagination="pagination"
         :rows-per-page-options="[0]"
       >
-        <template v-slot:body-cell="props">
+        <template v-slot:top-right>
+          <q-input
+            borderless
+            dense
+            debounce="300"
+            v-model="searching"
+            placeholder="Search"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
+        <template v-slot:body-cell-time="props">
           <q-td :props="props">
             <a
-              v-if="props.col.name === 'time'"
               style="color: inherit; text-decoration: none"
               :href="props.row.url"
               target="_blank"
             >
               {{ props.value }}
             </a>
-            <div v-else-if="['team1', 'team2'].includes(props.col.name)">
+          </q-td>
+        </template>
+        <template v-slot:body-cell-result="props">
+          <q-td :props="props">
+            <q-chip
+              :color="props.value === 'Win' ? 'light-green-8' : 'orange-8'"
+              :label="props.value"
+            />
+          </q-td>
+        </template>
+        <template v-slot:body-cell-tags="props">
+          <q-td :props="props">
+            <q-chip
+              v-for="(tag, i) in props.value"
+              :key="i"
+              color="teal-8"
+              :label="tag"
+            />
+          </q-td>
+        </template>
+        <template v-slot:body-cell-remarks="props">
+          <q-td :props="props" style="width: 100%; min-height: 24px">
+            <span v-for="(line, i) in props.value.split('\n')" :key="i">
+              <br v-if="i > 0" />
+              {{ line }}
+            </span>
+            <q-popup-edit
+              v-model="props.row.remarks"
+              v-slot="scope"
+              buttons
+              @save="onSaveEdited(props.row, props.col)"
+            >
+              <q-input
+                type="textarea"
+                v-model="scope.value"
+                counter
+                @keyup.enter.stop
+              />
+            </q-popup-edit>
+          </q-td>
+        </template>
+        <template v-slot:body-cell="props">
+          <q-td :props="props">
+            <div v-if="['team1', 'team2'].includes(props.col.name)">
               <q-chip
                 v-for="([sentOut, poke], i) in props.value"
                 :key="i"
@@ -142,42 +197,6 @@
                 "
               />
             </div>
-            <div v-else-if="props.col.name === 'result'">
-              <q-chip
-                :color="props.value === 'Win' ? 'light-green-8' : 'orange-8'"
-                :label="props.value"
-              />
-            </div>
-            <div v-else-if="props.col.name === 'tags'">
-              <q-chip
-                v-for="(tag, i) in props.value"
-                :key="i"
-                color="teal-8"
-                :label="tag"
-              />
-            </div>
-            <div
-              v-else-if="props.col.name === 'remarks'"
-              style="width: 100%; min-height: 24px"
-            >
-              <span v-for="(line, i) in props.value.split('\n')" :key="i">
-                <br v-if="i > 0" />
-                {{ line }}
-              </span>
-              <q-popup-edit
-                v-model="props.row.remarks"
-                v-slot="scope"
-                buttons
-                @save="onSaveEdited(props.row, props.col)"
-              >
-                <q-input
-                  type="textarea"
-                  v-model="scope.value"
-                  counter
-                  @keyup.enter.stop
-                />
-              </q-popup-edit>
-            </div>
             <span v-else>
               {{ props.value }}
             </span>
@@ -187,6 +206,28 @@
     </div>
   </page-base>
 </template>
+
+<style lang="scss">
+.battle-table {
+  max-height: 900px;
+}
+
+.battle-table-header {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+}
+
+.battle-table > div:nth-child(1),
+.battle-table-header {
+  background-color: #fff;
+}
+
+.body--dark .battle-table > div:nth-child(1),
+.body--dark .battle-table-header {
+  background-color: #121212;
+}
+</style>
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
@@ -224,8 +265,6 @@ export type Analyzer = {
   script: ScriptSnippet
   args: unknown[]
 }
-
-const $q = useQuasar()
 
 const extendedFields = ref(false)
 
@@ -304,6 +343,11 @@ const DefaultColumns: QTableProps['columns'] = [
 ]
 const ExtendedColumns: QTableProps['columns'] = DefaultColumns.concat([
   {
+    name: 'userPlayer',
+    label: 'User Player',
+    field: (battle: ParsedBattle) => getPlayer(battle, battle.userPlayer).name,
+  },
+  {
     name: 'platform',
     label: 'Platform',
     field: 'platform',
@@ -345,6 +389,7 @@ const pagination = ref({
 const splitterModel = ref(20)
 const tab = ref('filters')
 
+const searching = ref('')
 const filters = ref<Filter[]>([])
 const analyzer = ref<Analyzer>()
 const createFunction = <T>(script: ScriptSnippet, args: unknown[]) => {
@@ -353,13 +398,11 @@ const createFunction = <T>(script: ScriptSnippet, args: unknown[]) => {
     const func = (arg0: T) => f(arg0, ...args)
     return func
   } catch (e) {
-    $q.notify({
-      message: `Failed to create function:${
-        (e as { message: string }).message
-      }`,
-      color: 'negative',
-      icon: 'warning',
-    })
+    showDialog(
+      `Failed to create function:${(e as { message: string }).message}`,
+      'negative',
+      { icon: 'warning' }
+    )
     throw e
   }
 }
@@ -419,23 +462,34 @@ const tableTitle = computed(() => {
   }
   return `Battles (${rows.value.length}/${data.value.length})`
 })
+
+const searchFilter = (arr: unknown[]) => {
+  if (!searching.value) return arr
+  return arr.filter((x) =>
+    Object.values(x as Record<string, unknown>).some((v) =>
+      String(v).toLowerCase().includes(searching.value.toLowerCase())
+    )
+  )
+}
 const rows = computed(() => {
   const filtered = filters.value.reduce(
     (acc, filter) => acc.filter(filter.func),
     data.value
   )
   if (!analyzer.value) {
-    return filtered
+    return searchFilter(filtered)
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const analyzed = analyzer.value.func(filtered) as any
   if (Array.isArray(analyzed)) {
-    return analyzed
+    return searchFilter(analyzed)
   }
-  return Object.keys(analyzed).map((key) => ({
-    key,
-    value: analyzed[key],
-  }))
+  return searchFilter(
+    Object.keys(analyzed).map((key) => ({
+      key,
+      value: analyzed[key],
+    }))
+  )
 })
 const columns = computed(() => {
   if (!analyzer.value) {
@@ -581,25 +635,3 @@ const onSaveEdited = async (
   }
 }
 </script>
-
-<style lang="scss">
-.battle-table {
-  max-height: 900px;
-}
-
-.battle-table-header {
-  position: sticky;
-  z-index: 1;
-  top: 0;
-}
-
-.battle-table > div:nth-child(1),
-.battle-table-header {
-  background-color: #fff;
-}
-
-.body--dark .battle-table > div:nth-child(1),
-.body--dark .battle-table-header {
-  background-color: #121212;
-}
-</style>
