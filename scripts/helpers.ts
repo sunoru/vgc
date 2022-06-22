@@ -9,9 +9,13 @@ import {
 // Only cover some common cases
 export const normalizeName = (name: string): string => {
   if (!name.includes('-')) return name
-  if (['Necrozma-', 'Calyrex-', 'Kyurem-'].some((x) => name.startsWith(x)))
+  if (
+    ['Necrozma-', 'Calyrex-', 'Kyurem-', 'Ho-Oh'].some((x) =>
+      name.startsWith(x)
+    )
+  )
     return name
-  if (['-Therian'].some((x) => name.endsWith(x))) return name
+  if (['-F', '-Therian'].some((x) => name.endsWith(x))) return name
   if (name.endsWith('-Gmax')) name = name.slice(0, -5)
   const tmp = name.split('-', 2)
   return tmp.length === 1 ? name : `${tmp[0]}-*`

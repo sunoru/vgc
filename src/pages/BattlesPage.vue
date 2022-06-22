@@ -156,6 +156,28 @@
                 :label="tag"
               />
             </div>
+            <div
+              v-else-if="props.col.name === 'remarks'"
+              style="width: 100%; min-height: 24px"
+            >
+              <span v-for="(line, i) in props.value.split('\n')" :key="i">
+                <br v-if="i > 0" />
+                {{ line }}
+              </span>
+              <q-popup-edit
+                v-model="props.row.remarks"
+                v-slot="scope"
+                buttons
+                @save="onSaveEdited(props.row, props.col)"
+              >
+                <q-input
+                  type="textarea"
+                  v-model="scope.value"
+                  counter
+                  @keyup.enter.stop
+                />
+              </q-popup-edit>
+            </div>
             <span v-else>
               {{ props.value }}
             </span>
@@ -187,7 +209,7 @@ import PageBase from '../layouts/PageBase.vue'
 import ScriptInput from '../components/ScriptInput.vue'
 import { showDialog } from '../utils/dialog'
 import { clone } from '../utils/utils'
-import { getOpponent, getPlayer } from '../../scripts/helpers'
+import { getOpponent, getPlayer, normalizeName } from '../../scripts/helpers'
 import { RestrictedPokemons } from '../../scripts/consts'
 import { getConfig, saveConfig } from '../utils/config'
 import { getDB } from '../utils/db'
@@ -220,7 +242,9 @@ const getTeam = (
       ? getPlayer(battle, battle.userPlayer)
       : getOpponent(battle)
   return player.team.toArray().map((poke) => {
-    const sentOutIndex = player.sentOut.findIndex((p) => p.id === poke)
+    const sentOutIndex = player.sentOut.findIndex(
+      (p) => normalizeName(p.id) === poke
+    )
     return [sentOutIndex + 1, poke] as const
   })
 }
@@ -268,8 +292,9 @@ const DefaultColumns: QTableProps['columns'] = [
   },
   {
     name: 'remarks',
-    label: 'remarks',
+    label: 'Remarks',
     field: 'remarks',
+    style: 'text-align: left;',
   },
   {
     name: 'tags',
@@ -532,18 +557,34 @@ const onExportTable = async () => {
   })
 
   if (status !== true) {
-    $q.notify({
-      message: 'Browser denied file download...',
-      color: 'negative',
+    showDialog('Browser denied file download...', 'negative', {
       icon: 'warning',
     })
+  }
+}
+
+const onSaveEdited = async (
+  edited: ParsedBattle,
+  column?: { name: string }
+) => {
+  try {
+    await saveObject('battles', edited)
+    const message = column ? `${column.name} updated` : 'Battle updated'
+    showDialog(message)
+  } catch (e) {
+    console.error(e)
+    showDialog(
+      `Error saving battle: ${(e as { message: string }).message}`,
+      'negative',
+      { icon: 'warning' }
+    )
   }
 }
 </script>
 
 <style lang="scss">
 .battle-table {
-  max-height: 720px;
+  max-height: 900px;
 }
 
 .battle-table-header {

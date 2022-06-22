@@ -41,7 +41,7 @@ import {
   PlayerNumber,
   Pokemon,
 } from '../utils/models'
-import { saveObjects } from '../utils/storage'
+import { getSavedObject, saveObjects } from '../utils/storage'
 import { getConfig, saveConfig } from '../utils/config'
 
 import PageBase from '../layouts/PageBase.vue'
@@ -249,8 +249,8 @@ const importAll = async (
     }
     const { id, password, remarks: inlineRemarks } = m.groups
     console.log(`Importing ${id}...`)
-    // currentBattle = id in battles ? battles[id] : await getSavedBattle(id)
-    currentBattle = null
+    currentBattle =
+      id in battles ? battles[id] : await getSavedObject('battles', id)
     if (currentBattle === null) {
       currentBattle = await parseReplay(id, password)
     }
