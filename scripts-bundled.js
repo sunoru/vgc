@@ -70,9 +70,9 @@
   var normalizeName = (name) => {
     if (!name.includes("-"))
       return name;
-    if (["Necrozma-", "Calyrex-", "Kyurem-"].some((x) => name.startsWith(x)))
+    if (["Necrozma-", "Calyrex-", "Kyurem-", "Ho-Oh"].some((x) => name.startsWith(x)))
       return name;
-    if (["-Therian"].some((x) => name.endsWith(x)))
+    if (["-F", "-Therian"].some((x) => name.endsWith(x)))
       return name;
     if (name.endsWith("-Gmax"))
       name = name.slice(0, -5);

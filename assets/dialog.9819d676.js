@@ -1,0 +1,1 @@
+import{ao as e}from"./index.3b87f82e.js";const m=(a,s="primary",o={})=>(o.message=a,o.color=s,e.create(o)),n=(a,...s)=>new Promise(o=>{const t={message:a,timeout:0,actions:s.map((c,i)=>({label:c,handler:()=>{r(),o(i)},color:"info",noCaps:!0}))},r=e.create(t)}),f=async(a,s="Yes",o="No")=>await n(a,s,o)===0;export{n as a,f as c,m as s};
