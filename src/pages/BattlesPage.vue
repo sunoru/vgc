@@ -412,9 +412,16 @@ const onSaveFilter = async (script: ScriptSnippet) => {
   if (!filterScripts.value.some((x) => x.id === script.id)) {
     filterScripts.value.push(script)
   }
-  showDialog('Filter saved')
+  showDialog('Filter script saved')
 }
-const onSaveAnalyzer = () => console.log('save analyzer')
+const onSaveAnalyzer = async (script: ScriptSnippet) => {
+  console.log(`Saving script ${script.name} (${script.id})`)
+  await saveObject('scripts', script)
+  if (!analyzerScripts.value.some((x) => x.id === script.id)) {
+    analyzerScripts.value.push(script)
+  }
+  showDialog('Analyzer script saved')
+}
 const onAddFilter = (script: ScriptSnippet, args: unknown[]) => {
   const func = createFunction<ParsedBattle>(script, args)
   filters.value.push({ func, script: clone(script), args: args })
