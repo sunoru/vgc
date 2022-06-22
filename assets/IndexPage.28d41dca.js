@@ -1,1 +1,0 @@
-import{Q as e}from"./QPage.0b9ac273.js";import{_ as a}from"./plugin-vue_export-helper.21dcd24c.js";import{x as t,y as o,z as s,A as r,a8 as n}from"./index.54d40874.js";const c=t({name:"IndexPage"}),i=n("div",null,"Hello.",-1);function _(d,f,p,l,m,u){return o(),s(e,{class:"row items-center justify-evenly"},{default:r(()=>[i]),_:1})}var h=a(c,[["render",_]]);export{h as default};
