@@ -5,12 +5,15 @@
 <script setup lang="ts">
 import Immutable from 'immutable'
 import * as db from './utils/db'
+import { PlayerNumber } from './utils/models'
 import * as storage from './utils/storage'
 
-window.Immutable = Immutable
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-;(window as any).vgc = {
+const w = window as any
+w.Immutable = Immutable
+w.vgc = {
   db,
   storage,
 }
+w.PlayerNumber = PlayerNumber
 </script>

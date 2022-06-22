@@ -5,7 +5,7 @@
         class="col"
         style="width: 100%"
         label="Actions"
-        v-model="scriptsExpanded"
+        v-model="actionsExpanded"
       >
         <q-splitter v-model="splitterModel" style="height: 748px; width: 100%">
           <template v-slot:before>
@@ -322,6 +322,22 @@ const tab = ref('filters')
 
 const filters = ref<Filter[]>([])
 const analyzer = ref<Analyzer>()
+const createFunction = <T>(script: ScriptSnippet, args: unknown[]) => {
+  try {
+    const f = new Function(`return ${script.code}`)()
+    const func = (arg0: T) => f(arg0, ...args)
+    return func
+  } catch (e) {
+    $q.notify({
+      message: `Failed to create function:${
+        (e as { message: string }).message
+      }`,
+      color: 'negative',
+      icon: 'warning',
+    })
+    throw e
+  }
+}
 const onSaveFilter = async (script: ScriptSnippet) => {
   console.log(`Saving script ${script.name} (${script.id})`)
   await saveObject('scripts', script)
@@ -332,11 +348,7 @@ const onSaveFilter = async (script: ScriptSnippet) => {
 }
 const onSaveAnalyzer = () => console.log('save analyzer')
 const onAddFilter = (script: ScriptSnippet, args: unknown[]) => {
-  console.log(args)
-  const f = new Function(`return ${script.code}`)()
-  const func = (battle: ParsedBattle) => f(battle, ...args)
-  window.t = func
-  console.log(func)
+  const func = createFunction<ParsedBattle>(script, args)
   filters.value.push({ func, script: clone(script), args: args })
   showDialog(`Filter "${script.name}" added`)
 }
@@ -345,8 +357,7 @@ const onRemoveFilter = (filter: Filter) => {
   showDialog(`Filter "${filter.script.name}" removed`)
 }
 const onAnalyze = (script: ScriptSnippet, args: unknown[]) => {
-  const f = new Function(`return ${script.code}`)()
-  const func = (battles: ParsedBattle[]) => f(battles, ...args)
+  const func = createFunction<ParsedBattle[]>(script, args)
   analyzer.value = { func, script: clone(script), args: args }
   showDialog(`Analyzer "${script.name}" added`)
 }
@@ -375,7 +386,7 @@ const onDeleteAnalyzerScript = async (script: ScriptSnippet) => {
 
 const onRemoveAnalyzer = () => void (analyzer.value = undefined)
 
-const scriptsExpanded = ref(true)
+const actionsExpanded = ref(false)
 
 const tableTitle = computed(() => {
   if (analyzer.value) {

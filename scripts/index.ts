@@ -18,8 +18,8 @@ window.vgcScripts = {
   helpers,
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const w = window as any
 // For being eval-ed
-Object.entries(helpers).forEach(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ([key, value]) => void ((window as any)[key] = value)
-)
+Object.entries(helpers).forEach(([key, value]) => void (w[key] = value))
+Object.entries(defaultScripts).forEach(([key, value]) => void (w[key] = value))
