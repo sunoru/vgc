@@ -76,8 +76,10 @@
       return name;
     if (name.endsWith("-Gmax"))
       name = name.slice(0, -5);
-    const tmp = name.split("-", 2);
-    return tmp.length === 1 ? name : `${tmp[0]}-*`;
+    const [base, forme] = name.split("-", 2);
+    if (["Xerneas"].some((x) => x === base))
+      return base;
+    return forme ? `${base}-*` : name;
   };
   var compareName = (a, b) => normalizeName(a) === normalizeName(b);
   var makePokemonSet = (pokes) => Immutable.Set(Array.isArray(pokes) ? pokes.map(normalizeName) : pokes);
@@ -93,7 +95,7 @@
   var hasPokes = (player, pokes) => player.team.isSuperset(makePokemonSet(pokes));
   var sentOutPokes = (player, pokes) => makePokemonSet(player.sentOut.map((x) => x.id)).isSuperset(makePokemonSet(pokes));
   var getRestrictedPokes = (player) => {
-    return player.team.filter((x) => RestrictedPokemons.includes(x));
+    return player.team.filter((x) => RestrictedPokemons.includes(normalizeName(x)));
   };
   var categorize = (items, getKey) => {
     let data = Immutable.Map();
@@ -112,23 +114,33 @@
   var myBattles = (battle) => battle.userPlayer !== 0 /* None */;
   var myTeam = (battle, pokes) => hasPokes(getPlayer(battle, battle.userPlayer), pokes);
   var opponentTeam = (battle, pokes) => hasPokes(getOpponent(battle), pokes);
-  var teamSentOut = (battles, onlyLeads = true, getTeam = (p) => p.team) => {
+  var teamSentOut = (battles, onlyLeads = true, maxSentOutPairs = 3, getTeam = (p) => p.team) => {
     const data = categorize(battles, (battle) => getTeam(getOpponent(battle)));
     return [...data].map(([team, bs]) => {
       const data2 = categorize(bs, (b) => Immutable.Set(getOpponent(b).sentOut.slice(0, onlyLeads ? 2 : 4).map((x) => x.id)));
-      return {
-        key: team.toArray(),
-        win: bs.filter((b) => b.winner === b.userPlayer).length,
-        total: bs.length,
-        sentOuts: [...data2].map(([sentOut, bs2]) => ({
+      const sentOuts = [...data2].map(([sentOut, bs2]) => {
+        return {
           sentOut,
           win: bs2.filter((b) => b.winner === b.userPlayer).length,
           total: bs2.length
-        })).sort((a, b) => b.total - a.total)
+        };
+      }).sort((a, b) => b.total - a.total).slice(0, maxSentOutPairs);
+      const win = bs.filter((b) => b.winner === b.userPlayer).length;
+      const result = {
+        key: team.toArray(),
+        win,
+        total: bs.length,
+        winningPercentage: `${(win / bs.length * 100).toFixed(2)}%`
       };
+      sentOuts.forEach((x, i) => {
+        result[`sentOut${i + 1}`] = x.sentOut;
+        result[`sentOut${i + 1} Win`] = x.win;
+        result[`sentOut${i + 1} Total`] = x.total;
+      });
+      return result;
     }).sort((a, b) => b.total - a.total);
   };
-  var restrictedSentOut = (battles, onlyLeads = true) => teamSentOut(battles, onlyLeads, getRestrictedPokes);
+  var restrictedSentOut = (battles, onlyLeads = true, maxSentOutPairs = 3) => teamSentOut(battles, onlyLeads, maxSentOutPairs, getRestrictedPokes);
 
   // scripts/index.ts
   window.vgcScripts = {
