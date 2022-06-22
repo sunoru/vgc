@@ -72,6 +72,8 @@
       return name;
     if (["Necrozma-", "Calyrex-", "Kyurem-"].some((x) => name.startsWith(x)))
       return name;
+    if (["-Therian"].some((x) => name.endsWith(x)))
+      return name;
     if (name.endsWith("-Gmax"))
       name = name.slice(0, -5);
     const tmp = name.split("-", 2);
@@ -134,5 +136,7 @@
     defaultScripts: default_scripts_exports,
     helpers: helpers_exports
   };
-  Object.entries(helpers_exports).forEach(([key, value]) => void (window[key] = value));
+  var w = window;
+  Object.entries(helpers_exports).forEach(([key, value]) => void (w[key] = value));
+  Object.entries(default_scripts_exports).forEach(([key, value]) => void (w[key] = value));
 })();
