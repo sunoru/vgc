@@ -24,6 +24,7 @@ export const opponentTeam = (battle: ParsedBattle, pokes: string[]) =>
 export const teamSentOut = (
   battles: ParsedBattle[],
   onlyLeads = true,
+  maxSentOutPairs = 3,
   getTeam: (p: BattlePlayer) => Team = (p) => p.team
 ) => {
   const data = categorize(battles, (battle) => getTeam(getOpponent(battle)))
@@ -36,20 +37,35 @@ export const teamSentOut = (
             .map((x) => x.id)
         )
       )
-      return {
-        key: team.toArray(),
-        win: bs.filter((b) => b.winner === b.userPlayer).length,
-        total: bs.length,
-        sentOuts: [...data2]
-          .map(([sentOut, bs2]) => ({
+      const sentOuts = [...data2]
+        .map(([sentOut, bs2]) => {
+          return {
             sentOut,
             win: bs2.filter((b) => b.winner === b.userPlayer).length,
             total: bs2.length,
-          }))
-          .sort((a, b) => b.total - a.total),
-      }
+          }
+        })
+        .sort((a, b) => b.total - a.total)
+        .slice(0, maxSentOutPairs)
+      const win = bs.filter((b) => b.winner === b.userPlayer).length
+      const result = {
+        key: team.toArray(),
+        win,
+        total: bs.length,
+        winningPercentage: `${((win / bs.length) * 100).toFixed(2)}%`,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as Record<string, any>
+      sentOuts.forEach((x, i) => {
+        result[`sentOut${i + 1}`] = x.sentOut
+        result[`sentOut${i + 1} Win`] = x.win
+        result[`sentOut${i + 1} Total`] = x.total
+      })
+      return result
     })
     .sort((a, b) => b.total - a.total)
 }
-export const restrictedSentOut = (battles: ParsedBattle[], onlyLeads = true) =>
-  teamSentOut(battles, onlyLeads, getRestrictedPokes)
+export const restrictedSentOut = (
+  battles: ParsedBattle[],
+  onlyLeads = true,
+  maxSentOutPairs = 3
+) => teamSentOut(battles, onlyLeads, maxSentOutPairs, getRestrictedPokes)

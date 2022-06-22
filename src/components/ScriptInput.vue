@@ -158,7 +158,6 @@ const save = async () => {
     isSaving.value = true
     if (script.value === undefined) return
     const toSave = clone(script.value)
-    toSave.isDefault = false
     await emit('save', toSave)
     newScript.value = undefined
   } finally {
@@ -198,7 +197,8 @@ const createScript: QSelectProps['onNewValue'] = (val) => {
   if (val === '@new') {
     val = `New Script - ${key.slice(0, 8)}`
   }
-  newScript.value = script.value
+  newScript.value = clone(script.value)
+  script.value = newScript.value
   if (newScript.value.code.trim() === '') {
     newScript.value.code = props.defaultScript || ''
   }

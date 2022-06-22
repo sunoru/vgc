@@ -17,8 +17,9 @@ export const normalizeName = (name: string): string => {
     return name
   if (['-F', '-Therian'].some((x) => name.endsWith(x))) return name
   if (name.endsWith('-Gmax')) name = name.slice(0, -5)
-  const tmp = name.split('-', 2)
-  return tmp.length === 1 ? name : `${tmp[0]}-*`
+  const [base, forme] = name.split('-', 2)
+  if (['Xerneas'].some((x) => x === base)) return base
+  return forme ? `${base}-*` : name
 }
 
 export const compareName = (a: string, b: string) =>
@@ -66,7 +67,9 @@ export const sentOutPokes = (
   )
 
 export const getRestrictedPokes = (player: BattlePlayer): Team => {
-  return player.team.filter((x) => RestrictedPokemons.includes(x))
+  return player.team.filter((x) =>
+    RestrictedPokemons.includes(normalizeName(x))
+  )
 }
 
 export const categorize = <TKey, T>(

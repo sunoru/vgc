@@ -45,7 +45,11 @@
               />
               <q-route-tab>
                 <template v-slot>
-                  <q-toggle v-model="extendedFields" label="Extended Fields" />
+                  <q-toggle
+                    v-model="extendedFields"
+                    :disable="analyzer !== undefined"
+                    label="Extended Fields"
+                  />
                 </template>
               </q-route-tab>
             </q-tabs>
@@ -231,7 +235,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { exportFile, QTableProps, useQuasar } from 'quasar'
+import { exportFile, QTableProps } from 'quasar'
 import { ParsedBattle, PlayerNumber } from '../utils/models'
 import {
   defaultAnalyzers,
@@ -407,6 +411,10 @@ const createFunction = <T>(script: ScriptSnippet, args: unknown[]) => {
   }
 }
 const onSaveFilter = async (script: ScriptSnippet) => {
+  if (script.isDefault) {
+    showDialog('Cannot save default filter', 'negative', { icon: 'warning' })
+    return
+  }
   console.log(`Saving script ${script.name} (${script.id})`)
   await saveObject('scripts', script)
   if (!filterScripts.value.some((x) => x.id === script.id)) {
@@ -415,6 +423,10 @@ const onSaveFilter = async (script: ScriptSnippet) => {
   showDialog('Filter script saved')
 }
 const onSaveAnalyzer = async (script: ScriptSnippet) => {
+  if (script.isDefault) {
+    showDialog('Cannot save default analyzer', 'negative', { icon: 'warning' })
+    return
+  }
   console.log(`Saving script ${script.name} (${script.id})`)
   await saveObject('scripts', script)
   if (!analyzerScripts.value.some((x) => x.id === script.id)) {
@@ -434,7 +446,7 @@ const onRemoveFilter = (filter: Filter) => {
 const onAnalyze = (script: ScriptSnippet, args: unknown[]) => {
   const func = createFunction<ParsedBattle[]>(script, args)
   analyzer.value = { func, script: clone(script), args: args }
-  showDialog(`Analyzer "${script.name}" added`)
+  showDialog(`Analyzer "${script.name}" applied`)
 }
 const onDeleteFilterScript = async (script: ScriptSnippet) => {
   if (script.isDefault) {
@@ -510,7 +522,7 @@ const columns = computed(() => {
   if (rows.value.length === 0) {
     return []
   }
-  const x = rows.value[0]
+  const x = rows.value[0] as Record<string, unknown>
   return Object.keys(x)
     .map((key) => {
       if (IgnoredColumns.includes(key)) {
@@ -524,6 +536,7 @@ const columns = computed(() => {
         name: key,
         label: key,
         field: key,
+        sortable: true,
       }
     })
     .filter((x) => x !== undefined) as QTableProps['columns']
