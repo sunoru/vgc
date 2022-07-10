@@ -198,7 +198,7 @@ const parseReplay = async (
     team2,
     team1SentOut,
     team2SentOut,
-    remarks: '',
+    remarks: ' ',
     tags: [],
     userPlayer: await getUserPlayer(p1, p2, config),
     log,
@@ -216,6 +216,9 @@ interface ImportResult {
 const updateRemarks = (battle: ParsedBattle, remarks: string[]): number => {
   const remarksText = remarks.join('\n')
   if (battle.remarks !== remarksText) {
+    if (battle.remarks === ' ') {
+      battle.remarks = ''
+    }
     battle.remarks += remarksText
     return 0
   }
