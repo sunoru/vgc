@@ -8,9 +8,9 @@
   "scripts": {
     "build-scripts": "esbuild scripts/index.ts --bundle --external:immutable --outfile=public/scripts-bundled.js",
     "watch-scripts": "npm run build-scripts -- --watch",
-    "watch": "quasar dev",
+    "watch": "quasar dev -m pwa",
     "dev": "concurrently 'npm:watch-scripts' 'npm:watch'",
-    "build": "npm run build-scripts && quasar build",
+    "build": "npm run build-scripts && quasar build -m pwa",
     "lint": "eslint --ext .js,.ts,.vue ./",
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore"
   },
@@ -41,7 +41,14 @@
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^9.0.1",
     "prettier": "^2.5.1",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.4",
+    "workbox-build": "^6.5.3",
+    "workbox-cacheable-response": "^6.5.3",
+    "workbox-core": "^6.5.3",
+    "workbox-expiration": "^6.5.3",
+    "workbox-precaching": "^6.5.3",
+    "workbox-routing": "^6.5.3",
+    "workbox-strategies": "^6.5.3"
   },
   "engines": {
     "node": "^18 || ^16 || ^14.19",
