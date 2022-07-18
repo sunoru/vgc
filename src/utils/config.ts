@@ -2,7 +2,7 @@ import { Config } from './models'
 
 const DefaultLocalConfigs = {
   useLocalStorage: true,
-  useDarkMode: false,
+  useDarkMode: true,
 }
 
 export const LocalConfigs = new Proxy(
