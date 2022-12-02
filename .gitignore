@@ -36,3 +36,5 @@ build/
 *.swp
 
 /public/scripts-bundled.js
+/.yarn/
+/.yarnrc

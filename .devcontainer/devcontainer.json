@@ -1,14 +1,7 @@
 {
   "customizations": {
     "codespaces": {
-      "repositories": {
-        "sunoru/pokemon-showdown-client": {
-          "permissions": {
-            "contents": "write",
-            "pull_requests": "write"
-          }
-        }
-      }
+      "repositories": {}
     }
   }
 }
