@@ -1,0 +1,1 @@
+import{ap as e}from"./index.ac067182.js";const m=(a,s="primary",o={})=>(o.message=a,o.color=s,e.create(o)),n=(a,...s)=>new Promise(o=>{const t={message:a,timeout:0,actions:s.map((c,i)=>({label:c,handler:()=>{r(),o(i)},color:"info",noCaps:!0}))},r=e.create(t)}),p=async(a,s="Yes",o="No")=>await n(a,s,o)===0;export{n as a,p as c,m as s};

@@ -1,0 +1,1 @@
+import{Q as a}from"./QPage.eac6da68.js";import{y as s,f as n,z as l,A as r,B as p,aq as c}from"./index.ac067182.js";const f=s({__name:"PageBase",props:{title:null},setup(e){const t=e;return n(()=>{document.title=(t.title?`${t.title} - `:"")+"VGC Tools"}),(o,i)=>(l(),r(a,null,{default:p(()=>[c(o.$slots,"default")]),_:3}))}});export{f as _};
