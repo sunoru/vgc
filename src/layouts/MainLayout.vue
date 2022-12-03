@@ -2,14 +2,7 @@
   <q-layout view="hHh Lpr lff">
     <q-header elevated>
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title> VGC Tools </q-toolbar-title>
 
@@ -23,11 +16,7 @@
       <q-list>
         <q-item-label header> Pages </q-item-label>
 
-        <essential-link
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
+        <essential-link v-for="link in essentialLinks" :key="link.title" v-bind="link" />
       </q-list>
     </q-drawer>
 
@@ -39,7 +28,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+import EssentialLink from '../components/EssentialLink.vue'
 import { useQuasar } from 'quasar'
 import { LocalConfigs } from 'src/utils/config'
 
@@ -65,6 +54,11 @@ const linksList = [
     title: 'Damage Calculator',
     icon: 'calculate',
     link: '/damagecalc',
+  },
+  {
+    title: 'Scripts',
+    icon: 'integration_instructions',
+    link: '/scripts',
   },
   {
     title: 'Settings',

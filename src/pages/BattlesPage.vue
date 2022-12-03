@@ -1,135 +1,49 @@
 <template>
   <page-base class="row items-top justify-evenly" title="Battles (WIP)">
     <div class="q-pa-md col">
-      <q-expansion-item
-        class="col"
-        style="width: 100%"
-        label="Actions"
-        v-model="actionsExpanded"
-      >
+      <q-expansion-item class="col" style="width: 100%" label="Actions" v-model="actionsExpanded">
         <q-splitter v-model="splitterModel" style="height: 748px; width: 100%">
           <template v-slot:before>
             <q-tabs v-model="tab" vertical>
               <q-tab name="filters" icon="filter_alt" label="Filters" />
               <q-tab name="analytics" icon="analytics" label="Analytics" />
-              <q-route-tab
-                href="https://github.com/sunoru/vgc/blob/main/src/utils/models.ts"
-                icon="source"
-                label="Model Reference"
-                target="_blank"
-              />
-              <q-route-tab
-                href="https://github.com/sunoru/vgc/blob/main/scripts/helpers.ts"
-                icon="help_center"
-                label="Helper Functions"
-                target="_blank"
-              />
+              <q-route-tab href="https://github.com/sunoru/vgc/blob/main/src/utils/models.ts" icon="source"
+                label="Model Reference" target="_blank" />
+              <q-route-tab href="https://github.com/sunoru/vgc/blob/main/scripts/helpers.ts" icon="help_center"
+                label="Helper Functions" target="_blank" />
               <q-route-tab icon="file_upload" label="Import All Data">
                 <template v-slot>
-                  <q-file
-                    v-model="fileToUpload"
-                    filled
-                    style="width: 100%; position: absolute; opacity: 0"
-                  />
+                  <q-file v-model="fileToUpload" filled style="width: 100%; position: absolute; opacity: 0" />
                 </template>
               </q-route-tab>
-              <q-route-tab
-                icon="file_download"
-                label="Export All Data"
-                @click="onExport"
-              />
-              <q-route-tab
-                icon="file_download"
-                label="Export Table (CSV)"
-                @click="onExportTable"
-              />
+              <q-route-tab icon="file_download" label="Export All Data" @click="onExport" />
+              <q-route-tab icon="file_download" label="Export Table (CSV)" @click="onExportTable" />
               <q-route-tab>
                 <template v-slot>
-                  <q-toggle
-                    v-model="extendedFields"
-                    :disable="analyzer !== undefined"
-                    label="Extended Fields"
-                  />
+                  <q-toggle v-model="extendedFields" :disable="analyzer !== undefined" label="Extended Fields" />
                 </template>
               </q-route-tab>
             </q-tabs>
           </template>
           <template v-slot:after>
-            <q-tab-panels
-              v-model="tab"
-              animated
-              swipeable
-              vertical
-              transition-prev="jump-up"
-              transition-next="jump-up"
-            >
-              <q-tab-panel name="filters">
-                <script-input
-                  :disable="!mounted"
-                  type="filter"
-                  :script-snippets="filterScripts"
-                  default-script="(battle) => true"
-                  @save="onSaveFilter"
-                  @delete="onDeleteFilterScript"
-                  @execute="onAddFilter"
-                />
-              </q-tab-panel>
-
-              <q-tab-panel name="analytics">
-                <script-input
-                  :disable="!mounted"
-                  type="analyzer"
-                  :script-snippets="analyzerScripts"
-                  default-script="(battles) => battles"
-                  @save="onSaveAnalyzer"
-                  @delete="onDeleteAnalyzerScript"
-                  @execute="onAnalyze"
-                />
-              </q-tab-panel>
+            <q-tab-panels v-model="tab" animated swipeable vertical transition-prev="jump-up" transition-next="jump-up">
             </q-tab-panels>
           </template>
         </q-splitter>
       </q-expansion-item>
 
       <div class="q-mt-sm q-gutter-xs">
-        <q-chip
-          v-for="(filter, i) in filters"
-          :key="i"
-          :label="getChipLabel(filter.script, filter.args)"
-          color="primary"
-          removable
-          @remove="onRemoveFilter(filter)"
-        />
-        <q-chip
-          v-if="analyzer"
-          :label="getChipLabel(analyzer.script, analyzer.args)"
-          color="green"
-          removable
-          @remove="onRemoveAnalyzer"
-        />
+        <q-chip v-for="(filter, i) in filters" :key="i" :label="getChipLabel(filter.script, filter.args)"
+          color="primary" removable @remove="onRemoveFilter(filter)" />
+        <q-chip v-if="analyzer" :label="getChipLabel(analyzer.script, analyzer.args)" color="green" removable
+          @remove="onRemoveAnalyzer" />
       </div>
 
-      <q-table
-        :title="tableTitle"
-        class="battle-table q-mt-md"
-        table-header-class="battle-table-header"
-        :rows="rows"
-        :columns="columns"
-        separator="cell"
-        row-key="id"
-        bordered
-        virtual-scroll
-        v-model:pagination="pagination"
-        :rows-per-page-options="[0]"
-      >
+      <q-table :title="tableTitle" class="battle-table q-mt-md" table-header-class="battle-table-header" :rows="rows"
+        :columns="columns" separator="cell" row-key="id" bordered virtual-scroll v-model:pagination="pagination"
+        :rows-per-page-options="[0]">
         <template v-slot:top-right>
-          <q-input
-            borderless
-            dense
-            debounce="300"
-            v-model="searching"
-            placeholder="Search"
-          >
+          <q-input borderless dense debounce="300" v-model="searching" placeholder="Search">
             <template v-slot:append>
               <q-icon name="search" />
             </template>
@@ -137,31 +51,19 @@
         </template>
         <template v-slot:body-cell-time="props">
           <q-td :props="props">
-            <a
-              style="color: inherit; text-decoration: none"
-              :href="props.row.url"
-              target="_blank"
-            >
+            <a style="color: inherit; text-decoration: none" :href="props.row.url" target="_blank">
               {{ props.value }}
             </a>
           </q-td>
         </template>
         <template v-slot:body-cell-result="props">
           <q-td :props="props">
-            <q-chip
-              :color="props.value === 'Win' ? 'light-green-8' : 'orange-8'"
-              :label="props.value"
-            />
+            <q-chip :color="props.value === 'Win' ? 'light-green-8' : 'orange-8'" :label="props.value" />
           </q-td>
         </template>
         <template v-slot:body-cell-tags="props">
           <q-td :props="props">
-            <q-chip
-              v-for="(tag, i) in props.value"
-              :key="i"
-              color="teal-8"
-              :label="tag"
-            />
+            <q-chip v-for="(tag, i) in props.value" :key="i" color="teal-8" :label="tag" />
           </q-td>
         </template>
         <template v-slot:body-cell-remarks="props">
@@ -170,36 +72,22 @@
               <br v-if="i > 0" />
               {{ line }}
             </span>
-            <q-popup-edit
-              v-model="props.row.remarks"
-              v-slot="scope"
-              buttons
-              @save="onSaveEdited(props.row, props.col)"
-            >
-              <q-input
-                type="textarea"
-                v-model="scope.value"
-                counter
-                @keyup.enter.stop
-              />
+            <q-popup-edit v-model="props.row.remarks" v-slot="scope" buttons @save="onSaveEdited(props.row, props.col)">
+              <q-input type="textarea" v-model="scope.value" counter @keyup.enter.stop />
             </q-popup-edit>
           </q-td>
         </template>
         <template v-slot:body-cell="props">
           <q-td :props="props">
             <div v-if="['team1', 'team2'].includes(props.col.name)">
-              <q-chip
-                v-for="([sentOut, poke], i) in props.value"
-                :key="i"
-                :label="(sentOut > 0 ? sentOut + ' ' : '') + poke"
-                :color="
+              <q-chip v-for="([sentOut, poke], i) in props.value" :key="i"
+                :label="(sentOut > 0 ? sentOut + ' ' : '') + poke" :color="
                   sentOut > 0
                     ? RestrictedPokemons.includes(poke)
                       ? 'pink'
                       : 'purple'
                     : ''
-                "
-              />
+                " />
             </div>
             <span v-else>
               {{ props.value }}
@@ -222,12 +110,12 @@
   top: 0;
 }
 
-.battle-table > div:nth-child(1),
+.battle-table>div:nth-child(1),
 .battle-table-header {
   background-color: #fff;
 }
 
-.body--dark .battle-table > div:nth-child(1),
+.body--dark .battle-table>div:nth-child(1),
 .body--dark .battle-table-header {
   background-color: #121212;
 }
@@ -251,7 +139,7 @@ import {
 } from '../utils/storage'
 
 import PageBase from '../layouts/PageBase.vue'
-import ScriptInput from '../components/ScriptInput.vue'
+import ScriptInput from '../../build/ScriptInput.vue'
 import { showDialog } from '../utils/dialog'
 import { clone } from '../utils/utils'
 import { getOpponent, getPlayer, normalizeName } from '../../scripts/helpers'
@@ -282,8 +170,8 @@ const getTeam = (
         ? getPlayer(battle, PlayerNumber.Player1)
         : getPlayer(battle, PlayerNumber.Player2)
       : isUserPlayer
-      ? getPlayer(battle, battle.userPlayer)
-      : getOpponent(battle)
+        ? getPlayer(battle, battle.userPlayer)
+        : getOpponent(battle)
   return player.team.toArray().map((poke) => {
     const sentOutIndex = player.sentOut.findIndex(
       (p) => normalizeName(p.id) === poke
@@ -320,8 +208,8 @@ const DefaultColumns: QTableProps['columns'] = [
       battle.userPlayer === PlayerNumber.None
         ? 'N/A'
         : battle.userPlayer === battle.winner
-        ? 'Win'
-        : 'Lose',
+          ? 'Win'
+          : 'Lose',
   },
   {
     name: 'team1',
