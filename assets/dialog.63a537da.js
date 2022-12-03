@@ -1,0 +1,1 @@
+import{ap as e}from"./index.9f709251.js";const l=(s,a="primary",o={})=>(o.message=s,o.color=a,e.create(o)),m=(s,...a)=>new Promise(o=>{const r={message:s,timeout:0,actions:a.map((i,c)=>({label:i,handler:()=>{t(),o(c)},color:"info",noCaps:!0}))},t=e.create(r)});export{m as a,l as s};
