@@ -19,6 +19,10 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/DamageCalcPage.vue'),
       },
       {
+        path: 'speed-tiers',
+        component: () => import('pages/SpeedTiersPage.vue'),
+      },
+      {
         path: 'scripts',
         component: () => import('pages/ScriptsPage.vue'),
       },

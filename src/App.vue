@@ -4,6 +4,7 @@
 
 <script setup lang="ts">
 import Immutable from 'immutable'
+import { BattleTeambuilderTable } from './data/teambuilder-tables.cjs'
 import * as db from './utils/db'
 import { PlayerNumber } from './utils/models'
 import * as storage from './utils/storage'
@@ -14,6 +15,7 @@ w.Immutable = Immutable
 w.vgc = {
   db,
   storage,
+  BattleTeambuilderTable,
 }
 w.PlayerNumber = PlayerNumber
 </script>

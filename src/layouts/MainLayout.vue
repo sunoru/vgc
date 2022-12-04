@@ -55,6 +55,11 @@ const linksList = [
     icon: 'calculate',
     link: '/damagecalc',
   },
+  // {
+  //   title: 'Speed Tiers',
+  //   icon: 'speed',
+  //   link: '/speed-tiers',
+  // },
   {
     title: 'Scripts',
     icon: 'integration_instructions',

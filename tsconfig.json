@@ -18,7 +18,8 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "scripts",
-    "build/ScriptInput.vue.ts"
+    "src/**/*.cts",
+    "src/**/*.d.cts",
+    "scripts"
   ]
 }

@@ -7,10 +7,18 @@
             <q-tabs v-model="tab" vertical>
               <q-tab name="filters" icon="filter_alt" label="Filters" />
               <q-tab name="analytics" icon="analytics" label="Analytics" />
-              <q-route-tab href="https://github.com/sunoru/vgc/blob/main/src/utils/models.ts" icon="source"
-                label="Model Reference" target="_blank" />
-              <q-route-tab href="https://github.com/sunoru/vgc/blob/main/scripts/helpers.ts" icon="help_center"
-                label="Helper Functions" target="_blank" />
+              <q-route-tab
+                href="https://github.com/sunoru/vgc/blob/main/src/utils/models.ts"
+                icon="source"
+                label="Model Reference"
+                target="_blank"
+              />
+              <q-route-tab
+                href="https://github.com/sunoru/vgc/blob/main/scripts/helpers.ts"
+                icon="help_center"
+                label="Helper Functions"
+                target="_blank"
+              />
               <q-route-tab icon="file_upload" label="Import All Data">
                 <template v-slot>
                   <q-file v-model="fileToUpload" filled style="width: 100%; position: absolute; opacity: 0" />
@@ -20,28 +28,60 @@
               <q-route-tab icon="file_download" label="Export Table (CSV)" @click="onExportTable" />
               <q-route-tab>
                 <template v-slot>
-                  <q-toggle v-model="extendedFields" :disable="analyzer !== undefined" label="Extended Fields" />
+                  <q-toggle
+                    v-model="extendedFields"
+                    :disable="analyzer !== undefined"
+                    label="Extended Fields"
+                  />
                 </template>
               </q-route-tab>
             </q-tabs>
           </template>
           <template v-slot:after>
-            <q-tab-panels v-model="tab" animated swipeable vertical transition-prev="jump-up" transition-next="jump-up">
+            <q-tab-panels
+              v-model="tab"
+              animated
+              swipeable
+              vertical
+              transition-prev="jump-up"
+              transition-next="jump-up"
+            >
             </q-tab-panels>
           </template>
         </q-splitter>
       </q-expansion-item>
 
       <div class="q-mt-sm q-gutter-xs">
-        <q-chip v-for="(filter, i) in filters" :key="i" :label="getChipLabel(filter.script, filter.args)"
-          color="primary" removable @remove="onRemoveFilter(filter)" />
-        <q-chip v-if="analyzer" :label="getChipLabel(analyzer.script, analyzer.args)" color="green" removable
-          @remove="onRemoveAnalyzer" />
+        <q-chip
+          v-for="(filter, i) in filters"
+          :key="i"
+          :label="getChipLabel(filter.script, filter.args)"
+          color="primary"
+          removable
+          @remove="onRemoveFilter(filter)"
+        />
+        <q-chip
+          v-if="analyzer"
+          :label="getChipLabel(analyzer.script, analyzer.args)"
+          color="green"
+          removable
+          @remove="onRemoveAnalyzer"
+        />
       </div>
 
-      <q-table :title="tableTitle" class="battle-table q-mt-md" table-header-class="battle-table-header" :rows="rows"
-        :columns="columns" separator="cell" row-key="id" bordered virtual-scroll v-model:pagination="pagination"
-        :rows-per-page-options="[0]">
+      <q-table
+        :title="tableTitle"
+        class="battle-table q-mt-md"
+        table-header-class="battle-table-header"
+        :rows="rows"
+        :columns="columns"
+        separator="cell"
+        row-key="id"
+        bordered
+        virtual-scroll
+        v-model:pagination="pagination"
+        :rows-per-page-options="[0]"
+      >
         <template v-slot:top-right>
           <q-input borderless dense debounce="300" v-model="searching" placeholder="Search">
             <template v-slot:append>
@@ -72,7 +112,12 @@
               <br v-if="i > 0" />
               {{ line }}
             </span>
-            <q-popup-edit v-model="props.row.remarks" v-slot="scope" buttons @save="onSaveEdited(props.row, props.col)">
+            <q-popup-edit
+              v-model="props.row.remarks"
+              v-slot="scope"
+              buttons
+              @save="onSaveEdited(props.row, props.col)"
+            >
               <q-input type="textarea" v-model="scope.value" counter @keyup.enter.stop />
             </q-popup-edit>
           </q-td>
@@ -80,14 +125,12 @@
         <template v-slot:body-cell="props">
           <q-td :props="props">
             <div v-if="['team1', 'team2'].includes(props.col.name)">
-              <q-chip v-for="([sentOut, poke], i) in props.value" :key="i"
-                :label="(sentOut > 0 ? sentOut + ' ' : '') + poke" :color="
-                  sentOut > 0
-                    ? RestrictedPokemons.includes(poke)
-                      ? 'pink'
-                      : 'purple'
-                    : ''
-                " />
+              <q-chip
+                v-for="([sentOut, poke], i) in props.value"
+                :key="i"
+                :label="(sentOut > 0 ? sentOut + ' ' : '') + poke"
+                :color="sentOut > 0 ? (RestrictedPokemons.includes(poke) ? 'pink' : 'purple') : ''"
+              />
             </div>
             <span v-else>
               {{ props.value }}
@@ -110,12 +153,12 @@
   top: 0;
 }
 
-.battle-table>div:nth-child(1),
+.battle-table > div:nth-child(1),
 .battle-table-header {
   background-color: #fff;
 }
 
-.body--dark .battle-table>div:nth-child(1),
+.body--dark .battle-table > div:nth-child(1),
 .body--dark .battle-table-header {
   background-color: #121212;
 }
@@ -125,21 +168,11 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { exportFile, QTableProps } from 'quasar'
 import { ParsedBattle, PlayerNumber } from '../utils/models'
-import {
-  defaultAnalyzers,
-  defaultFilters,
-  ScriptSnippet,
-} from '../utils/scripts'
+import { defaultAnalyzers, defaultFilters, ScriptSnippet } from '../utils/scripts'
 
-import {
-  deleteObject,
-  getAllSavedObjects,
-  saveObject,
-  saveObjects,
-} from '../utils/storage'
+import { deleteObject, getAllSavedObjects, saveObject, saveObjects } from '../utils/storage'
 
 import PageBase from '../layouts/PageBase.vue'
-import ScriptInput from '../../build/ScriptInput.vue'
 import { showDialog } from '../utils/dialog'
 import { clone } from '../utils/utils'
 import { getOpponent, getPlayer, normalizeName } from '../../scripts/helpers'
@@ -160,22 +193,17 @@ export type Analyzer = {
 
 const extendedFields = ref(false)
 
-const getTeam = (
-  battle: ParsedBattle,
-  isUserPlayer: boolean
-): Array<readonly [number, string]> => {
+const getTeam = (battle: ParsedBattle, isUserPlayer: boolean): Array<readonly [number, string]> => {
   const player =
     battle.userPlayer === PlayerNumber.None
       ? isUserPlayer
         ? getPlayer(battle, PlayerNumber.Player1)
         : getPlayer(battle, PlayerNumber.Player2)
       : isUserPlayer
-        ? getPlayer(battle, battle.userPlayer)
-        : getOpponent(battle)
+      ? getPlayer(battle, battle.userPlayer)
+      : getOpponent(battle)
   return player.team.toArray().map((poke) => {
-    const sentOutIndex = player.sentOut.findIndex(
-      (p) => normalizeName(p.id) === poke
-    )
+    const sentOutIndex = player.sentOut.findIndex((p) => normalizeName(p.id) === poke)
     return [sentOutIndex + 1, poke] as const
   })
 }
@@ -191,9 +219,7 @@ const DefaultColumns: QTableProps['columns'] = [
     name: 'opponent',
     label: 'Opponent',
     field: (battle: ParsedBattle) =>
-      battle.userPlayer === PlayerNumber.None
-        ? `${battle.p1}, ${battle.p2}`
-        : getOpponent(battle).name,
+      battle.userPlayer === PlayerNumber.None ? `${battle.p1}, ${battle.p2}` : getOpponent(battle).name,
   },
   {
     name: 'rating',
@@ -205,11 +231,7 @@ const DefaultColumns: QTableProps['columns'] = [
     name: 'result',
     label: 'Result',
     field: (battle: ParsedBattle) =>
-      battle.userPlayer === PlayerNumber.None
-        ? 'N/A'
-        : battle.userPlayer === battle.winner
-          ? 'Win'
-          : 'Lose',
+      battle.userPlayer === PlayerNumber.None ? 'N/A' : battle.userPlayer === battle.winner ? 'Win' : 'Lose',
   },
   {
     name: 'team1',
@@ -265,14 +287,8 @@ onMounted(async () => {
   const battles = await getAllSavedObjects('battles')
   data.value = Array.from(Object.values(battles))
   const scripts = Array.from(Object.values(await getAllSavedObjects('scripts')))
-  filterScripts.value = [
-    ...defaultFilters,
-    ...scripts.filter((x) => x.type === 'filter'),
-  ]
-  analyzerScripts.value = [
-    ...defaultAnalyzers,
-    ...scripts.filter((x) => x.type === 'analyzer'),
-  ]
+  filterScripts.value = [...defaultFilters, ...scripts.filter((x) => x.type === 'filter')]
+  analyzerScripts.value = [...defaultAnalyzers, ...scripts.filter((x) => x.type === 'analyzer')]
   mounted.value = true
 })
 const pagination = ref({
@@ -290,11 +306,9 @@ const createFunction = <T>(script: ScriptSnippet, args: unknown[]) => {
     const func = (arg0: T) => f(arg0, ...args)
     return func
   } catch (e) {
-    showDialog(
-      `Failed to create function:${(e as { message: string }).message}`,
-      'negative',
-      { icon: 'warning' }
-    )
+    showDialog(`Failed to create function:${(e as { message: string }).message}`, 'negative', {
+      icon: 'warning',
+    })
     throw e
   }
 }
@@ -352,9 +366,7 @@ const onDeleteAnalyzerScript = async (script: ScriptSnippet) => {
     return
   }
   console.log(`Deleting script ${script.name} (${script.id})`)
-  analyzerScripts.value = analyzerScripts.value.filter(
-    (x) => x.id !== script.id
-  )
+  analyzerScripts.value = analyzerScripts.value.filter((x) => x.id !== script.id)
   await deleteObject('scripts', script.id)
   showDialog('Analyzer script deleted')
 }
@@ -375,16 +387,11 @@ const applySearch = (arr: unknown[]) => {
   const key = searching.value.trim().toLowerCase()
   if (!key) return arr
   return arr.filter((x) =>
-    Object.values(x as Record<string, unknown>).some((v) =>
-      String(v).toLowerCase().includes(key)
-    )
+    Object.values(x as Record<string, unknown>).some((v) => String(v).toLowerCase().includes(key))
   )
 }
 const rows = computed(() => {
-  const filtered = filters.value.reduce(
-    (acc, filter) => acc.filter(filter.func),
-    data.value
-  )
+  const filtered = filters.value.reduce((acc, filter) => acc.filter(filter.func), data.value)
   if (!analyzer.value) {
     return applySearch(filtered)
   }
@@ -448,9 +455,7 @@ watch(
       if (!ev.target) return
       const { result } = ev.target
       if (!result) return
-      const { usernames, scripts, battles } = JSON.parse(
-        result as string
-      ) as Partial<ExportedFile>
+      const { usernames, scripts, battles } = JSON.parse(result as string) as Partial<ExportedFile>
       const config = await getConfig()
       if (usernames) {
         usernames.forEach((x) => {
@@ -482,15 +487,10 @@ const onExport = async () => {
   const s = JSON.stringify(data)
   exportFile('data.json', s)
 }
-function wrapCsvValue<T>(
-  val: string,
-  formatFn?: (x: string, row?: T) => string,
-  row?: T
-) {
+function wrapCsvValue<T>(val: string, formatFn?: (x: string, row?: T) => string, row?: T) {
   let formatted = formatFn !== void 0 ? formatFn(val, row) : val
 
-  formatted =
-    formatted === void 0 || formatted === null ? '' : String(formatted)
+  formatted = formatted === void 0 || formatted === null ? '' : String(formatted)
 
   formatted = formatted.split('"').join('""')
   return `"${formatted}"`
@@ -528,21 +528,14 @@ const onExportTable = async () => {
   }
 }
 
-const onSaveEdited = async (
-  edited: ParsedBattle,
-  column?: { name: string }
-) => {
+const onSaveEdited = async (edited: ParsedBattle, column?: { name: string }) => {
   try {
     await saveObject('battles', edited)
     const message = column ? `${column.name} updated` : 'Battle updated'
     showDialog(message)
   } catch (e) {
     console.error(e)
-    showDialog(
-      `Error saving battle: ${(e as { message: string }).message}`,
-      'negative',
-      { icon: 'warning' }
-    )
+    showDialog(`Error saving battle: ${(e as { message: string }).message}`, 'negative', { icon: 'warning' })
   }
 }
 </script>
