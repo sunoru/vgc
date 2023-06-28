@@ -10,10 +10,7 @@ export const showDialog = (
   return Notify.create(opts)
 }
 
-export const selectDialog = (
-  message: string,
-  ...selections: string[]
-): Promise<number> =>
+export const selectDialog = (message: string, ...selections: string[]): Promise<number> =>
   new Promise((resolve) => {
     const opts: QNotifyCreateOptions = {
       message,
@@ -31,8 +28,5 @@ export const selectDialog = (
     const dismiss = Notify.create(opts)
   })
 
-export const confirmDialog = async (
-  message: string,
-  yes = 'Yes',
-  no = 'No'
-): Promise<boolean> => (await selectDialog(message, yes, no)) === 0
+export const confirmDialog = async (message: string, yes = 'Yes', no = 'No'): Promise<boolean> =>
+  (await selectDialog(message, yes, no)) === 0

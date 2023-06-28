@@ -1,19 +1,16 @@
 import { Table } from 'dexie'
+import { TableNames, VGCDatabase, getDB } from './db'
+import { getLocalConfig } from '../stores/config'
 
-import { LocalConfigs } from './config'
-import { getDB, TableNames, VGCDatabase } from './db'
+export type Cache<T> = Record<string, T>
 
-type ObjectType<T extends TableNames> = VGCDatabase[T] extends Table<infer R>
-  ? R
-  : never
+type ObjectType<T extends TableNames> = VGCDatabase[T] extends Table<infer R> ? R : never
 
-const _cachedObjects: Record<string, unknown> = {}
+const _cachedObjects: Cache<unknown> = {}
 
-const _getObjectsFromIDB = async <T extends TableNames>(
-  tableName: T
-): Promise<Record<string, ObjectType<T>>> => {
+const _getObjectsFromIDB = async <T extends TableNames>(tableName: T): Promise<Cache<ObjectType<T>>> => {
   const db = getDB()
-  const cached: Record<string, ObjectType<T>> = (_cachedObjects[tableName] = {})
+  const cached: Cache<ObjectType<T>> = (_cachedObjects[tableName] = {})
   for (const x of await db[tableName].toArray()) {
     cached[x.id] = x as ObjectType<T>
   }
@@ -23,15 +20,15 @@ const _getObjectsFromIDB = async <T extends TableNames>(
 export const getAllSavedObjects = async <T extends TableNames>(
   tableName: T,
   force = false
-): Promise<Record<string, ObjectType<T>>> => {
+): Promise<Cache<ObjectType<T>>> => {
   if (force || !(tableName in _cachedObjects)) {
-    if (LocalConfigs.useLocalStorage) {
+    if (getLocalConfig().useLocalStorage) {
       await _getObjectsFromIDB(tableName)
     } else {
       throw new Error('Not implemented')
     }
   }
-  return _cachedObjects[tableName] as Record<string, ObjectType<T>>
+  return _cachedObjects[tableName] as Cache<ObjectType<T>>
 }
 
 export const getSavedObject = async <T extends TableNames>(
@@ -47,7 +44,7 @@ export const saveObject = async <T extends TableNames>(
   tableName: T,
   x: ObjectType<T> & { id: string }
 ): Promise<ObjectType<T>> => {
-  if (LocalConfigs.useLocalStorage) {
+  if (getLocalConfig().useLocalStorage) {
     const db = getDB()
     await (db[tableName] as Table<ObjectType<T>>).put(x)
   } else {
@@ -60,12 +57,10 @@ export const saveObject = async <T extends TableNames>(
 
 export const saveObjects = async <T extends TableNames>(
   tableName: T,
-  objects:
-    | Record<string, ObjectType<T> & { id: string }>
-    | (ObjectType<T> & { id: string })[]
+  objects: Record<string, ObjectType<T> & { id: string }> | (ObjectType<T> & { id: string })[]
 ): Promise<ObjectType<T>[]> => {
   const items = Object.values(objects)
-  if (LocalConfigs.useLocalStorage) {
+  if (getLocalConfig().useLocalStorage) {
     const db = getDB()
     await (db[tableName] as Table<ObjectType<T>>).bulkPut(items)
   } else {
@@ -89,7 +84,7 @@ export const deleteObject = async <T extends TableNames>(
   }
   const x = cached[key]
   delete cached[key]
-  if (LocalConfigs.useLocalStorage) {
+  if (getLocalConfig().useLocalStorage) {
     const db = getDB()
     await (db[tableName] as Table<ObjectType<T>>).delete(key)
   } else {

@@ -1,53 +1,9 @@
-import JQuery from 'jquery'
+import type { MoveCategory as TMoveCategory, NatureName, TypeName, As } from 'vgc-tools'
 
 declare namespace DamageCalc {
-  type Type =
-    | 'Typeless'
-    | 'Normal'
-    | 'Fire'
-    | 'Water'
-    | 'Electric'
-    | 'Grass'
-    | 'Ice'
-    | 'Fighting'
-    | 'Poison'
-    | 'Ground'
-    | 'Flying'
-    | 'Psychic'
-    | 'Bug'
-    | 'Rock'
-    | 'Ghost'
-    | 'Dragon'
-    | 'Dark'
-    | 'Steel'
-    | 'Fairy'
-  type Nature =
-    | 'Adamant'
-    | 'Bashful'
-    | 'Bold'
-    | 'Brave'
-    | 'Calm'
-    | 'Careful'
-    | 'Docile'
-    | 'Gentle'
-    | 'Hardy'
-    | 'Hasty'
-    | 'Impish'
-    | 'Jolly'
-    | 'Lax'
-    | 'Lonely'
-    | 'Mild'
-    | 'Modest'
-    | 'Naive'
-    | 'Naughty'
-    | 'Quiet'
-    | 'Quirky'
-    | 'Rash'
-    | 'Relaxed'
-    | 'Sassy'
-    | 'Serious'
-    | 'Timid'
-  type MoveCategory = 'Physical' | 'Special' | 'Status'
+  type Type = Exclude<TypeName, '???'> | 'Typeless'
+  type Nature = NatureName
+  type MoveCategory = TMoveCategory
   interface Stats {
     hp: number
     at: number
@@ -58,10 +14,10 @@ declare namespace DamageCalc {
 
     sl?: number // Not in use
   }
-  type PokemonID = string
-  type AbilityID = string
-  type MoveID = string
-  type ItemID = string
+  type PokemonID = string & As<'pokemon-id'>
+  type AbilityID = string & As<'ability-id'>
+  type MoveID = string & As<'move-id'>
+  type ItemID = string & As<'item-id'>
   interface DexPokemon {
     t1: Type
     t2?: Type
@@ -96,18 +52,10 @@ export interface DamageCalc extends Window {
   Pokemon: new () => DamageCalc.Pokemon
   deletecustom: () => void
   savecustom: () => void
-  savecalc: (
-    set: DamageCalc.Pokemon,
-    spreadName: string,
-    accessIVs: JQuery
-  ) => void
+  savecalc: (set: DamageCalc.Pokemon, spreadName: string, accessIVs: JQuery) => void
   savecalc1: () => void
   savecalc2: () => void
-  exportset: (
-    set: DamageCalc.Pokemon,
-    spreadName: string,
-    accessIVs: JQuery
-  ) => void
+  exportset: (set: DamageCalc.Pokemon, spreadName: string, accessIVs: JQuery) => void
   exportset1: () => void
   exportset2: () => void
   bounds: {

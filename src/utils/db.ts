@@ -1,13 +1,12 @@
-import Dexie, { Table } from 'dexie'
+import Dexie, { type Table } from 'dexie'
 
-import { ParsedBattle } from './models'
-import { ScriptSnippet } from './scripts'
+import { ParsedBattle } from 'vgc-tools'
 
-export type TableNames = 'battles' | 'scripts'
-
+export type TableNames = 'battles'
 export class VGCDatabase extends Dexie {
-  battles!: Table<ParsedBattle>
-  scripts!: Table<ScriptSnippet>
+  battles!: Table<ParsedBattle, string>
+  // TODO: refactor scripts
+  scripts!: Table<unknown, string>
 
   constructor() {
     super('vgc')
@@ -15,6 +14,7 @@ export class VGCDatabase extends Dexie {
       battles: 'id',
       scripts: 'id',
     })
+    this.battles.mapToClass(ParsedBattle)
   }
 }
 
