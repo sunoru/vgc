@@ -5,3 +5,5 @@
 /node_modules
 .eslintrc.js
 /src-ssr
+/public/deps/
+/vgc-tools/dist
