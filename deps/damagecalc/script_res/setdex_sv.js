@@ -1,12 +1,8 @@
-var SETDEX_SS = {};
-var SETDEX_CUSTOM_SS = {};
+var SETDEX_SV = {};
+var SETDEX_CUSTOM_SV = {};
 
 var components = [
-    SETDEX_VGC2022_S13,
-    SETDEX_VGC2022,
-    SETDEX_VGC2021,
-    SETDEX_VGC2021_S10,
-    SETDEX_VGC_BFD,
+    SETDEX_VGC2023,
 ];
 
 for (var i=0; i<components.length; i++) {
@@ -14,20 +10,18 @@ for (var i=0; i<components.length; i++) {
     if (sourceDex) {
         for (var p in sourceDex) {
             if (sourceDex.hasOwnProperty(p)) {
-                SETDEX_SS[p] = $.extend(SETDEX_SS[p], sourceDex[p])
+                SETDEX_SV[p] = $.extend(SETDEX_SV[p], sourceDex[p])
             }
         }
     }
 }
 
-var reloadSSScript = function()
+var reloadSVScript = function()
 {
-  console.log(SETDEX_CUSTOM_SS);
+  console.log(SETDEX_CUSTOM_SV);
     components = [
-    SETDEX_VGC2022,
-    SETDEX_VGC2021,
-    SETDEX_VGC2021_S10,
-    SETDEX_CUSTOM_SS,
+    SETDEX_VGC2023,
+    SETDEX_CUSTOM_SV,
 ];
 
 for (var i=0; i<components.length; i++) {
@@ -35,7 +29,7 @@ for (var i=0; i<components.length; i++) {
     if (sourceDex) {
         for (var p in sourceDex) {
             if (sourceDex.hasOwnProperty(p)) {
-                SETDEX_SS[p] = $.extend(SETDEX_SS[p], sourceDex[p])
+                SETDEX_SV[p] = $.extend(SETDEX_SV[p], sourceDex[p])
             }
         }
     }

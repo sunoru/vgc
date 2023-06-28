@@ -1,21 +1,10 @@
-var showdownToCalcFormes = [["Kyurem-White", "Kyurem-W"],
-["Kyurem-Black", "Kyurem-B"],
-["Rotom-Wash", "Rotom-W"],
-["Rotom-Heat", "Rotom-H"],
-["Rotom-Frost", "Rotom-F"],
-["Rotom-Mow", "Rotom-C"],
-["Rotom-Fan", "Rotom-S"],
-["Giratina-Origin", "Giratina-O"],
-["Landorus-Therian", "Landorus-T"],
-["Thundurus-Therian", "Thundurus-T"],
-["Tornadus-Therian", "Tornadus-T"],
-["Floette-Eternal", "Floette-E"],
-["Pumpkaboo", "Pumpkaboo-Average"],
-["Gourgeist", "Gourgeist-Average"],
-["Wormadan-Sandy", "Wormadan-G"],
-["Wormadan-Trash", "Wormadan-S"],
-["Groudon-Primal", "Groudon"],
-["Kyogre-Primal", "Kyogre"],
+var showdownToCalcFormes = [
+    ["Pumpkaboo", "Pumpkaboo-Average"],
+    ["Gourgeist", "Gourgeist-Average"],
+    ["Wormadan-Sandy", "Wormadan-G"],
+    ["Wormadan-Trash", "Wormadan-S"],
+    ["Groudon-Primal", "Groudon"],
+    ["Kyogre-Primal", "Kyogre"],
     ["Zygarde-10%", "Zygarde"],
     ["Zygarde-Complete", "Zygarde"],
     ["Zacian-Crowned", "Zacian"],
@@ -23,85 +12,236 @@ var showdownToCalcFormes = [["Kyurem-White", "Kyurem-W"],
     ["Urshifu", "Urshifu-Single Strike"],
     ["Urshifu-Rapid-Strike", "Urshifu-Rapid Strike"],
     ["Calyrex-Ice", "Calyrex-Ice Rider"],
-    ["Calyrex-Shadow", "Calyrex-Shadow Rider"],];
+    ["Calyrex-Shadow", "Calyrex-Shadow Rider"],
+    ["Pikachu-Rock-Star", "Pikachu"],
+    ["Pikachu-Belle", "Pikachu"],
+    ["Pikachu-Pop-Star", "Pikachu"],
+    ["Pikachu-PhD", "Pikachu"],
+    ["Pikachu-Libre", "Pikachu"],
+    ["Shellos-East", "Shellos"],
+    ["Gastrodon-East", "Gastrodon"],
+    ["Basculin-Blue-Striped", "Basculin"],
+    ["Basculin-White-Striped", "Basculin"],
+    ["Deerling-Summer", "Deerling"],
+    ["Deerling-Autumn", "Deerling"],
+    ["Deerling-Winter", "Deerling"],
+    ["Sawsbuck-Summer", "Sawsbuck"],
+    ["Sawsbuck-Autumn", "Sawsbuck"],
+    ["Sawsbuck-Winter", "Sawsbuck"],
+    ["Keldeo-Resolute", "Keldeo"],
+    ["Genesect-Burn", "Genesect"],
+    ["Genesect-Chill", "Genesect"],
+    ["Genesect-Douse", "Genesect"],
+    ["Genesect-Shock", "Genesect"],
+    ["Magearna-Original", "Magearna"],
+    ["Toxtricity-Low-Key", "Toxtricity"],
+    ["Toxtricity-Low-Key-Gmax", "Toxtricity-Gmax"],
+    ["Sinistea-Antique", "Sinistea"],
+    ["Polteageist-Antique", "Polteageist"],
+    ["Zarude-Dada", "Zarude"],
+    ["Dudunsparce-Three-Segment", "Dudunsparce-Big"],
+    ["Tatsugiri-Droopy", "Tatsugiri"],
+    ["Tatsugiri-Stretchy", "Tatsugiri"],
+];
 
-var calcToShowdownFormes = [["Kyurem-White", "Kyurem-W"],
-["Kyurem-Black", "Kyurem-B"],
-["Rotom-Wash", "Rotom-W"],
-["Rotom-Heat", "Rotom-H"],
-["Rotom-Frost", "Rotom-F"],
-["Rotom-Mow", "Rotom-C"],
-["Rotom-Fan", "Rotom-S"],
-["Giratina-Origin", "Giratina-O"],
-["Landorus-Therian", "Landorus-T"],
-["Thundurus-Therian", "Thundurus-T"],
-["Tornadus-Therian", "Tornadus-T"],
-["Floette-Eternal", "Floette-E"],
-["Pumpkaboo", "Pumpkaboo-Average"],
-["Gourgeist", "Gourgeist-Average"],
-["Wormadan-Sandy", "Wormadan-G"],
-["Wormadan-Trash", "Wormadan-S"],
-["Urshifu", "Urshifu-Single Strike"],
-["Urshifu-Rapid-Strike", "Urshifu-Rapid Strike"],
-["Calyrex-Ice", "Calyrex-Ice Rider"],
-    ["Calyrex-Shadow", "Calyrex-Shadow Rider"],];
+var calcToShowdownFormes = [
+    ["Pumpkaboo", "Pumpkaboo-Average"],
+    ["Gourgeist", "Gourgeist-Average"],
+    ["Urshifu", "Urshifu-Single Strike"],
+    ["Urshifu-Rapid-Strike", "Urshifu-Rapid Strike"],
+    ["Calyrex-Ice", "Calyrex-Ice Rider"],
+    ["Calyrex-Shadow", "Calyrex-Shadow Rider"],
+    ["Shellos-East", "Shellos"],
+    ["Gastrodon-East", "Gastrodon"],
+    ["Dudunsparce-Three-Segment", "Dudunsparce-Big"],
+];
 
-var saveToCalcFormes = [["Darmanitan-Z", "Darmanitan"],
-["Darmanitan-Z-Galar", "Darmanitan-Galar"],
-["Zygarde 50%", "Zygarde"],
-["Zygarde 10%", "Zygarde"],
-["Zygarde Complete", "Zygarde"],
-["Zacian-Crowned", "Zacian"],
-["Zamazenta-Crowned", "Zamazenta"],];
+var saveToCalcFormes = [
+    ["Darmanitan-Zen", "Darmanitan"],
+    ["Darmanitan-Galar-Zen", "Darmanitan-Galar"],
+    ["Zygarde 50%", "Zygarde"],
+    ["Zygarde 10%", "Zygarde"],
+    ["Zygarde Complete", "Zygarde"],
+    ["Zacian-Crowned", "Zacian"],
+    ["Zamazenta-Crowned", "Zamazenta"],
+    ["Palafin-Hero", "Palafin"],
+];
+
+if (localStorage.custom_gen_5 != null) {
+    SETDEX_CUSTOM_BW = JSON.parse(localStorage.custom_gen_5);
+    reloadBWScript();
+}
+if (localStorage.custom_gen_6 != null) {
+    SETDEX_CUSTOM_XY = JSON.parse(localStorage.custom_gen_6);
+    reloadXYScript();
+}
+if (localStorage.custom_gen_7 != null) {
+    SETDEX_CUSTOM_SM = JSON.parse(localStorage.custom_gen_7);
+    reloadSMScript();
+}
+if (localStorage.custom_gen_8 != null) {
+    SETDEX_CUSTOM_SS = JSON.parse(localStorage.custom_gen_8);
+    reloadSSScript();
+}
+if (localStorage.custom_gen_9 != null) {
+    SETDEX_CUSTOM_SV = JSON.parse(localStorage.custom_gen_9);
+    reloadSVScript();
+}
+
 
 if (readCookie("custom_gen_5") != null) {
-    SETDEX_CUSTOM_BW = JSON.parse(readCookie("custom_gen_5"));
+    custom_cookies = JSON.parse(readCookie("custom_gen_5"));
+    cookiesToLocalStorage(custom_cookies, 5);
+    eraseCookie("custom_gen_5");
     reloadBWScript();
 }
 if (readCookie("custom_gen_6") != null) {
-    SETDEX_CUSTOM_XY = JSON.parse(readCookie("custom_gen_6"));
+    custom_cookies = JSON.parse(readCookie("custom_gen_6"));
+    cookiesToLocalStorage(custom_cookies, 6);
+    eraseCookie("custom_gen_6");
     reloadXYScript();
 }
 if (readCookie("custom_gen_7") != null) {
-    SETDEX_CUSTOM_SM = JSON.parse(readCookie("custom_gen_7"));
+    custom_cookies = JSON.parse(readCookie("custom_gen_7"));
+    cookiesToLocalStorage(custom_cookies, 7);
+    eraseCookie("custom_gen_7");
     reloadSMScript();
 }
 if (readCookie("custom_gen_8") != null) {
-    SETDEX_CUSTOM_SS = JSON.parse(readCookie("custom_gen_8"));
+    custom_cookies = JSON.parse(readCookie("custom_gen_8"));
+    cookiesToLocalStorage(custom_cookies, 8);
+    eraseCookie("custom_gen_8");
     reloadSSScript();
 }
 if (readCookie("custom_gen_84") != null) {
-    SETDEX_CUSTOM_BDSP = JSON.parse(readCookie("custom_gen_84"));
-    reloadBDSPScript();
+    custom_cookies = JSON.parse(readCookie("custom_gen_84"));
+    cookiesToLocalStorage(custom_cookies, 8);
+    eraseCookie("custom_gen_84");
+    reloadSSScript();
+}
+if (readCookie("custom_gen_9") != null) {
+    custom_cookies = JSON.parse(readCookie("custom_gen_9"));
+    cookiesToLocalStorage(custom_cookies, 9);
+    eraseCookie("custom_gen_9");
+    reloadSVScript();
+}
+
+function cookiesToLocalStorage(custom_cookies, generation) {
+    for (p in custom_cookies) {
+        for (set in custom_cookies[p]) {
+            var customFormat = {
+                "level": custom_cookies[p][set].level,
+                "evs": {
+                    "hp": custom_cookies[p][set].evs.hp,
+                    "at": custom_cookies[p][set].evs.at,
+                    "df": custom_cookies[p][set].evs.df,
+                    "sa": custom_cookies[p][set].evs.sa,
+                    "sd": custom_cookies[p][set].evs.sd,
+                    "sp": custom_cookies[p][set].evs.sp,
+                },
+                "ivs": {
+                    "hp": custom_cookies[p][set].ivs.hp,
+                    "at": custom_cookies[p][set].ivs.at,
+                    "df": custom_cookies[p][set].ivs.df,
+                    "sa": custom_cookies[p][set].ivs.sa,
+                    "sd": custom_cookies[p][set].ivs.sd,
+                    "sp": custom_cookies[p][set].ivs.sp,
+                },
+                "nature": custom_cookies[p][set].nature,
+                "ability": custom_cookies[p][set].ability,
+                "item": custom_cookies[p][set].item,
+                "moves": custom_cookies[p][set].moves,
+                "tera_type": custom_cookies[p][set].tera_type,
+            }
+
+            saveSets(generation, customFormat, p, set);
+        }
+    }
+}
+
+//Check for any sets that have the old naming convention
+if (SETDEX_CUSTOM_SV["Tauros-Paldea"]) {
+    for (set in SETDEX_CUSTOM_SV["Tauros-Paldea"]) {
+        saveSets(9, SETDEX_CUSTOM_SV["Tauros-Paldea"][set], "Tauros-Paldea-Combat", set);
+    }
+    delete SETDEX_CUSTOM_SV["Tauros-Paldea"];
+}
+if (SETDEX_CUSTOM_SV["Tauros-Paldea-Water"]) {
+    for (set in SETDEX_CUSTOM_SV["Tauros-Paldea-Water"]) {
+        saveSets(9, SETDEX_CUSTOM_SV["Tauros-Paldea-Water"][set], "Tauros-Paldea-Aqua", set);
+    }
+    delete SETDEX_CUSTOM_SV["Tauros-Paldea-Water"];
+}
+if (SETDEX_CUSTOM_SV["Tauros-Paldea-Fire"]) {
+    for (set in SETDEX_CUSTOM_SV["Tauros-Paldea-Fire"]) {
+        saveSets(9, SETDEX_CUSTOM_SV["Tauros-Paldea-Fire"][set], "Tauros-Paldea-Blaze", set);
+    }
+    delete SETDEX_CUSTOM_SV["Tauros-Paldea-Fire"];
 }
 
 var deletecustom = function () {
-    gen = parseInt($('input[name="gen"]:checked').val());
+    if (confirm("Warning: ALL custom sets from this generation will be deleted. This cannot be undone. Proceed?")) {
+        gen = parseInt($('input[name="gen"]:checked').val());
+        localStorage.removeItem("custom_gen_" + gen);
+        switch (gen) {
+            case 5:
+                SETDEX_CUSTOM_BW = {};
+                reloadBWScript();
+                break;
+            case 6:
+                SETDEX_CUSTOM_XY = {};
+                reloadXYScript();
+                break;
+            case 7:
+                SETDEX_CUSTOM_SM = {};
+                reloadSMScript();
+                break;
+            case 8:
+                SETDEX_CUSTOM_SS = {};
+                reloadSSScript();
+                break;
+            case 9:
+                SETDEX_CUSTOM_SV = {};
+                reloadSVScript();
+                break;
+            default:
+                console.log("THIS SHOULDN\'T HAPPEN LOL");
+        }
+        alert("Custom set deletion successful.");
+    }
+}
+
+function saveSets(gen, customFormat, species, spreadName) {
     switch (gen) {
         case 5:
-            SETDEX_CUSTOM_BW = {};
-            eraseCookie("custom_gen_" + gen);
-            reloadBWScript();
+            if (SETDEX_CUSTOM_BW[species] == null)
+                SETDEX_CUSTOM_BW[species] = {}
+            SETDEX_CUSTOM_BW[species][spreadName] = customFormat
+            localStorage.custom_gen_5 = JSON.stringify(SETDEX_CUSTOM_BW);
             break;
         case 6:
-            SETDEX_CUSTOM_XY = {};
-            eraseCookie("custom_gen_" + gen);
-            reloadXYScript();
+            if (SETDEX_CUSTOM_XY[species] == null)
+                SETDEX_CUSTOM_XY[species] = {}
+            SETDEX_CUSTOM_XY[species][spreadName] = customFormat
+            localStorage.custom_gen_6 = JSON.stringify(SETDEX_CUSTOM_XY);
             break;
         case 7:
-            SETDEX_CUSTOM_SM = {};
-            eraseCookie("custom_gen_" + gen);
-            reloadSMScript();
+            if (SETDEX_CUSTOM_SM[species] == null)
+                SETDEX_CUSTOM_SM[species] = {}
+            SETDEX_CUSTOM_SM[species][spreadName] = customFormat
+            localStorage.custom_gen_7 = JSON.stringify(SETDEX_CUSTOM_SM);
             break;
         case 8:
-            SETDEX_CUSTOM_SS = {};
-            eraseCookie("custom_gen_" + gen);
-            reloadSSScript();
+            if (SETDEX_CUSTOM_SS[species] == null)
+                SETDEX_CUSTOM_SS[species] = {}
+            SETDEX_CUSTOM_SS[species][spreadName] = customFormat
+            localStorage.custom_gen_8 = JSON.stringify(SETDEX_CUSTOM_SS);
             break;
-        case 84:
-            SETDEX_CUSTOM_BDSP = {};
-            eraseCookie("custom_gen_" + gen);
-            reloadBDSPScript();
+        case 9:
+            if (SETDEX_CUSTOM_SV[species] == null)
+                SETDEX_CUSTOM_SV[species] = {}
+            SETDEX_CUSTOM_SV[species][spreadName] = customFormat
+            localStorage.custom_gen_9 = JSON.stringify(SETDEX_CUSTOM_SV);
             break;
         default:
             console.log("THIS SHOULDN\'T HAPPEN LOL");
@@ -142,36 +282,40 @@ var savecustom = function()
 	var spreadName = document.getElementById('spreadName').value
 	if(spreadName == '')
         spreadName = "My Custom Set";
+    //if ('https://pokepast.es/'.indexOf(string) !== -1) {
+    //    $.ajax({ url: 'string', success: function (data) { alert(data); } });
+    //}
 
     //numPokemon separates individual Pokemon so user can add multiple Pokemon at once under the same set name
     var numPokemon = string.split('\n\n')
     numPokemon = numPokemon.filter(element => element)
 
     for (var a = 0; a < numPokemon.length; a++) {
-        var lines = numPokemon[a].split('\n')
+        var lines = numPokemon[a].split('\n');
         var species = "";
         var item = "";
-        var ability = ""
+        var ability = "";
         var level = 50;
         var EVs = [0, 0, 0, 0, 0, 0];
-        var IVs = [31, 31, 31, 31, 31, 31]
-        var nature = "Serious"
-        var moves = []
+        var IVs = [31, 31, 31, 31, 31, 31];
+        var nature = "Serious";
+        var moves = [];
 
         /*	Pokemon Showdown Export Format
     0	Nickname (Species) @ Item
     1	Ability: Name
     2	Level: #
-    3	EVs: # Stat / # Stat / # Stat
-    4	Serious Nature
-    5	IVs: # Stat
-    6	- Move Name
+    3	Tera Type: #
+    4	EVs: # Stat / # Stat / # Stat
+    5	Serious Nature
+    6	IVs: # Stat
     7	- Move Name
     8	- Move Name
     9	- Move Name
+    10	- Move Name
         */
 
-        //geting rid of gender identities (lel)
+        //The calc won't save gender until there's a new viable, calc-relevant thing in the games. Or Rivalry has a niche again
         if (lines[0].indexOf('(M)') != -1) {
             lines[0] = lines[0].substring(0, lines[0].indexOf('(M)') - 1) +
                 lines[0].substring(lines[0].indexOf('(M)') + 3, lines[0].length);
@@ -188,13 +332,21 @@ var savecustom = function()
         else
             species = lines[0].split('@')[0].trim(); //species is always first
 
-        checkGmax = species.indexOf("-Gmax", 0)
+        checkGmax = species.indexOf("-Gmax", 0);
+        checkMega = species.indexOf("-Mega", 0);
+        checkPrimal = species.indexOf("-Primal", 0);
         if (checkGmax != -1)
             species = species.substring(0, checkGmax);
+        if (checkMega != -1)
+            species = species.substring(0, checkMega);
+        if (checkPrimal != -1)
+            species = species.substring(0, checkPrimal);
         for (var i = 0; i < showdownToCalcFormes.length; ++i) {
             if (species == showdownToCalcFormes[i][0])
                 species = showdownToCalcFormes[i][1]
         }
+
+        var tera_type = pokedex[species].t1;
 
         if (lines[0].indexOf('@') != -1)
             item = lines[0].substring(lines[0].indexOf('@') + 1).trim(); //item is always after @
@@ -203,6 +355,9 @@ var savecustom = function()
             for (var i = 2; i < lines.length; ++i) {
                 if (lines[i].indexOf("Level") != -1) {
                     level = lines[2].split(' ')[1].trim(); //level is sometimes third but uh not always
+                }
+                if (lines[i].indexOf("Tera Type") != -1) {
+                    tera_type = lines[i].split(' ')[2].trim(); //
                 }
                 if (lines[i].indexOf("EVs") != -1) //if EVs are in this line
                 {
@@ -307,43 +462,11 @@ var savecustom = function()
             },
             "nature": nature,
             "ability": ability,
+            "tera_type": tera_type,
             "item": item,
             "moves": moves,
         }
-        switch (gen) {
-            case 5:
-                if (SETDEX_CUSTOM_BW[species] == null)
-                    SETDEX_CUSTOM_BW[species] = {}
-                SETDEX_CUSTOM_BW[species][spreadName] = customFormat
-                createCookie("custom_gen_5", JSON.stringify(SETDEX_CUSTOM_BW), 365)
-                break;
-            case 6:
-                if (SETDEX_CUSTOM_XY[species] == null)
-                    SETDEX_CUSTOM_XY[species] = {}
-                SETDEX_CUSTOM_XY[species][spreadName] = customFormat
-                createCookie("custom_gen_6", JSON.stringify(SETDEX_CUSTOM_XY), 365)
-                break;
-            case 7:
-                if (SETDEX_CUSTOM_SM[species] == null)
-                    SETDEX_CUSTOM_SM[species] = {}
-                SETDEX_CUSTOM_SM[species][spreadName] = customFormat
-                createCookie("custom_gen_7", JSON.stringify(SETDEX_CUSTOM_SM), 365)
-                break;
-            case 8:
-                if (SETDEX_CUSTOM_SS[species] == null)
-                    SETDEX_CUSTOM_SS[species] = {}
-                SETDEX_CUSTOM_SS[species][spreadName] = customFormat
-                createCookie("custom_gen_8", JSON.stringify(SETDEX_CUSTOM_SS), 365)
-                break;
-            case 84:
-                if (SETDEX_CUSTOM_BDSP[species] == null)
-                    SETDEX_CUSTOM_BDSP[species] = {}
-                SETDEX_CUSTOM_BDSP[species][spreadName] = customFormat
-                createCookie("custom_gen_84", JSON.stringify(SETDEX_CUSTOM_BDSP), 365)
-                break;
-            default:
-                console.log("THIS SHOULDN\'T HAPPEN LOL");
-        }
+        saveSets(gen, customFormat, species, spreadName);
     }
     switch (gen) {
         case 5:
@@ -360,6 +483,9 @@ var savecustom = function()
             break;
         case 84:
             reloadBDSPScript();
+            break;
+        case 9:
+            reloadSVScript();
             break;
         default:
             console.log("THIS SHOULDN\'T HAPPEN LOL");
@@ -421,43 +547,25 @@ var savecalc = function (set, spreadName, accessIVs) {
         "ability": set.ability,
         "item": set.item,
         "moves": moves,
-    }
+        "tera_type": set.tera_type,
+    };
 
+    saveSets(gen, customFormat, species, spreadName);
     switch (gen) {
         case 5:
-            if (SETDEX_CUSTOM_BW[species] == null)
-                SETDEX_CUSTOM_BW[species] = {}
-            SETDEX_CUSTOM_BW[species][spreadName] = customFormat
-            createCookie("custom_gen_5", JSON.stringify(SETDEX_CUSTOM_BW), 365)
             reloadBWScript()
             break;
         case 6:
-            if (SETDEX_CUSTOM_XY[species] == null)
-                SETDEX_CUSTOM_XY[species] = {}
-            SETDEX_CUSTOM_XY[species][spreadName] = customFormat
-            createCookie("custom_gen_6", JSON.stringify(SETDEX_CUSTOM_XY), 365)
             reloadXYScript()
             break;
         case 7:
-            if (SETDEX_CUSTOM_SM[species] == null)
-                SETDEX_CUSTOM_SM[species] = {}
-            SETDEX_CUSTOM_SM[species][spreadName] = customFormat
-            createCookie("custom_gen_7", JSON.stringify(SETDEX_CUSTOM_SM), 365)
             reloadSMScript()
             break;
         case 8:
-            if (SETDEX_CUSTOM_SS[species] == null)
-                SETDEX_CUSTOM_SS[species] = {}
-            SETDEX_CUSTOM_SS[species][spreadName] = customFormat
-            createCookie("custom_gen_8", JSON.stringify(SETDEX_CUSTOM_SS), 365)
             reloadSSScript()
             break;
-        case 84:
-            if (SETDEX_CUSTOM_BDSP[species] == null)
-                SETDEX_CUSTOM_BDSP[species] = {}
-            SETDEX_CUSTOM_BDSP[species][spreadName] = customFormat
-                createCookie("custom_gen_84", JSON.stringify(SETDEX_CUSTOM_BDSP), 365)
-            reloadBDSPScript()
+        case 9:
+            reloadSVScript()
             break;
         default:
             console.log("THIS SHOULDN\'T HAPPEN LOL");
@@ -510,8 +618,17 @@ var exportset = function (set, accessIVs) {
     }
 
     exItem = set.item != "" ? " @ " + set.item : "";
-    exAbility = "Ability: " + set.ability;
-    exLevel = "Level: " + set.level;
+    if (set.ability === "As One") {
+        set.ability = exSpecies === "Calyrex-Ice" ? set.ability + " (Glastrier)"
+            : exSpecies === "Calyrex-Shadow" ? set.ability + " (Spectrier)"
+                : set.ability;
+    }
+    exAbility = "Ability: " + set.ability + "\n";
+    exLevel = "Level: " + set.level + "\n";
+    if (gen == 9)
+        exTera = "Tera Type: " + set.tera_type + "\n";
+    else
+        exTera = "";
 
     //MORE OPTIMAL VERSION OF EV EXPORT IF READABILITY ISN'T A CONCERN
     //
@@ -559,9 +676,9 @@ var exportset = function (set, accessIVs) {
         hasEVs = true;
     }
     if (hasEVs) {
-        exEVs = "EVs: " + exEVs;
+        exEVs = "EVs: " + exEVs + "\n";
     }
-    exNature = set.nature + " Nature";
+    exNature = set.nature + " Nature\n";
 
     //SAME DEAL WITH EVS, OPTIMIZED IV EXPORT IF READABILITY ISN'T A CONCERN
     //
@@ -609,7 +726,7 @@ var exportset = function (set, accessIVs) {
         hasIVs = true;
     }
     if (hasIVs) {
-        exIVs = "IVs: " + exIVs;
+        exIVs = "IVs: " + exIVs + "\n";
     }
     exMoves = ["- " + set.moves[0].name,
         "- " + set.moves[1].name,
@@ -622,10 +739,11 @@ var exportset = function (set, accessIVs) {
         }
     }
 
-    exportText = exSpecies + exItem + "\n" + exAbility + "\n" + exLevel + "\n" + exEVs + "\n" + exNature + "\n" + exIVs + "\n" +
-        exMoveset;
+    exSpeciesAndItem = exSpecies + exItem + "\n";
 
+    exportText = exSpeciesAndItem + exAbility + exLevel + exTera + exEVs + exNature + exIVs + exMoveset;
     Clipboard_CopyTo(exportText);
+    //tempCSV();
 }
 
 var exportset1 = function () {

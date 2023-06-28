@@ -69,6 +69,14 @@ function GET_DAMAGE_SS(attacker, defender, move, field) {
                     : field.terrain === "Psychic" ? "Psychic"
                         : "Normal";
     }
+    else if (move.name == "Techno Blast") {
+        move.type = attacker.item === "Burn Drive" ? "Fire"
+            : attacker.item === "Chill Drive" ? "Ice"
+                : attacker.item === "Douse Drive" ? "Water"
+                    : attacker.item === "Shock Drive" ? "Electric"
+                        : "Normal";
+    }
+    
     if (move.isSignatureZ) {
         move.isZ = true;
         if (field.isProtect) {
@@ -159,23 +167,24 @@ function GET_DAMAGE_SS(attacker, defender, move, field) {
             move.bp = 0;
             move.isCrit = false;
         }
-        else move.isCrit = tempMove.isCrit;
+        else {
+            move.isCrit = tempMove.isCrit;
+            move.type = tempMove.type;
+        }
         move.category = tempMove.category;
         move.hits = 1;
         if (field.isProtect && ["G-Max One Blow", "G-Max Rapid Flow"].indexOf(maxName) == -1) isQuarteredByProtect = true;
     }
     if (move.name === "Nature Power") {         //Rename Nature Power to its appropriately called moves; needs to be done after Max Moves since Nature Power becomes Max Guard
         move.category = "Special";
-        move.name = (field.terrain == "Electric") ? "Thunderbolt"
+        var npMove = (field.terrain == "Electric") ? "Thunderbolt"
             : (field.terrain == "Grassy") ? "Energy Ball"
                 : (field.terrain == "Psychic") ? "Psychic"
                     : (field.terrain == "Misty") ? "Moonblast"
                         : "Tri Attack";
-        move.bp = (field.terrain == "Electric" || field.terrain == "Grassy" || field.terrain == "Psychic") ? 90
-            : (field.terrain == "Misty") ? 95
-                : 80;
-        if (field.terrain == "Grassy") move.isBullet = true;
-        moveDescName = move.name;
+        move.name = npMove;
+        move = moves[npMove];
+        moveDescName = npMove;
     }
     attacker_name = attacker.name;
     if (attacker_name && attacker_name.includes("-Gmax")) attacker_name = attacker_name.substring(0, attacker_name.indexOf('-Gmax'));
@@ -438,11 +447,11 @@ function GET_DAMAGE_SS(attacker, defender, move, field) {
         case "Rising Voltage":
             basePower = (field.terrain === "Electric" && defIsGrounded) ? move.bp * 2 : move.bp;
             description.moveBP = basePower;
-            break;
+            break;/*
         case "Triple Kick":
         case "Triple Axel":
             basePower = move.bp * 2;
-            break;
+            break;*/
         case "Crush Grip":
         case "Wring Out":
             basePower = floor(pokeRound(120 * 100 * floor(attacker.curHP*0x1000/attacker.maxHP)/0x1000)/100);
@@ -560,8 +569,8 @@ function GET_DAMAGE_SS(attacker, defender, move, field) {
         description.moveBP = move.bp / 2;
         description.weather = field.weather;
     } //technicially Me First would sandwich between these
-    else if (move.name === "Knock Off" && !(defender.item === null || defender.item === "" || defender.item.includes("ium Z") ||
-        (defender.name === "Giratina-O" && defender.item === "Griseous Orb") ||
+    else if (move.name === "Knock Off" && defender.name !== null && !(defender.item === null || defender.item === "" || defender.item.includes("ium Z") ||
+        (defender.name === "Giratina-Origin" && defender.item === "Griseous Orb") ||
         (defender.name.indexOf("Arceus") !== -1 && defender.item.indexOf("Plate") !== -1) ||
         (defender.name.indexOf("Genesect") !== -1 && defender.item.indexOf("Drive") !== -1) ||
         (defender.name.indexOf("Silvally") !== -1 && defender.item.indexOf("Memory") !== -1) ||
@@ -636,7 +645,12 @@ function GET_DAMAGE_SS(attacker, defender, move, field) {
     description.attackEVs = attacker.evs[attackStat] +
             (NATURES[attacker.nature][0] === attackStat ? "+" : NATURES[attacker.nature][1] === attackStat ? "-" : "") + " " +
         toSmogonStat(attackStat);
-    if (move.name === "Meteor Beam") {
+
+    if (move.name === "Spectral Thief" && defender.boosts[attackStat] > 0) {
+        description.attackBoost = Math.min(6, attacker.boosts[attackStat] + defender.boosts[attackStat]);
+        attack = getModifiedStat(attackSource.rawStats[attackStat], Math.min(6, attacker.boosts[attackStat] + defender.boosts[attackStat]));
+    }
+    else if (move.name === "Meteor Beam") {
         description.attackBoost = Math.min(6, attackSource.boosts[attackStat] + 1);
         attack = getModifiedStat(attackSource.rawStats[attackStat], Math.min(6, attackSource.boosts[attackStat] + 1));
     } else if (attackSource.boosts[attackStat] === 0 || (isCritical && attackSource.boosts[attackStat] < 0)) {
@@ -732,7 +746,11 @@ function GET_DAMAGE_SS(attacker, defender, move, field) {
     description.defenseEVs = defender.evs[defenseStat] +
             (NATURES[defender.nature][0] === defenseStat ? "+" : NATURES[defender.nature][1] === defenseStat ? "-" : "") + " " +
             toSmogonStat(defenseStat);
-    if (defender.boosts[defenseStat] === 0 || (isCritical && defender.boosts[defenseStat] > 0) || move.ignoresDefenseBoosts) {
+
+    if (move.name === "Spectral Thief" && defender.boosts[defenseStat] > 0) {
+        defense = defender.rawStats[defenseStat];
+    }
+    else if (defender.boosts[defenseStat] === 0 || (isCritical && defender.boosts[defenseStat] > 0) || move.ignoresDefenseBoosts) {
         defense = defender.rawStats[defenseStat];
     } else if (attacker.ability === "Unaware") {
         defense = defender.rawStats[defenseStat];
@@ -764,7 +782,7 @@ function GET_DAMAGE_SS(attacker, defender, move, field) {
         dfMods.push(0x1800);
         description.defenderAbility = defAbility;
     } else if ((defAbility === "Fur Coat" && hitsPhysical) ||
-        (defAbility === "Ice Scales" && ((!hitsPhysical && !makesContact) || move.name == "Psyshock" || move.name == "Psystrike" || move.name == "Secret Sword"))) {
+        (defAbility === "Ice Scales" && ((!hitsPhysical && !move.makesContact) || move.name == "Psyshock" || move.name == "Psystrike" || move.name == "Secret Sword"))) {
         dfMods.push(0x2000);
         description.defenderAbility = defAbility;
     }
@@ -896,17 +914,31 @@ function GET_DAMAGE_SS(attacker, defender, move, field) {
     var finalMod = chainMods(finalMods);
 
     var damage = [], pbDamage = [];
-    var child, childDamage, j;
-    if (attacker.ability === "Parental Bond" && move.hits === 1 && (field.format === "Singles" || !move.isSpread)) {
-        child = JSON.parse(JSON.stringify(attacker));
-        child.ability = '';
-        child.isChild = true;
-        if (move.name === 'Power-Up Punch') {
-            child.boosts[AT]++;
-            child.stats[AT] = getModifiedStat(child.rawStats[AT], child.boosts[AT]);
+    var child, childDamage, j; 
+    var childMove, child2Damage, tripleDamage = [];
+
+    //Triple Kick/Axel check comes first so Parental Bond doesn't mess with a multi hit move
+    if (typeof (move.tripleHit) === 'undefined') {
+        if (move.name === "Triple Kick" || move.name === "Triple Axel") {
+            childMove = move;
+            childMove.tripleHit = true;
+            childMove.bp = move.bp * 2;
+            childDamage = GET_DAMAGE_SS(attacker, defender, childMove, field).damage;
+            childMove.bp = childMove.bp * 1.5;
+            child2Damage = GET_DAMAGE_SS(attacker, defender, childMove, field).damage;
+            move.tripleHit = false;
         }
-        childDamage = GET_DAMAGE_SS(child, defender, move, field).damage;
-        description.attackerAbility = attacker.ability;
+        else if (attacker.ability === "Parental Bond" && move.hits === 1 && (field.format === "Singles" || !move.isSpread)) {
+            child = JSON.parse(JSON.stringify(attacker));
+            child.ability = '';
+            child.isChild = true;
+            if (move.name === 'Power-Up Punch') {
+                child.boosts[AT]++;
+                child.stats[AT] = getModifiedStat(child.rawStats[AT], child.boosts[AT]);
+            }
+            childDamage = GET_DAMAGE_SS(child, defender, move, field).damage;
+            description.attackerAbility = attacker.ability;
+        }
     }
 
     for (var i = 0; i < 16; i++) {
@@ -922,7 +954,14 @@ function GET_DAMAGE_SS(attacker, defender, move, field) {
             description.isQuarteredByProtect = true;
         }
         damage[i] = Math.max(1, damage[i]);
-        if (attacker.ability === "Parental Bond" && move.hits === 1 && (field.format === "Singles" || !move.isSpread)) {
+        if (typeof (move.tripleHit) !== 'undefined' && move.tripleHit === false && (move.name === "Triple Kick" || move.name === "Triple Axel")) {
+            for (j = 0; j < 16; j++) {
+                for (k = 0; k < 16; k++) {
+                    tripleDamage[(16 * i) + (16 * j) + k] = damage[i] + childDamage[j] + child2Damage[k];
+                }
+            }
+        }
+        else if (typeof (move.tripleHit) === 'undefined' && attacker.ability === "Parental Bond" && move.hits === 1 && (field.format === "Singles" || !move.isSpread)) {
             for (j = 0; j < 16; j++) {
                 pbDamage[(16 * i) + j] = damage[i] + childDamage[j];
             }
@@ -936,8 +975,22 @@ function GET_DAMAGE_SS(attacker, defender, move, field) {
             "childDamage": childDamage,
             "description": buildDescriptionSS(description)
         };
-    }
-    return { "damage": pbDamage.length ? pbDamage.sort(numericSort) : damage, "description": buildDescriptionSS(description) };
+    }///*
+    if (tripleDamage.length) {
+        return {
+            "damage": tripleDamage.sort(numericSort),
+            "parentDamage": damage,
+            "childDamage": childDamage,
+            "child2Damage": child2Damage,
+            "description": buildDescriptionSS(description)
+        };
+    }//*/
+    return {
+        "damage": pbDamage.length ? pbDamage.sort(numericSort) :///*
+            tripleDamage.length ? tripleDamage.sort(numericSort) ://*/
+                damage,
+        "description": buildDescriptionSS(description)
+    };
 }
 
 function numericSort(a, b) {

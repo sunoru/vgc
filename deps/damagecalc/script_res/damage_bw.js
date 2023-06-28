@@ -79,8 +79,8 @@ function GET_DAMAGE_BW(attacker, defender, move, field) {
         description.attackerAbility = attacker.ability;
     }
 
-    var typeEffect1 = getMoveEffectiveness(move, defender.type1, defender.type2, attacker.ability === "Scrappy" || field.isForesight, field.isGravity);
-    var typeEffect2 = defender.type2 ? getMoveEffectiveness(move, defender.type2, defender.type1, attacker.ability === "Scrappy" || field.isForesight, field.isGravity) : 1;
+    var typeEffect1 = getMoveEffectiveness(move, defender.type1, defender.type2, attacker.ability === "Scrappy" || field.isForesight, field.isGravity, defender.item);
+    var typeEffect2 = defender.type2 ? getMoveEffectiveness(move, defender.type2, defender.type1, attacker.ability === "Scrappy" || field.isForesight, field.isGravity, defender.item) : 1;
     var typeEffectiveness = typeEffect1 * typeEffect2;
 
     if (typeEffectiveness === 0) {
@@ -469,35 +469,35 @@ function GET_DAMAGE_BW(attacker, defender, move, field) {
     return {damage, "description": buildDescription(description)};
 }
 
-function getFinalSpeed(pokemon, weather) {
-    var speed = getModifiedStat(pokemon.rawStats[SP], pokemon.boosts[SP]);
-    var otherSpeedMods = 1;
-    if (pokemon.item === "Choice Scarf") {
-        otherSpeedMods *= 1.5;
-    } else if (pokemon.item === "Macho Brace" || pokemon.item === "Iron Ball") {
-        otherSpeedMods *= 0.5;
-    }
-    if (pokemon.ability === "Quick Feet" && pokemon.status !== "Healthy")
-    {
-        otherSpeedMods *= 1.5;
-    }
-    if (pokemon.ability === "Slow Start")
-    {
-        otherSpeedMods *= 0.5;
-    }
-    if ((pokemon.ability === "Chlorophyll" && weather.indexOf("Sun") > -1) ||
-            (pokemon.ability === "Sand Rush" && weather === "Sand") ||
-            (pokemon.ability === "Swift Swim" && weather.indexOf("Rain") > -1) ||
-            (pokemon.ability === "Slush Rush" && weather.indexOf("Hail") > -1) ||
-            (pokemon.ability === "Unburden" && pokemon.item === "") ||
-            (pokemon.name === "Ditto" && pokemon.item === "Quick Powder")) {
-        otherSpeedMods *= 2;
-    }
-    speed = pokeRound(speed * otherSpeedMods);
-    if (pokemon.status === "Paralyzed" && pokemon.ability !== "Quick Feet") {
-        speed = Math.floor(speed / 4);
-    }
-    if (speed > 10000) {speed = 10000;}
-    return speed;
-}
+//function getFinalSpeed(pokemon, weather) {
+//    var speed = getModifiedStat(pokemon.rawStats[SP], pokemon.boosts[SP]);
+//    var otherSpeedMods = 1;
+//    if (pokemon.item === "Choice Scarf") {
+//        otherSpeedMods *= 1.5;
+//    } else if (pokemon.item === "Macho Brace" || pokemon.item === "Iron Ball") {
+//        otherSpeedMods *= 0.5;
+//    }
+//    if (pokemon.ability === "Quick Feet" && pokemon.status !== "Healthy")
+//    {
+//        otherSpeedMods *= 1.5;
+//    }
+//    if (pokemon.ability === "Slow Start")
+//    {
+//        otherSpeedMods *= 0.5;
+//    }
+//    if ((pokemon.ability === "Chlorophyll" && weather.indexOf("Sun") > -1) ||
+//            (pokemon.ability === "Sand Rush" && weather === "Sand") ||
+//            (pokemon.ability === "Swift Swim" && weather.indexOf("Rain") > -1) ||
+//            (pokemon.ability === "Slush Rush" && weather.indexOf("Hail") > -1) ||
+//            (pokemon.ability === "Unburden" && pokemon.item === "") ||
+//            (pokemon.name === "Ditto" && pokemon.item === "Quick Powder")) {
+//        otherSpeedMods *= 2;
+//    }
+//    speed = pokeRound(speed * otherSpeedMods);
+//    if (pokemon.status === "Paralyzed" && pokemon.ability !== "Quick Feet") {
+//        speed = Math.floor(speed / 4);
+//    }
+//    if (speed > 10000) {speed = 10000;}
+//    return speed;
+//}
 
