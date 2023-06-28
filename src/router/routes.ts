@@ -7,8 +7,8 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
       {
-        path: 'replays',
-        component: () => import('src/pages/ReplayImporterPage.vue'),
+        path: 'replay-importer',
+        component: () => import('pages/ReplayImporterPage.vue'),
       },
       {
         path: 'battles',

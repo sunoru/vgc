@@ -5,13 +5,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { watch, onMounted } from 'vue'
 
 const props = defineProps<{
   title?: string
 }>()
 
-onMounted(() => {
+const setTitle = () => {
   document.title = (props.title ? `${props.title} - ` : '') + 'VGC Tools'
-})
+}
+onMounted(setTitle)
+watch(() => props.title, setTitle)
+
 </script>

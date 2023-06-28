@@ -3,46 +3,46 @@
     <div class="q-pa-md col" style="max-width: 720px">
       <div class="text-h3">Settings</div>
       <q-form class="q-mt-md" @submit="save">
-        <q-toggle disable v-model="useLocalStorage" label="Use Local Storage" />
+        <div>
+          <q-toggle disable v-model="config.useLocalStorage" label="Use Local Storage" />
+        </div>
+        <div>
+          <q-toggle v-model="config.darkMode" label="Dark Mode" />
+        </div>
         <q-input
-          label="My Usernames (Separated by commas)"
+          label="My Usernames (Separated by linebreaks)"
           v-model="textMyUsernames"
           filled
           type="textarea"
         />
-        <q-btn class="q-mt-md" type="submit" label="Save" />
+        <q-btn class="q-mt-md" color="primary" type="submit" label="Save" :loading="isSaving" />
       </q-form>
     </div>
   </page-base>
 </template>
 
-<script lang="ts">
-import { getConfig, saveConfig, LocalConfigs } from '../utils/config'
-import { defineComponent, onMounted, ref } from 'vue'
-import PageBase from '../layouts/PageBase.vue'
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
 
-export default defineComponent({
-  name: 'SettingsPage',
-  setup() {
-    const textMyUsernames = ref('')
-    const save = async () => {
-      const config = await getConfig()
-      config.myUsernames = textMyUsernames.value
-        .split(',')
-        .map((s) => s.trim())
-        .filter((s) => s)
-      await saveConfig(config)
-    }
-    onMounted(async () => {
-      const c = await getConfig()
-      textMyUsernames.value = c.myUsernames.join(',')
-    })
-    return {
-      textMyUsernames,
-      save,
-      useLocalStorage: ref(LocalConfigs.useLocalStorage),
-    }
-  },
-  components: { PageBase },
+import PageBase from '../layouts/PageBase.vue'
+import { useConfigStore } from '../stores/config'
+
+const config = useConfigStore().config
+const textMyUsernames = ref('')
+const isSaving = ref(true)
+const save = () => {
+  if (isSaving.value) return
+  isSaving.value = true
+  config.showdownUsernames = textMyUsernames.value
+    .split('\n')
+    .map((s) => s.trim())
+    .filter((s) => s)
+  setTimeout(() => {
+    isSaving.value = false
+  }, 500)
+}
+onMounted(() => {
+  textMyUsernames.value = config.showdownUsernames.join('\n')
+  isSaving.value = false
 })
 </script>

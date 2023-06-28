@@ -5,13 +5,8 @@
       </div> -->
       <div class="row justify-center" :style="{ height }">
         <q-spinner v-if="!loaded" class="q-mt-md" color="primary" size="3em" />
-        <iframe
-          class="col iframe"
-          :class="{ hidden: !loaded }"
-          ref="iframeRef"
-          src="/deps/damagecalc/index.html"
-          frameborder="0"
-        />
+        <iframe class="col iframe" :class="{ hidden: !loaded }" style="border: none" ref="iframeRef"
+          src="/deps/damagecalc/index.html" frameborder="0" />
       </div>
       <div v-if="loaded" class="row justify-center">
         <q-item :href="OriginalURL" target="_blank">
@@ -27,9 +22,8 @@ import { onMounted, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 
 import PageBase from '../layouts/PageBase.vue'
-import { LocalConfigs } from '../utils/config'
-import { asyncCall } from '../utils/utils'
-import { DamageCalc } from '../utils/damage-calc'
+import type { DamageCalc } from '../utils/damage-calc'
+import { useConfigStore } from '../stores/config'
 
 const OriginalURL = 'https://github.com/nerd-of-now/NCP-VGC-Damage-Calculator'
 
@@ -51,12 +45,14 @@ const updateTheme = (dark: boolean) => {
   }
 }
 
+const config = useConfigStore().config
+
 watch(() => $q.dark.isActive, updateTheme)
 onMounted(() => {
   const iframe = iframeRef.value
   if (!iframe) return
   iframe.onload = () => {
-    updateTheme(LocalConfigs.useDarkMode)
+    updateTheme(config.darkMode)
     const body = iframe.contentDocument?.body
     if (body) {
       body.style.boxSizing = 'border-box'
@@ -78,15 +74,10 @@ onMounted(() => {
       damageCalc.value = iframe.contentWindow as DamageCalc
     }
     loaded.value = true
-    asyncCall(
-      () => void (height.value = body ? body.scrollHeight + 10 + 'px' : 'auto')
+    setTimeout(
+      () => void (height.value = body ? body.scrollHeight + 10 + 'px' : 'auto'),
+      0
     )
   }
 })
 </script>
-
-<style scoped>
-.iframe {
-  border: none;
-}
-</style>

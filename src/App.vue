@@ -3,19 +3,11 @@
 </template>
 
 <script setup lang="ts">
-import Immutable from 'immutable'
-import { BattleTeambuilderTable } from './data/teambuilder-tables.cjs'
-import * as db from './utils/db'
-import { PlayerNumber } from './utils/models'
-import * as storage from './utils/storage'
+import { getAllSavedObjects } from './utils/storage'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const w = window as any
-w.Immutable = Immutable
 w.vgc = {
-  db,
-  storage,
-  BattleTeambuilderTable,
+  getAllSavedObjects
 }
-w.PlayerNumber = PlayerNumber
 </script>

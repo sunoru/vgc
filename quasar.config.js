@@ -9,14 +9,15 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 const { configure } = require('quasar/wrappers')
+const path = require('path')
 
 module.exports = configure(function (/* ctx */) {
   return {
     eslint: {
       // fix: true,
-      // include = [],
-      // exclude = [],
-      // rawOptions = {},
+      // include: [],
+      // exclude: [],
+      // rawOptions: {},
       warnings: true,
       errors: true,
     },
@@ -27,7 +28,7 @@ module.exports = configure(function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: [],
+    boot: ['i18n'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss'],
@@ -50,7 +51,7 @@ module.exports = configure(function (/* ctx */) {
     build: {
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
-        node: 'node18',
+        node: 'node16',
       },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
@@ -68,11 +69,26 @@ module.exports = configure(function (/* ctx */) {
       // minify: false,
       // polyfillModulePreload: true,
       // distDir
+
+      // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
-      // vitePlugins: [
-      //   [ 'package-name', { ..options.. } ]
-      // ]
+      vitePlugins: [
+        [
+          '@intlify/vite-plugin-vue-i18n',
+          {
+            // if you want to use Vue I18n Legacy API, you need to set `compositionOnly: false`
+            // compositionOnly: false,
+
+            // if you want to use named tokens in your Vue I18n messages, such as 'Hello {name}',
+            // you need to set `runtimeOnly: false`
+            // runtimeOnly: false,
+
+            // you need to set i18n resource including paths !
+            include: path.resolve(__dirname, './src/i18n/**'),
+          },
+        ],
+      ],
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
@@ -83,9 +99,7 @@ module.exports = configure(function (/* ctx */) {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
-      config: {
-        notify: {},
-      },
+      config: {},
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -145,6 +159,7 @@ module.exports = configure(function (/* ctx */) {
       swFilename: 'sw.js',
       manifestFilename: 'manifest.json',
       useCredentialsForManifestTag: false,
+      // useFilenameHashes: true,
       // extendGenerateSWOptions (cfg) {}
       // extendInjectManifestOptions (cfg) {},
       // extendManifestJson (json) {}

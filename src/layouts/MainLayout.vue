@@ -1,22 +1,23 @@
 <template>
-  <q-layout view="hHh Lpr lff">
+  <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title> VGC Tools </q-toolbar-title>
 
-        <q-toggle label="Dark Mode" v-model="inDarkMode" color="black" />
+        <q-toggle label="Dark Mode" v-model="config.darkMode" color="black" />
 
         <q-btn flat stretch disable icon="login" label="Sign in" />
+
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above elevated>
+    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
         <q-item-label header> Pages </q-item-label>
 
-        <essential-link v-for="link in essentialLinks" :key="link.title" v-bind="link" />
+        <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" />
       </q-list>
     </q-drawer>
 
@@ -26,49 +27,49 @@
   </q-layout>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, watch } from 'vue'
-import EssentialLink from '../components/EssentialLink.vue'
-import { useQuasar } from 'quasar'
-import { LocalConfigs } from 'src/utils/config'
+<script setup lang="ts">
+import { ref } from 'vue'
+import EssentialLink, { EssentialLinkProps } from '../components/EssentialLink.vue'
 
-const linksList = [
+import { useConfigStore } from '../stores/config'
+
+const essentialLinks: EssentialLinkProps[] = [
   {
     title: 'Home',
     icon: 'home',
-    link: '/',
+    to: '/',
   },
   {
     title: 'Replay Importer',
     caption: 'Parse & import Pokemon Showdown replays',
     icon: 'video_library',
-    link: '/replays',
+    to: '/replay-importer',
   },
   {
     title: 'Battles',
     caption: 'Manage & analyze saved battles',
     icon: 'view_list',
-    link: '/battles',
+    to: '/battles',
   },
   {
     title: 'Damage Calculator',
     icon: 'calculate',
-    link: '/damagecalc',
+    to: '/damagecalc',
   },
   // {
   //   title: 'Speed Tiers',
   //   icon: 'speed',
-  //   link: '/speed-tiers',
+  //   to: '/speed-tiers',
   // },
-  {
-    title: 'Scripts',
-    icon: 'integration_instructions',
-    link: '/scripts',
-  },
+  // {
+  //   title: 'Scripts',
+  //   icon: 'integration_instructions',
+  //   to: '/scripts',
+  // },
   {
     title: 'Settings',
     icon: 'settings',
-    link: '/settings',
+    to: '/settings',
   },
   {
     title: 'Source Code',
@@ -79,35 +80,11 @@ const linksList = [
   },
 ]
 
-export default defineComponent({
-  name: 'MainLayout',
+const leftDrawerOpen = ref(false)
 
-  components: {
-    EssentialLink,
-  },
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value
+}
 
-  setup() {
-    const leftDrawerOpen = ref(false)
-    const $q = useQuasar()
-    const inDarkMode = ref(LocalConfigs.useDarkMode)
-    $q.dark.set(inDarkMode.value)
-
-    watch(
-      () => inDarkMode.value,
-      (v) => {
-        LocalConfigs.useDarkMode = v
-        $q.dark.set(v)
-      }
-    )
-
-    return {
-      essentialLinks: linksList,
-      leftDrawerOpen,
-      toggleLeftDrawer() {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      },
-      inDarkMode,
-    }
-  },
-})
+const config = useConfigStore().config
 </script>

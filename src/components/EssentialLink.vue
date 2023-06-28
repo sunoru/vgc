@@ -1,5 +1,5 @@
 <template>
-  <q-item clickable tag="a" :to="link" :href="href" :target="target" exact>
+  <q-item clickable tag="a" :to="to" :href="href" :target="target" exact>
     <q-item-section v-if="icon" avatar>
       <q-icon :name="icon" />
     </q-item-section>
@@ -11,41 +11,18 @@
   </q-item>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-  name: 'EssentialLink',
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-
-    caption: {
-      type: String,
-      default: '',
-    },
-
-    link: {
-      type: String,
-      default: undefined,
-    },
-
-    href: {
-      type: String,
-      default: undefined,
-    },
-
-    icon: {
-      type: String,
-      default: '',
-    },
-
-    target: {
-      type: String,
-      default: '',
-    },
-  },
+<script setup lang="ts">
+export interface EssentialLinkProps {
+  title: string
+  caption?: string
+  to?: string
+  href?: string
+  target?: string
+  icon?: string
+}
+withDefaults(defineProps<EssentialLinkProps>(), {
+  caption: '',
+  link: '#',
+  icon: '',
 })
 </script>
