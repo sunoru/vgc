@@ -18,14 +18,14 @@ const routes: RouteRecordRaw[] = [
         path: 'damagecalc',
         component: () => import('pages/DamageCalcPage.vue'),
       },
-      {
-        path: 'speed-tiers',
-        component: () => import('pages/SpeedTiersPage.vue'),
-      },
-      {
-        path: 'scripts',
-        component: () => import('pages/ScriptsPage.vue'),
-      },
+      // {
+      //   path: 'speed-tiers',
+      //   component: () => import('pages/SpeedTiersPage.vue'),
+      // },
+      // {
+      //   path: 'scripts',
+      //   component: () => import('pages/ScriptsPage.vue'),
+      // },
       {
         path: 'settings',
         component: () => import('pages/SettingsPage.vue'),
