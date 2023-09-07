@@ -233,7 +233,7 @@ const applyFilters = (arr: unknown[]) => {
   // TODO: custom filters
   const battles = arr as ParsedBattle[]
   return battles.filter((x) => {
-    return x.id.startsWith('gen9vgc2023regulationc')
+    return x.id.startsWith('gen9vgc2023regulationd')
   })
 }
 const applySearch = (arr: unknown[]) => {
