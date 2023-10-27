@@ -86,13 +86,15 @@ var MOVES_RBY = {
         bp: 100,
         type: 'Ground',
         category: 'Physical',
-        isSpread: true
+        isSpread: true,
+        isGen3Spread: true,
     },
     'Explosion': {
         bp: 170,
         type: 'Normal',
         category: 'Physical',
-        isSpread: true
+        isSpread: true,
+        isGen3Spread: true,
     },
     'Fire Blast': {
         bp: 120,
@@ -204,7 +206,8 @@ var MOVES_RBY = {
         bp: 130,
         type: 'Normal',
         category: 'Physical',
-        isSpread: true
+        isSpread: true,
+        isGen3Spread: true,
     },
     'Sky Attack': {
         bp: 140,
@@ -681,6 +684,7 @@ var MOVES_RBY = {
     //    type: 'Fighting',
     //    category: 'Physical',
     //    makesContact: true,
+    //    usesOppMoves: true,
     //},
     'Strength': {
         bp: 80,
@@ -1499,7 +1503,8 @@ var MOVES_GSC = $.extend(true, {}, MOVES_RBY, {
     //    bp: 1,
     //    type: 'Ground',
     //    category: 'Physical',
-    //    isSpread: true
+    //    isSpread: true,
+    //    isGen3Spread: true,
     //    zp: 140
     //},
     'Dragon Breath': {
@@ -1533,6 +1538,7 @@ var MOVES_GSC = $.extend(true, {}, MOVES_RBY, {
     //    bp: 1,
     //    type: 'Psychic',
     //    category: 'Special',
+    //    usesOppMoves: true,
     //},
     'Future Sight': {
         bp: 80,
@@ -2714,7 +2720,8 @@ var MOVES_DPP = $.extend(true, {}, MOVES_ADV, {
     'Me First': {
 
         type: 'Normal',
-        category: 'Status'
+        category: 'Status',
+        //usesOppMoves: true,
     },
     'Copycat': {
 
@@ -2829,6 +2836,7 @@ var MOVES_DPP = $.extend(true, {}, MOVES_ADV, {
     //    bp: 1,
     //    type: 'Steel',
     //    category: 'Physical',
+    //    usesOppMoves: true,
     //},
     'Trump Card': {
         bp: 40,
@@ -3577,7 +3585,7 @@ var MOVES_XY = $.extend(true, {}, MOVES_BW, {
     'Ice Beam': { bp: 90 },
     'Incinerate': { bp: 60 },
     'Knock Off': { bp: 65 },
-    'Land\'s Wrath': {
+    "Land's Wrath": {
         bp: 90,
         type: 'Ground',
         category: 'Physical',
@@ -3717,7 +3725,7 @@ var MOVES_XY = $.extend(true, {}, MOVES_BW, {
         type: 'Ghost',
         category: 'Status'
     },
-    'Forest\'s Curse': {
+    "Forest's Curse": {
 
         type: 'Grass',
         category: 'Status'
@@ -3752,7 +3760,7 @@ var MOVES_XY = $.extend(true, {}, MOVES_BW, {
         type: 'Electric',
         category: 'Status'
     },
-    'King\'s Shield': {
+    "King's Shield": {
 
         type: 'Steel',
         category: 'Status'
@@ -4229,7 +4237,7 @@ var MOVES_SM = $.extend(true, {}, MOVES_XY, {
         bp: 80,
         hasSecondaryEffect: true,
     },
-    'Nature\'s Madness':{
+    "Nature's Madness":{
         bp: 1,
         category: 'Special',
         type: 'Fairy',
@@ -4418,7 +4426,7 @@ var MOVES_SM = $.extend(true, {}, MOVES_XY, {
         category: 'Special',
         isSignatureZ: true,
     },
-    'Let\'s Snuggle Forever': {
+    "Let's Snuggle Forever": {
         bp: 190,
         type: 'Fairy',
         category: 'Physical',
@@ -4493,6 +4501,7 @@ var MOVES_SS = $.extend(true, {}, MOVES_SM, {
         bp: 50,
         type: 'Dragon',
         category: 'Physical',
+        oneTwoHit: true,
     },
     'Bolt Beak': {
         bp: 85,
@@ -5109,7 +5118,7 @@ var MOVES_SS_NATDEX = $.extend(true, {}, MOVES_SS, {});
     'Breakneck Blitz', 'Inferno Overdrive', 'Bloom Doom', 'Hydro Vortex', 'Gigavolt Havoc', 'Never-Ending Nightmare',
     'Black Hole Eclipse', 'Shattered Psyche', 'All-Out Pummeling', 'Corkscrew Crash', 'Subzero Slammer', 'Tectonic Rage',
     'Continental Crush', 'Savage Spin-Out', 'Twinkle Tackle', 'Supersonic Skystrike', 'Devastating Drake', 'Acid Downpour',
-    'Catastropika', 'Clangorous Soulblaze', 'Genesis Supernova', 'Let\'s Snuggle Forever', 'Light That Burns the Sky',
+    'Catastropika', 'Clangorous Soulblaze', 'Genesis Supernova', "Let's Snuggle Forever", 'Light That Burns the Sky',
     'Malicious Moonsault', 'Menacing Moonraze Maelstrom', 'Oceanic Operetta', 'Pulverizing Pancake', 'Searing Sunraze Smash',
     'Sinister Arrow Raid', 'Soul-Stealing 7-Star Strike', 'Splintered Stormshards', 'Stoked Sparksurfer', 'Extreme Evoboost', '10,000,000 Volt Thunderbolt',
     //Hidden Power
@@ -5209,7 +5218,7 @@ var MOVES_SV_NATDEX = $.extend(true, {}, MOVES_SS_NATDEX, {
         bp: 75,
     },
     'Grassy Glide': {
-        bp: 60,
+        bp: 55,
     },
     'Glacial Lance': {
         bp: 120,
@@ -5388,6 +5397,7 @@ var MOVES_SV_NATDEX = $.extend(true, {}, MOVES_SS_NATDEX, {
         bp: 50,
         type: 'Ghost',
         category: 'Physical',
+        linearAddBP: true,
     },
     'Lumina Crash': {
         bp: 80,
@@ -5584,6 +5594,7 @@ var MOVES_SV_NATDEX = $.extend(true, {}, MOVES_SS_NATDEX, {
         category: 'Physical',
         makesContact: true,
         isPunch: true,
+        linearAddBP: true,
     },
     'Armor Cannon': {
         bp: 120,
@@ -5613,6 +5624,7 @@ var MOVES_SV_NATDEX = $.extend(true, {}, MOVES_SS_NATDEX, {
     //    type: 'Dark',
     //    category: 'Physical',
     //    makesContact: true,
+    //    usesOppMoves: true,
     //},
     'Aqua Cutter': {
         bp: 70,
@@ -5661,6 +5673,30 @@ var MOVES_SV_NATDEX = $.extend(true, {}, MOVES_SS_NATDEX, {
         category: 'Physical',
         isSlice: true,
     },
+    //Teal Mask new additions
+    'Blood Moon': {
+        bp: 140,
+        type: 'Normal',
+        category: 'Special',
+    },
+    'Matcha Gotcha': {
+        bp: 80,
+        type: 'Grass',
+        category: 'Special',
+        hasSecondaryEffect: true,
+        isSpread: true,
+    },
+    'Syrup Bomb': {
+        bp: 60,
+        type: 'Grass',
+        category: 'Special',
+        hasSecondaryEffect: true,
+    },
+    'Ivy Cudgel': {
+        bp: 100,
+        type: 'Grass',
+        category: 'Physical',
+    },
 });
 
 var MOVES_SV = $.extend(true, {}, MOVES_SV_NATDEX, {});
@@ -5684,7 +5720,7 @@ var MOVES_SV = $.extend(true, {}, MOVES_SV_NATDEX, {});
     'Devastating Drake', 'Black Hole Eclipse', 'Twinkle Tackle', 'Catastropika', 'Sinister Arrow Raid',
     'Malicious Moonsault', 'Oceanic Operetta', 'Guardian of Alola', 'Soul-Stealing 7-Star Strike', 'Stoked Sparksurfer',
     'Pulverizing Pancake', 'Extreme Evoboost', 'Genesis Supernova', '10,000,000 Volt Thunderbolt', 'Light That Burns the Sky',
-    'Searing Sunraze Smash', 'Menacing Moonraze Maelstrom', 'Let\'s Snuggle Forever', 'Splintered Stormshards', 'Clangorous Soulblaze',
+    'Searing Sunraze Smash', 'Menacing Moonraze Maelstrom', "Let's Snuggle Forever", 'Splintered Stormshards', 'Clangorous Soulblaze',
     //Hidden Power
     'Hidden Power Fire', 'Hidden Power Water', 'Hidden Power Grass', 'Hidden Power Electric', 'Hidden Power Psychic',
     'Hidden Power Ice', 'Hidden Power Dragon', 'Hidden Power Dark', 'Hidden Power Fighting', 'Hidden Power Flying',
@@ -5702,14 +5738,14 @@ var MOVES_SV = $.extend(true, {}, MOVES_SV_NATDEX, {});
     'Sky Drop', 'Bestow', 'Heart Stamp', 'Steamroller', 'Rototiller', 'Ion Deluge', 'Spotlight', 'Laser Focus', 'Gear Up',
     //deleted SV moves
     'Submission', 'Skull Bash', 'Hyper Fang', 'Mind Reader', 'Vital Throw', 'Hail', 'Nature Power', 'Magic Coat',
-    'Revenge', 'Grudge', 'Aromatherapy', 'Doom Desire', 'Psycho Shift', 'Heart Swap', 'Autotomize', 'Dual Chop',
+    'Revenge', 'Grudge', 'Aromatherapy', 'Psycho Shift', 'Autotomize', 'Dual Chop',
     'Leaf Tornado', 'Mat Block', 'Crafty Shield', 'Flower Shield', 'Venom Drench', 'Powder', 'Power-Up Punch', 'Dragon Hammer',
-    'Eternabeam', 'Take Heart',
+    'Eternabeam', 
     //unusable SV moves
     'Blazing Torque', 'Wicked Torque', 'Noxious Torque', 'Combat Torque', 'Magical Torque',
     //currently unusable SV moves that might be usable later
-    //'Freeze Shock', 'Ice Burn', 'Gear Grind', 'Conversion', 'Head Charge', 'Lovely Kiss', 'Trick-or-Treat',
-    //'Rock Wrecker', 'Bonemerang', 'Fusion Bolt', 'Octazooka', 'Fusion Flare', 'Bolt Strike', 'Sparkling Aria',
-    //'Triple Kick', 'Blue Flare', 'Glaciate', 'King\'s Shield', 'Sketch', 'Kinesis', 'Electrify', 'Conversion 2',
-    //'Forest\'s Curse', 'Light of Ruin', 'Floral Healing', 'Topsy-Turvy',
+    'Freeze Shock', 'Ice Burn', 'Gear Grind', 'Conversion', 'Head Charge', 'Lovely Kiss', 'Trick-or-Treat',
+    'Rock Wrecker', 'Bonemerang', 'Fusion Bolt', 'Octazooka', 'Fusion Flare', 'Bolt Strike', 'Sparkling Aria',
+    'Triple Kick', 'Blue Flare', 'Glaciate', "King's Shield", 'Sketch', 'Kinesis', 'Electrify', 'Conversion 2',
+    'Light of Ruin', 'Floral Healing', 'Topsy-Turvy',
 ].forEach(e => delete MOVES_SV[e]);

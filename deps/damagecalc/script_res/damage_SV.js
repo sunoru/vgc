@@ -25,8 +25,12 @@ function CALCULATE_ALL_MOVES_SV(p1, p2, field) {
     checkWindRider(p2, field.getTailwind(1));
     checkIntimidate(p1, p2);
     checkIntimidate(p2, p1);
+    checkSupersweetSyrup(p1, p2);
+    checkSupersweetSyrup(p2, p1);
     checkDownload(p1, p2);
     checkDownload(p2, p1);
+    checkEmbodyAspect(p1);
+    checkEmbodyAspect(p2);
     p1.stats[AT] = getModifiedStat(p1.rawStats[AT], p1.boosts[AT]); //new order is important for the proper Protosynthesis/Quark Drive boost
     p1.stats[DF] = getModifiedStat(p1.rawStats[DF], p1.boosts[DF]);
     p1.stats[SA] = getModifiedStat(p1.rawStats[SA], p1.boosts[SA]);
@@ -61,6 +65,7 @@ function GET_DAMAGE_SV(attacker, defender, move, field) {
     var isQuarteredByProtect = false;
 
     checkMoveTypeChange(move, field, attacker);
+    checkConditionalPriority(move, field.terrain);
 
     if (attacker.isDynamax)
         [move, isQuarteredByProtect, moveDescName] = MaxMoves(move, attacker, isQuarteredByProtect, moveDescName, field);
@@ -88,9 +93,6 @@ function GET_DAMAGE_SV(attacker, defender, move, field) {
     description.attackerTera = attacker.isTerastalize ? attacker.tera_type : false;
     description.defenderTera = defender.isTerastalize ? defender.tera_type : false;
 
-    if (move.name === "Grassy Glide" && field.terrain === "Grassy") //sloppy addition
-        move.hasPriority = true;
-
 
     var defAbility = defender.ability;
     [defAbility, description] = abilityIgnore(attacker, move, defAbility, description, defender.item);
@@ -104,12 +106,12 @@ function GET_DAMAGE_SV(attacker, defender, move, field) {
     var ateIzeAbility = ATE_IZE_ABILITIES.indexOf(attacker.ability);    //Confirms abilities like Normalize and Pixilate but not Liquid Voice
     var ateIzeBoosted;
     if (!move.isZ && (ateIzeAbility !== -1 || attacker.ability == "Liquid Voice")
-        && (gen <= 4 || ['Hidden Power', 'Weather Ball', 'Natural Gift', 'Judgement', 'Techno Blast', 'Revelation Dance', 'Multi-Attack', 'Terrain Pulse'].indexOf(move.name) === -1)) {
+        && ['Hidden Power', 'Weather Ball', 'Natural Gift', 'Judgement', 'Techno Blast', 'Revelation Dance', 'Multi-Attack', 'Terrain Pulse'].indexOf(move.name) === -1) {
         [move, description, ateIzeBoosted] = ateIzeTypeChange(move, attacker, description);
     }
 
-    var typeEffect1 = getMoveEffectiveness(move, defender.type1, defender.type2, attacker.ability === "Scrappy" || field.isForesight, field.isGravity, defender.item, field.weather === "Strong Winds");
-    var typeEffect2 = defender.type2 ? getMoveEffectiveness(move, defender.type2, defender.type1, attacker.ability === "Scrappy" || field.isForesight, field.isGravity, defender.item, field.weather === "Strong Winds") : 1;
+    var typeEffect1 = getMoveEffectiveness(move, defender.type1, defender.type2, ["Scrappy", "Mind's Eye"].indexOf(attacker.ability) != -1 || field.isForesight, field.isGravity, defender.item, field.weather === "Strong Winds");
+    var typeEffect2 = defender.type2 && defender.type2 !== defender.type1 ? getMoveEffectiveness(move, defender.type2, defender.type1, ["Scrappy", "Mind's Eye"].indexOf(attacker.ability) != -1 || field.isForesight, field.isGravity, defender.item, field.weather === "Strong Winds") : 1;
     var typeEffectiveness = typeEffect1 * typeEffect2;
     immuneBuildDesc = immunityChecks(move, attacker, defender, field, description, defAbility, typeEffectiveness);
     if (immuneBuildDesc !== -1) return immuneBuildDesc;
@@ -175,5 +177,5 @@ function GET_DAMAGE_SV(attacker, defender, move, field) {
     var baseDamage = calcBaseDamage(attacker, basePower, attack, defense);
 
 
-    return calcGeneralMods(baseDamage, move, attacker, defender, defAbility, field, description, isCritical, typeEffectiveness, isQuarteredByProtect);
+    return calcGeneralMods(baseDamage, move, attacker, defender, defAbility, field, description, isCritical, typeEffectiveness, isQuarteredByProtect, hitsPhysical);
 }
