@@ -8,6 +8,19 @@ export interface ImportReplayOptions {
   whichIsUserPlayer?: (p1: string, p2: string) => Promise<PlayerNumber>
 }
 
+export interface RemoteReplay {
+  id: string
+  format: string
+  players: string[]
+  log: string
+  uploadtime: number
+  views: number
+  formatid: string
+  rating: number
+  private: number
+  password: number | null
+}
+
 const isP1 = (p: string): boolean => {
   p = p.slice(0, 2)
   if (p === 'p1') {
@@ -21,7 +34,7 @@ const isP1 = (p: string): boolean => {
 
 const getOrCreateParsedPokemon = (
   id: PokemonDetails,
-  sentOut: Map<PokemonDetails, ParsedPokemon>
+  sentOut: Map<PokemonDetails, ParsedPokemon>,
 ): ParsedPokemon => {
   if (sentOut.has(id)) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -56,7 +69,7 @@ const setAbilityItem = (pokes: Record<PokemonIdent, ParsedPokemon>, from: string
 
 export const parseBattleLog = async (
   log: string,
-  options: ImportReplayOptions = {}
+  options: ImportReplayOptions = {},
 ): Promise<ParsedBattle> => {
   const team1: string[] = []
   const team2: string[] = []
@@ -168,7 +181,7 @@ export const parseBattleLog = async (
 
 export const importReplay = async (
   idOrURL: string,
-  options: ImportReplayOptions & { password?: string } = {}
+  options: ImportReplayOptions & { password?: string } = {},
 ): Promise<ParsedBattle> => {
   const password = options.password
   let url = idOrURL.match(/^https?:\/\//i)
@@ -182,10 +195,12 @@ export const importReplay = async (
   }
   const jsonURL = `${url}.json`
   const response = await fetch(jsonURL)
-  const data = (await response.json()) as { id: string; log: string }
+  const data = (await response.json()) as RemoteReplay
   const log = data.log
   const parsed = await parseBattleLog(log, options)
   parsed.id = data.id
   parsed.url = url
+  parsed.format = data.format
+  parsed.rating = data.rating
   return parsed
 }

@@ -10,13 +10,13 @@
     "dev": "tsc -w"
   },
   "dependencies": {
-    "@pkmn/data": "^0.7.44",
-    "@pkmn/dex": "^0.7.44",
-    "@pkmn/mods": "^0.7.44",
-    "@pkmn/protocol": "^0.6.12",
+    "@pkmn/data": "^0.7.59",
+    "@pkmn/dex": "^0.7.59",
+    "@pkmn/mods": "^0.7.59",
+    "@pkmn/protocol": "^0.6.16",
     "@pkmn/types": "^3.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.1.5"
+    "typescript": "^5.3.3"
   }
 }

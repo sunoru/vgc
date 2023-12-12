@@ -39,12 +39,20 @@ const bar = ref<QAjaxBar>()
 const textInput = ref('')
 const isImporting = ref(false)
 
-interface ImportingResult {
-  battle?: ParsedBattle
+type ImportingResult = {
   url: string
-  skipped?: boolean
-  failed?: boolean
-}
+} & (
+  | {
+      battle: ParsedBattle
+      status: 'succeeded' | 'skipped'
+    }
+  | {
+      remarks: string
+      tags: string[]
+      status: 'failed'
+    }
+)
+
 const importingResults = reactive([] as ImportingResult[])
 const clearResults = () => {
   importingResults.splice(0)
@@ -54,23 +62,27 @@ const importingResultTree = computed(() => {
   const skipped: QTreeNode[] = []
   const failed: QTreeNode[] = []
   for (const x of importingResults) {
-    if (x.failed) {
-      failed.push({
-        key: failed.length,
-        label: `${x.url}\t${x.remarks}\t${x.tags.join(',')}`,
-      })
-    } else if (x.skipped) {
-      skipped.push({
-        key: skipped.length,
-        label: x.battle ? x.battle.id : x.url,
-        url: x.url,
-      })
-    } else if (x.battle) {
-      succeeded.push({
-        key: succeeded.length,
-        label: x.battle.id,
-        url: x.url,
-      })
+    switch (x.status) {
+      case 'failed':
+        failed.push({
+          key: failed.length,
+          label: `${x.url}\t${x.remarks}\t${x.tags.join(',')}`,
+        })
+        break
+      case 'skipped':
+        skipped.push({
+          key: skipped.length,
+          label: x.battle ? x.battle.id : x.url,
+          url: x.url,
+        })
+        break
+      case 'succeeded':
+        succeeded.push({
+          key: succeeded.length,
+          label: x.battle.id,
+          url: x.url,
+        })
+        break
     }
   }
   return [
@@ -104,7 +116,7 @@ const importOne = async (url: URL, remarks: string, tags: string[]): Promise<Imp
       return {
         battle: existing,
         url: urlString,
-        skipped: true,
+        status: 'skipped',
       }
     }
   }
@@ -127,6 +139,7 @@ const importOne = async (url: URL, remarks: string, tags: string[]): Promise<Imp
     return {
       battle,
       url: urlString,
+      status: 'succeeded',
     }
   } catch (e) {
     console.error(e)
@@ -134,7 +147,7 @@ const importOne = async (url: URL, remarks: string, tags: string[]): Promise<Imp
       url: urlString,
       remarks,
       tags,
-      failed: true,
+      status: 'failed',
     }
   }
 }
@@ -154,7 +167,7 @@ const importAll = async (input: string): Promise<[number, number]> => {
       const url = new URL(urlString)
       total += 1
       const parsed = await importOne(url, remarks, tags?.split(',') || [])
-      if (parsed.battle && !parsed.skipped) {
+      if (parsed.status === 'succeeded') {
         succeeded += 1
       }
       importingResults.push(parsed)

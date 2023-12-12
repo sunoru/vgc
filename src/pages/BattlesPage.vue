@@ -130,11 +130,11 @@ import PageBase from '../layouts/PageBase.vue'
 import { getDB } from '../utils/db'
 import { useConfigStore } from '../stores/config'
 import { showDialog } from '../utils/dialog'
-import { saveObject, getAllSavedObjects } from '../utils/storage'
+import { saveObject, saveObjects, getAllSavedObjects } from '../utils/storage'
 
 const extendedFields = ref(false)
 
-const getTeamCell = (battle: ParsedBattle, isTeam1: boolean): Array<[number, string]> => {
+const getTeamCell = (battle: ParsedBattle, isTeam1: boolean): Array<readonly [number, string]> => {
   const player = isTeam1 ? battle.getPlayer() : battle.getOpponent()
   return player.team.map((poke) => {
     const sentOutIndex = player.sentOut.findIndex((p) => p.id === poke)
@@ -233,7 +233,7 @@ const applyFilters = (arr: unknown[]) => {
   // TODO: custom filters
   const battles = arr as ParsedBattle[]
   return battles.filter((x) => {
-    return x.id.startsWith('gen9vgc2023regulationd')
+    return x.id.startsWith('gen9vgc2023regulatione')
   })
 }
 const applySearch = (arr: unknown[]) => {
@@ -241,7 +241,7 @@ const applySearch = (arr: unknown[]) => {
   const key = searching.value.trim().toLowerCase()
   if (!key) return arr
   return arr.filter((x) =>
-    Object.values(x as Record<string, unknown>).some((v) => String(v).toLowerCase().includes(key))
+    Object.values(x as Record<string, unknown>).some((v) => String(v).toLowerCase().includes(key)),
   )
 }
 const rows = computed(() => applyFilters(applySearch(data.value)))
@@ -273,7 +273,6 @@ watch(
             config.showdownUsernames.push(x)
           }
         })
-        await saveConfig(config)
       }
       if (battles) {
         await saveObjects('battles', battles)
@@ -282,13 +281,13 @@ watch(
       window.location.reload()
     }
     reader.readAsText(v)
-  }
+  },
 )
 
 const onExport = async () => {
   const db = getDB()
   const data = {
-    usernames: config.usernames,
+    usernames: config.showdownUsernames,
     battles: await db.battles.toArray(),
   }
   const s = JSON.stringify(data)
@@ -313,13 +312,13 @@ const onExportTable = async () => {
             wrapCsvValue(
               typeof col.field === 'function'
                 ? col.field(row)
-                : row[col.field === void 0 ? col.name : col.field],
+                : row[(col.field === void 0 ? col.name : col.field) as keyof ParsedBattle],
               col.format,
-              row
-            )
+              row,
+            ),
           )
-          .join(',')
-      )
+          .join(','),
+      ),
     )
     .join('\r\n')
 
