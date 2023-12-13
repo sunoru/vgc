@@ -4998,15 +4998,9 @@ vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-"vgc-tools@file:./vgc-tools":
-  version "1.0.0"
-  dependencies:
-    "@pkmn/data" "^0.7.59"
-    "@pkmn/dex" "^0.7.59"
-    "@pkmn/mods" "^0.7.59"
-    "@pkmn/protocol" "^0.6.16"
-    "@pkmn/sim" "^0.7.59"
-    "@pkmn/types" "^3.0.0"
+"vgc-tools@link:./vgc-tools":
+  version "0.0.0"
+  uid ""
 
 vite@^2.9.13:
   version "2.9.16"
