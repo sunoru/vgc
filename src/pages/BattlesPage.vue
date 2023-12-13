@@ -131,7 +131,7 @@ import { loadBattles } from '../utils/battles'
 import { getDB } from '../utils/db'
 import { useConfigStore } from '../stores/config'
 import { showDialog } from '../utils/dialog'
-import { saveObject, saveObjects, getAllSavedObjects } from '../utils/storage'
+import { saveObject, saveObjects } from '../utils/storage'
 
 const extendedFields = ref(false)
 
