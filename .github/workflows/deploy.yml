@@ -18,12 +18,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Setup VGC Tools 🛠️
-        working-directory: ./vgc-tools
-        run: |
-          yarn
-          yarn build
-
       - name: Install and Build 🔧
         run: |
           yarn
@@ -33,4 +27,4 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.3.3
         with:
           branch: gh-pages
-          folder: dist/pwa
+          folder: frontend/dist/pwa
