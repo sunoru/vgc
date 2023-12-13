@@ -1,1 +1,1 @@
-export * from './battles.js'
+export * from './battle.js'

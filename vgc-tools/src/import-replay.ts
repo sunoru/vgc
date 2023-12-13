@@ -201,6 +201,7 @@ export const importReplay = async (
   parsed.id = data.id
   parsed.url = url
   parsed.format = data.format
+  parsed.formatid = data.formatid
   parsed.rating = data.rating
   return parsed
 }

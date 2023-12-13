@@ -127,6 +127,7 @@ import { QTableProps, exportFile } from 'quasar'
 import { type ParsedBattle, PlayerNumber } from 'vgc-tools'
 
 import PageBase from '../layouts/PageBase.vue'
+import { loadBattles } from '../utils/battles'
 import { getDB } from '../utils/db'
 import { useConfigStore } from '../stores/config'
 import { showDialog } from '../utils/dialog'
@@ -217,8 +218,7 @@ const ExtendedColumns: QTableProps['columns'] = DefaultColumns.concat([
 const data = ref<ParsedBattle[]>([])
 
 onMounted(async () => {
-  const battles = await getAllSavedObjects('battles')
-  data.value = Array.from(Object.values(battles))
+  data.value = await loadBattles()
 })
 const pagination = ref({
   rowsPerPage: 0,

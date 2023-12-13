@@ -30,6 +30,21 @@ export class ParsedBattle {
   public p1 = ''
   public p2 = ''
   public format = ''
+
+  _formatid = ''
+  public get formatid(): string {
+    if (this._formatid) {
+      return this._formatid
+    }
+    if (this.platform === 'Showdown') {
+      return this.id.split('-')[0]
+    }
+    return ''
+  }
+  public set formatid(formatid: string) {
+    this._formatid = formatid
+  }
+
   public rating1 = 0
   public rating2 = 0
   public rating?: number
@@ -72,7 +87,7 @@ export class ParsedBattle {
   public getOpponent(): Player {
     // default to player 2 if userPlayer is unknown
     return this.getPlayer(
-      this.userPlayer === PlayerNumber.Player2 ? PlayerNumber.Player1 : PlayerNumber.Player2
+      this.userPlayer === PlayerNumber.Player2 ? PlayerNumber.Player1 : PlayerNumber.Player2,
     )
   }
 }

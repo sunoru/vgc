@@ -53,6 +53,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pkmn/sets@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "@pkmn/sets@npm:5.1.0"
+  dependencies:
+    "@pkmn/types": "npm:^3.0.0"
+  checksum: 1038cf3c00d00e25e8fdc191cddd0eae785ad6180f1e275cfafe4b0b30b4b23884429da8556c3e3803c6aee1b682cf6e2308308fe5b17534ed12d62abce0c864
+  languageName: node
+  linkType: hard
+
+"@pkmn/sim@npm:^0.7.59":
+  version: 0.7.59
+  resolution: "@pkmn/sim@npm:0.7.59"
+  dependencies:
+    "@pkmn/sets": "npm:^5.1.0"
+    "@pkmn/streams": "npm:^1.1.0"
+  checksum: 8344a66362f3715fda5e47e28f97a8822eaf56da041a495fde94d751bc52060c1efec0a3a1bdc180db90e8b0383806e2cf886f2b4a768a81e833e3b647ab033d
+  languageName: node
+  linkType: hard
+
+"@pkmn/streams@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@pkmn/streams@npm:1.1.0"
+  checksum: cab542cd840fd23b2b0804172a44ec3428a488a2dd55985fb929488386474a585cef4f21b7f24e2a42cc6989ca00b40324b1e494e84e234b946db8b53718913d
+  languageName: node
+  linkType: hard
+
 "@pkmn/types@npm:^3.0.0":
   version: 3.0.0
   resolution: "@pkmn/types@npm:3.0.0"
@@ -88,6 +114,7 @@ __metadata:
     "@pkmn/dex": "npm:^0.7.59"
     "@pkmn/mods": "npm:^0.7.59"
     "@pkmn/protocol": "npm:^0.6.16"
+    "@pkmn/sim": "npm:^0.7.59"
     "@pkmn/types": "npm:^3.0.0"
     typescript: "npm:^5.3.3"
   languageName: unknown

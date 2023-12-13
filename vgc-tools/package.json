@@ -14,6 +14,7 @@
     "@pkmn/dex": "^0.7.59",
     "@pkmn/mods": "^0.7.59",
     "@pkmn/protocol": "^0.6.16",
+    "@pkmn/sim": "^0.7.59",
     "@pkmn/types": "^3.0.0"
   },
   "devDependencies": {
