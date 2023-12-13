@@ -1,9 +1,8 @@
-/dist
-/src-capacitor
-/src-cordova
-/.quasar
-/node_modules
+dist
+src-capacitor
+src-cordova
+.quasar
+node_modules
 .eslintrc.js
-/src-ssr
-/public/deps/
-/vgc-tools/dist
+src-ssr
+/frontend/public/deps/
