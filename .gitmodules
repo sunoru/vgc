@@ -1,3 +1,6 @@
 [submodule "public/deps/damagecalc"]
 	path = public/deps/damagecalc
 	url = https://github.com/nerd-of-now/NCP-VGC-Damage-Calculator.git
+[submodule "frontend/public/deps/damagecalc"]
+	path = frontend/public/deps/damagecalc
+	url = https://github.com/nerd-of-now/NCP-VGC-Damage-Calculator.git
