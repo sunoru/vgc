@@ -67,8 +67,8 @@
                 (adsbygoogle = window.adsbygoogle || []).push({});
             </script>-->
             <p>VGC 2024 calculator maintainenance by Alex Collins (<a href="https://twitter.com/nerd_of_now">@nerd_of_now</a>). Basis of the calculator by Jake White (<a href="https://twitter.com/squirrelboydev" target="_blank" rel="noopener noreferrer">@squirrelboydev</a>).</p>
-            <p>The first wave of Pokémon Scarlet and Violet DLC, the Teal Mask, is out now! We are working on optimizing this calculator for the new games.
-            <!--<br><b><u>This calculator contains spoilers for the Teal Mask DLC.</u></b> This includes Pokémon, moves, abilities, and items. Use at your own discretion.--></p>
+            <p>The second wave of Pokémon Scarlet and Violet DLC, the Indigo Disk, is out now! We are working on optimizing this calculator for the new games.
+            <br><b><u>This calculator contains spoilers for the Indigo Disk DLC.</u></b> This includes Pokémon, moves, abilities, items, and the new Tera Type. Use at your own discretion.</p>
             <!--<br><p>Is there an important or relevant set missing? <a href="https://forms.gle/zBbEnvp2vZ2UADUJA" target="_blank" rel="noopener noreferrer">Give us your suggestion!</a></p>-->
             
             <p>If you like what we do here, please consider supporting us on <a href="https://www.buymeacoffee.com/NCPDamageCalc" target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a>!
@@ -108,9 +108,9 @@
                 <div class="panel-heading"><h4 class="panel-title">Pokémon 1</h4></div>
                 <div class="panel-body">
                     <input type="text" class="set-selector calc-trigger" />
-                    <!--<div class="gen-specific g5 g6 g7 g8 g9">
-                        <input type="checkbox" id="set-toggle" /> Custom sets only
-                    </div>-->
+                    <div class="gen-specific g5 g6 g7 g8 g9">
+                        <input type="checkbox" class="set-toggle" /> Custom sets only
+                    </div>
                     <div class="info-group">
                         <div>
                             <label>Type</label>
@@ -184,13 +184,14 @@
                         <input class="move-crit calc-trigger btn-input" type="checkbox" id="critL1" /><label class="btn crit-btn" for="critL1" title="Force this attack to be a critical hit?">Crit</label>
                         <input class="move-z calc-trigger btn-input" type="checkbox" id="zL1" /><label class="btn x-btn gen-specific g7" for="zL1" title="Use the corresponding Z-Move?">Z-Move</label>
                         <select class="move-hits calc-trigger hide"><option value="2">2 hits</option><option value="3">3 hits</option><option value="4">4 hits</option><option value="5">5 hits</option></select>
-                        <input class="move-double calc-trigger btn-input hide" type="checkbox" id="doubleL1"/><label class="double-btn btn x-btn" for="doubleL1" title="Force this attack to deal double damage?">2x BP</label>
+                        <input class="move-double calc-trigger btn-input hide" type="checkbox" id="doubleL1" /><label class="double-btn btn x-btn" for="doubleL1" title="Force this attack to deal double damage?">2x BP</label>
                         <select class="move-hits2 calc-trigger hide"><option value="1">1 hit</option><option value="2">2 hits</option></select>
                         <select class="move-hits3 calc-trigger hide"><option value="1">1 hit</option><option value="2">2 hits</option><option value="3">3 hits</option></select>
                         <select class="move-pledge calc-trigger hide"><option value="Grass Pledge">Grass Pledge</option><option value="Fire Pledge">Fire Pledge</option><option value="Water Pledge">Water Pledge</option></select>
                         <select class="move-10hits calc-trigger hide"><option value="1">1 hit</option><option value="2">2 hits</option><option value="3">3 hits</option><option value="4">4 hits</option><option value="5">5 hits</option><option value="6">6 hits</option><option value="7">7 hits</option><option value="8">8 hits</option><option value="9">9 hits</option><option value="10">10 hits</option></select>
                         <select class="move-linearAddedBP calc-trigger hide"><option value="0">0x effect</option><option value="1">1x effect</option><option value="2">2x effect</option><option value="3">3x effect</option><option value="4">4x effect</option><option value="5">5x effect</option><option value="6">6x effect</option></select>
                         <select class="move-opponent calc-trigger hide"><option value="1">Move 1</option><option value="2">Move 2</option><option value="3">Move 3</option><option value="4">Move 4</option></select>
+                        <input class="move-stellar calc-trigger btn-input hide" type="checkbox" id="stellarL1" checked="checked" /><label class="stellar-btn btn x-btn" for="stellarL1" title="Is this the first time using a move of this type after Terastalizing?">1st Use</label>
                     </div>
                     <div class="move2">
                         <select class="move-selector calc-trigger small-select"></select>
@@ -207,6 +208,7 @@
                         <select class="move-10hits calc-trigger hide"><option value="1">1 hit</option><option value="2">2 hits</option><option value="3">3 hits</option><option value="4">4 hits</option><option value="5">5 hits</option><option value="6">6 hits</option><option value="7">7 hits</option><option value="8">8 hits</option><option value="9">9 hits</option><option value="10">10 hits</option></select>
                         <select class="move-linearAddedBP calc-trigger hide"><option value="0">0x effect</option><option value="1">1x effect</option><option value="2">2x effect</option><option value="3">3x effect</option><option value="4">4x effect</option><option value="5">5x effect</option><option value="6">6x effect</option></select>
                         <select class="move-opponent calc-trigger hide"><option value="1">Move 1</option><option value="2">Move 2</option><option value="3">Move 3</option><option value="4">Move 4</option></select>
+                        <input class="move-stellar calc-trigger btn-input hide" type="checkbox" id="stellarL2" checked="checked" /><label class="stellar-btn btn x-btn" for="stellarL2" title="Is this the first time using a move of this type after Terastalizing?">1st Use</label>
                     </div>
                     <div class="move3">
                         <select class="move-selector calc-trigger small-select"></select>
@@ -223,6 +225,7 @@
                         <select class="move-10hits calc-trigger hide"><option value="1">1 hit</option><option value="2">2 hits</option><option value="3">3 hits</option><option value="4">4 hits</option><option value="5">5 hits</option><option value="6">6 hits</option><option value="7">7 hits</option><option value="8">8 hits</option><option value="9">9 hits</option><option value="10">10 hits</option></select>
                         <select class="move-linearAddedBP calc-trigger hide"><option value="0">0x effect</option><option value="1">1x effect</option><option value="2">2x effect</option><option value="3">3x effect</option><option value="4">4x effect</option><option value="5">5x effect</option><option value="6">6x effect</option></select>
                         <select class="move-opponent calc-trigger hide"><option value="1">Move 1</option><option value="2">Move 2</option><option value="3">Move 3</option><option value="4">Move 4</option></select>
+                        <input class="move-stellar calc-trigger btn-input hide" type="checkbox" id="stellarL3" checked="checked" /><label class="stellar-btn btn x-btn" for="stellarL3" title="Is this the first time using a move of this type after Terastalizing?">1st Use</label>
                     </div>
                     <div class="move4">
                         <select class="move-selector calc-trigger small-select"></select>
@@ -239,6 +242,7 @@
                         <select class="move-10hits calc-trigger hide"><option value="1">1 hit</option><option value="2">2 hits</option><option value="3">3 hits</option><option value="4">4 hits</option><option value="5">5 hits</option><option value="6">6 hits</option><option value="7">7 hits</option><option value="8">8 hits</option><option value="9">9 hits</option><option value="10">10 hits</option></select>
                         <select class="move-linearAddedBP calc-trigger hide"><option value="0">0x effect</option><option value="1">1x effect</option><option value="2">2x effect</option><option value="3">3x effect</option><option value="4">4x effect</option><option value="5">5x effect</option><option value="6">6x effect</option></select>
                         <select class="move-opponent calc-trigger hide"><option value="1">Move 1</option><option value="2">Move 2</option><option value="3">Move 3</option><option value="4">Move 4</option></select>
+                        <input class="move-stellar calc-trigger btn-input hide" type="checkbox" id="stellarL4" checked="checked" /><label class="stellar-btn btn x-btn" for="stellarL4" title="Is this the first time using a move of this type after Terastalizing?">1st Use</label>
                     </div>
                     <input class="glaive-rush calc-trigger hide" type="checkbox" id="glaiveL" title="Apply double damage from using Glaive Rush?" />
                     <div class="info-group">
@@ -302,21 +306,21 @@
                         <input class="btn-input calc-trigger" type="checkbox" name="aura" value="Fairy Aura" id="fairy-aura" /><label class="btn btn-wide btn-mid" for="fairy-aura">Fairy Aura</label>
                         <input class="btn-input calc-trigger" type="checkbox" name="aura" value="Dark Aura" id="dark-aura" /><label class="btn btn-wide btn-right" for="dark-aura">Dark Aura</label>
                     </div>
-                    <div class="gen-specific g9" style="width: 19em; margin: 5px auto;" title="Select the current active Ruin abilities.">
-                        <input class="btn-input calc-trigger" type="checkbox" name="ruin" value="Tablets of Ruin" id="tablets-of-ruin" /><label class="btn btn-xxxwide btn-left" for="tablets-of-ruin">Tablets of Ruin <u>(-Atk)</u></label>
-                        <input class="btn-input calc-trigger" type="checkbox" name="ruin" value="Vessel of Ruin" id="vessel-of-ruin" /><label class="btn btn-xxxwide btn-right" for="vessel-of-ruin">Vessel of Ruin <u>(-SpA)</u></label>
+                    <div class="gen-specific g9" style="width: 21em; margin: 5px auto;" title="Select the current active Ruin abilities.">
+                        <input class="btn-input calc-trigger" type="checkbox" name="ruin" value="Tablets of Ruin" id="tablets-of-ruin" /><label class="btn btn-xxxxwide btn-left" for="tablets-of-ruin">Tablets of Ruin <u>(-Atk)</u></label>
+                        <input class="btn-input calc-trigger" type="checkbox" name="ruin" value="Vessel of Ruin" id="vessel-of-ruin" /><label class="btn btn-xxxxwide btn-right" for="vessel-of-ruin">Vessel of Ruin <u>(-SpA)</u></label>
                         <br />
-                        <input class="btn-input calc-trigger" type="checkbox" name="ruin" value="Sword of Ruin" id="sword-of-ruin" /><label class="btn btn-xxxwide btn-left" for="sword-of-ruin">Sword of Ruin <u>(-Def)</u></label>
-                        <input class="btn-input calc-trigger" type="checkbox" name="ruin" value="Beads of Ruin" id="beads-of-ruin" /><label class="btn btn-xxxwide btn-right" for="beads-of-ruin">Beads of Ruin <u>(-SpD)</u></label>
+                        <input class="btn-input calc-trigger" type="checkbox" name="ruin" value="Sword of Ruin" id="sword-of-ruin" /><label class="btn btn-xxxxwide btn-left" for="sword-of-ruin">Sword of Ruin <u>(-Def)</u></label>
+                        <input class="btn-input calc-trigger" type="checkbox" name="ruin" value="Beads of Ruin" id="beads-of-ruin" /><label class="btn btn-xxxxwide btn-right" for="beads-of-ruin">Beads of Ruin <u>(-SpD)</u></label>
                     </div>
-                    <div class="gen-specific g4 g5 g6 g7 g8 g9" style="width: 14.6em; margin: 5px auto;">
+                    <div class="gen-specific g4 g5 g6 g7 g8 g9" style="width: 17em; margin: 5px auto;">
                         <div class="gen-specific g4 g5 g6 g7 divider">
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         </div>
                         <input class="btn-input calc-trigger" type="checkbox" id="gravity" /><label class="btn" for="gravity" title="Is gravity in effect?">Gravity</label>
                         <div class="gen-specific g8 g9 divider">
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <input class="btn-input calc-trigger" type="checkbox" id="neutralizingGas" /><label class="btn btn-xwide" for="neutralizingGas" title="Is neutralizing gas in effect?">Neutralizing Gas </label>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <input class="btn-input calc-trigger" type="checkbox" id="neutralizingGas" /><label class="btn btn-xxwide" for="neutralizingGas" title="Is neutralizing gas in effect?">Neutralizing Gas </label>
                         </div>
                     </div>
                     <!-- Note: I know the html is clunky but it does make it look nicer so idk probably worth -->
@@ -503,9 +507,9 @@
                 <div class="panel-heading"><h4 class="panel-title">Pokémon 2</h4></div>
                 <div class="panel-body">
                     <input type="text" class="set-selector calc-trigger" />
-                    <!--<div class="gen-specific g5 g6 g7 g8 g9">
-                        <input type="checkbox" id="set-toggle" /> Custom sets only
-                    </div>-->
+                    <div class="gen-specific g5 g6 g7 g8 g9">
+                        <input type="checkbox" class="set-toggle" /> Custom sets only
+                    </div>
                     <div class="info-group">
                         <div>
                             <label>Type</label>
@@ -586,6 +590,7 @@
                         <select class="move-10hits calc-trigger hide"><option value="1">1 hit</option><option value="2">2 hits</option><option value="3">3 hits</option><option value="4">4 hits</option><option value="5">5 hits</option><option value="6">6 hits</option><option value="7">7 hits</option><option value="8">8 hits</option><option value="9">9 hits</option><option value="10">10 hits</option></select>
                         <select class="move-linearAddedBP calc-trigger hide"><option value="0">0x effect</option><option value="1">1x effect</option><option value="2">2x effect</option><option value="3">3x effect</option><option value="4">4x effect</option><option value="5">5x effect</option><option value="6">6x effect</option></select>
                         <select class="move-opponent calc-trigger hide"><option value="1">Move 1</option><option value="2">Move 2</option><option value="3">Move 3</option><option value="4">Move 4</option></select>
+                        <input class="move-stellar calc-trigger btn-input hide" type="checkbox" id="stellarR1" checked="checked" /><label class="stellar-btn btn x-btn" for="stellarR1" title="Is this the first time using a move of this type after Terastalizing?">1st Use</label>
                     </div>
                     <div class="move2">
                         <select class="move-selector calc-trigger small-select"></select>
@@ -602,6 +607,7 @@
                         <select class="move-10hits calc-trigger hide"><option value="1">1 hit</option><option value="2">2 hits</option><option value="3">3 hits</option><option value="4">4 hits</option><option value="5">5 hits</option><option value="6">6 hits</option><option value="7">7 hits</option><option value="8">8 hits</option><option value="9">9 hits</option><option value="10">10 hits</option></select>
                         <select class="move-linearAddedBP calc-trigger hide"><option value="0">0x effect</option><option value="1">1x effect</option><option value="2">2x effect</option><option value="3">3x effect</option><option value="4">4x effect</option><option value="5">5x effect</option><option value="6">6x effect</option></select>
                         <select class="move-opponent calc-trigger hide"><option value="1">Move 1</option><option value="2">Move 2</option><option value="3">Move 3</option><option value="4">Move 4</option></select>
+                        <input class="move-stellar calc-trigger btn-input hide" type="checkbox" id="stellarR2" checked="checked" /><label class="stellar-btn btn x-btn" for="stellarR2" title="Is this the first time using a move of this type after Terastalizing?">1st Use</label>
                     </div>
                     <div class="move3">
                         <select class="move-selector calc-trigger small-select"></select>
@@ -618,6 +624,7 @@
                         <select class="move-10hits calc-trigger hide"><option value="1">1 hit</option><option value="2">2 hits</option><option value="3">3 hits</option><option value="4">4 hits</option><option value="5">5 hits</option><option value="6">6 hits</option><option value="7">7 hits</option><option value="8">8 hits</option><option value="9">9 hits</option><option value="10">10 hits</option></select>
                         <select class="move-linearAddedBP calc-trigger hide"><option value="0">0x effect</option><option value="1">1x effect</option><option value="2">2x effect</option><option value="3">3x effect</option><option value="4">4x effect</option><option value="5">5x effect</option><option value="6">6x effect</option></select>
                         <select class="move-opponent calc-trigger hide"><option value="1">Move 1</option><option value="2">Move 2</option><option value="3">Move 3</option><option value="4">Move 4</option></select>
+                        <input class="move-stellar calc-trigger btn-input hide" type="checkbox" id="stellarR3" checked="checked" /><label class="stellar-btn btn x-btn" for="stellarR3" title="Is this the first time using a move of this type after Terastalizing?">1st Use</label>
                     </div>
                     <div class="move4">
                         <select class="move-selector calc-trigger small-select"></select>
@@ -634,6 +641,7 @@
                         <select class="move-10hits calc-trigger hide"><option value="1">1 hit</option><option value="2">2 hits</option><option value="3">3 hits</option><option value="4">4 hits</option><option value="5">5 hits</option><option value="6">6 hits</option><option value="7">7 hits</option><option value="8">8 hits</option><option value="9">9 hits</option><option value="10">10 hits</option></select>
                         <select class="move-linearAddedBP calc-trigger hide"><option value="0">0x effect</option><option value="1">1x effect</option><option value="2">2x effect</option><option value="3">3x effect</option><option value="4">4x effect</option><option value="5">5x effect</option><option value="6">6x effect</option></select>
                         <select class="move-opponent calc-trigger hide"><option value="1">Move 1</option><option value="2">Move 2</option><option value="3">Move 3</option><option value="4">Move 4</option></select>
+                        <input class="move-stellar calc-trigger btn-input hide" type="checkbox" id="stellarR4" checked="checked" /><label class="stellar-btn btn x-btn" for="stellarR4" title="Is this the first time using a move of this type after Terastalizing?">1st Use</label>
                     </div>
                     <input class="glaive-rush calc-trigger hide" type="checkbox" id="glaiveR" title="Apply double damage from using Glaive Rush?" />
                     <div class="info-group">

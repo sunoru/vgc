@@ -45,6 +45,7 @@ $(".tera").bind("keyup change", function () {
     var poke = $(this).closest(".poke-info");
     calcHP(poke);
     calcStats(poke);
+    teraStellarBtns(poke, $(this).prop("checked"), poke.find(".tera-type").val() === 'Stellar');
 });
 $(".nature").bind("keyup change", function() {
     calcStats($(this).closest(".poke-info"));
@@ -156,6 +157,26 @@ $(".percent-hp").keyup(function() {
     var percent = $(this).val();
     calcCurrentHP($(this).parent(), max, percent);
 });
+
+$(".tera-type").bind("keyup change", function () {
+    var poke = $(this).closest(".poke-info");
+    teraStellarBtns(poke, poke.find(".tera").prop("checked"), $(this).val() === 'Stellar')
+});
+
+function teraStellarBtns(poke, isTera, isStellar) {
+    if (isTera && isStellar && poke.find("input.set-selector").val().indexOf('Terapagos') === -1) {
+        for (i = 1; i <= 4; i++) {
+            poke.find(".move" + i + " .stellar-btn").show();
+            poke.find(".move" + i + " .move-stellar").prop("checked", true);
+        }
+    }
+    else {
+        for (i = 1; i <= 4; i++) {
+            poke.find(".move" + i + " .stellar-btn").hide();
+            poke.find(".move" + i + " .move-stellar").prop("checked", false);
+        }
+    }
+}
 
 var lastAura = [false, false, false]
 var manualProtoQuark;
@@ -280,31 +301,30 @@ function autoSetRuin() {
     else
         $("input:checkbox[id='beads-of-ruin']").prop("checked", false)
 }
-function autoSetTerrain()
-{
+function autoSetTerrain() {
     var ability1 = $("#p1 select.ability").val()
     var ability2 = $("#p2 select.ability").val()
     var abOn1 = $("#p1").find(".abilityToggle").prop("checked")
     var abOn2 = $("#p2").find(".abilityToggle").prop("checked")
     //Grassy Terrain check is first due to the need to check for abilityToggle with Seed Sower
-    if ((ability1 == "Grassy Surge" || ability2 == "Grassy Surge" || (ability1 == "Seed Sower" && abOn1) || (ability2 == "Seed Sower" && abOn2))) {
-        $("input:radio[id='grassy']").prop("checked", true)
+    if ([ability1, ability2].indexOf("Grassy Surge") !== -1 || (ability1 == "Seed Sower" && abOn1) || (ability2 == "Seed Sower" && abOn2)) {
+        $("input:radio[id='grassy']").prop("checked", true);
         lastTerrain = 'grassy';
     }
-    else if ((["Electric Surge", "Hadron Engine"].indexOf(ability1) !== -1 || ["Electric Surge", "Hadron Engine"].indexOf(ability2) !== -1)) {
-        $("input:radio[id='electric']").prop("checked", true)
+    else if ([ability1, ability2].indexOf("Electric Surge") != -1 || [ability1, ability2].indexOf("Hadron Engine") != -1) {
+        $("input:radio[id='electric']").prop("checked", true);
         lastTerrain = 'electric';
     }
-    else if((ability1 == "Misty Surge" || ability2 == "Misty Surge")){
-        $("input:radio[id='misty']").prop("checked", true)
+    else if ([ability1, ability2].indexOf("Misty Surge") !== -1) {
+        $("input:radio[id='misty']").prop("checked", true);
         lastTerrain = 'misty';
     }
-    else if((ability1 == "Psychic Surge" || ability2 == "Psychic Surge")){
-        $("input:radio[id='psychic']").prop("checked", true)
+    else if ([ability1, ability2].indexOf("Psychic Surge") !== -1) {
+        $("input:radio[id='psychic']").prop("checked", true);
         lastTerrain = 'psychic';
     }
     else
-        $("input:radio[id='noterrain']").prop("checked", true)
+        $("input:radio[id='noterrain']").prop("checked", true);
 }
 
 function autosetWeather(ability, i, abOn) {
@@ -656,6 +676,7 @@ $(".set-selector").change(function() {
         }
         pokeObj.find(".max").prop("checked", false);
         pokeObj.find(".tera").prop("checked", false);
+        pokeObj.find(".tera").change();
         calcHP(pokeObj);
         calcStats(pokeObj);
         calcEvTotal(pokeObj);
@@ -687,7 +708,7 @@ function showFormes(formeObj, setName, pokemonName, pokemon) {
         }
     }
 
-    if (pokemonName === "Palafin")
+    if (pokemonName === "Palafin" || pokemonName === "Terapagos")
         defaultForme = 1;
     else if (gen == 8 && !defaultForme && gmaxDefaults.indexOf(pokemonName) != -1)
         defaultForme = pokedex[pokemonName].formes.indexOf(pokemonName + "-Gmax");
@@ -916,6 +937,7 @@ function findDamageResult(resultMoveObj) {
     }
 }
 
+var terapagosCheck = {"p1": false, "p2": false};
 function Pokemon(pokeInfo) {
     var setName = pokeInfo.find("input.set-selector").val();
 
@@ -923,7 +945,7 @@ function Pokemon(pokeInfo) {
         this.name = setName;
     } else {
         var pokemonName = setName.substring(0, setName.indexOf(" ("));
-        this.name = (pokedex[pokemonName].formes) ? pokeInfo.find(".forme").val() : pokemonName;
+        this.name = (pokedex[pokemonName] && pokedex[pokemonName].formes) ? pokeInfo.find(".forme").val() : pokemonName;
     }
 
     //Check for form-item coordination
@@ -951,7 +973,7 @@ function Pokemon(pokeInfo) {
         pokeInfo.find(".max").prop("disabled", false);
     }
 
-    //Check for Tera form (ability only for now, should probably be changed to a different form with Terapagos coming in the next DLC)
+    //Check for Tera form (ability only for now, should probably be changed to a different form with Terapagos coming in the next DLC) edit: nope lol
     if (this.name && this.name.indexOf('Ogerpon') !== -1) {
         var mask = pokeInfo.find("select.item").val().substring(0, pokeInfo.find("select.item").val().indexOf(" Mask"));
 
@@ -960,6 +982,8 @@ function Pokemon(pokeInfo) {
                 : mask === 'Hearthflame' ? 'Fire'
                     : mask === 'Cornerstone' ? 'Rock'
                         : 'Grass';
+            //pokeInfo.find(".type1").val(pokedex['Ogerpon-' + mask].t1);
+            //pokeInfo.find(".type2").val(pokedex['Ogerpon-' + mask].t2);
             pokeInfo.find(".tera-type").val(maskTera);
             pokeInfo.find(".tera-type").prop("disabled", true);
             if (pokeInfo.find(".tera").prop("checked")) {
@@ -971,9 +995,64 @@ function Pokemon(pokeInfo) {
                 pokeInfo.find("select.ability").trigger('change.select2');
             }
         }
+        terapagosCheck[pokeInfo.prop('id')] = false;
+        pokeInfo.find(".tera").prop("disabled", false);
+    }
+    else if (this.name && this.name.indexOf('Terapagos') !== -1) {
+        pokeInfo.find(".tera-type").val('Stellar');
+        pokeInfo.find(".tera-type").prop("disabled", true);
+        if (this.name === 'Terapagos-Terastal') {
+            pokeInfo.find(".tera").prop("disabled", false);
+            if (pokeInfo.find(".tera").prop("checked")) {
+                this.name = 'Terapagos-Stellar';
+                if (!terapagosCheck[pokeInfo.prop('id')]) {
+                    pokeInfo.find(".type1").val(pokedex['Terapagos-Stellar'].t1);
+                    pokeInfo.find(".type2").val(pokedex['Terapagos-Stellar'].t2);
+                    pokeInfo.find(".hp .base").val(pokedex['Terapagos-Stellar'].bs.hp);
+                    pokeInfo.find(".at .base").val(pokedex['Terapagos-Stellar'].bs.at);
+                    pokeInfo.find(".df .base").val(pokedex['Terapagos-Stellar'].bs.df);
+                    pokeInfo.find(".sa .base").val(pokedex['Terapagos-Stellar'].bs.sa);
+                    pokeInfo.find(".sd .base").val(pokedex['Terapagos-Stellar'].bs.sd);
+                    pokeInfo.find(".sp .base").val(pokedex['Terapagos-Stellar'].bs.sp);
+                    calcHP(pokeInfo);
+                    calcStats(pokeInfo);
+                    pokeInfo.find(".weight").val(pokedex['Terapagos-Stellar'].w);
+                    pokeInfo.find("select.ability").val(pokedex['Terapagos-Stellar'].ab);
+                    pokeInfo.find("select.ability").trigger('change.select2');
+                    terapagosCheck[pokeInfo.prop('id')] = true;
+                }
+                pokeInfo.find(".forme").prop("disabled", true);
+            }
+            else {
+                this.name = 'Terapagos-Terastal';
+                if (terapagosCheck[pokeInfo.prop('id')]) {
+                    pokeInfo.find(".type1").val(pokedex['Terapagos-Terastal'].t1);
+                    pokeInfo.find(".type2").val(pokedex['Terapagos-Terastal'].t2);
+                    pokeInfo.find(".hp .base").val(pokedex['Terapagos-Terastal'].bs.hp);
+                    pokeInfo.find(".at .base").val(pokedex['Terapagos-Terastal'].bs.at);
+                    pokeInfo.find(".df .base").val(pokedex['Terapagos-Terastal'].bs.df);
+                    pokeInfo.find(".sa .base").val(pokedex['Terapagos-Terastal'].bs.sa);
+                    pokeInfo.find(".sd .base").val(pokedex['Terapagos-Terastal'].bs.sd);
+                    pokeInfo.find(".sp .base").val(pokedex['Terapagos-Terastal'].bs.sp);
+                    calcHP(pokeInfo);
+                    calcStats(pokeInfo);
+                    pokeInfo.find(".weight").val(pokedex['Terapagos-Terastal'].w);
+                    pokeInfo.find("select.ability").val(pokedex['Terapagos-Terastal'].ab);
+                    pokeInfo.find("select.ability").trigger('change.select2');
+                    terapagosCheck[pokeInfo.prop('id')] = false;
+                }
+                pokeInfo.find(".forme").prop("disabled", false);
+            }
+        }
+        else {
+            pokeInfo.find(".tera").prop("disabled", true);
+        }
     }
     else {
         pokeInfo.find(".tera-type").prop("disabled", false);
+        pokeInfo.find(".forme").prop("disabled", false);
+        terapagosCheck[pokeInfo.prop('id')] = false;
+        pokeInfo.find(".tera").prop("disabled", false);
     }
 
     this.type1 = pokeInfo.find(".type1").val();
@@ -1010,7 +1089,7 @@ function Pokemon(pokeInfo) {
     ];
     this.glaiveRushMod = pokeInfo.find(".glaive-rush").prop("checked");
     this.weight = +pokeInfo.find(".weight").val();
-    this.canEvolve = pokedex[pokemonName].canEvolve;
+    this.canEvolve = pokedex[pokemonName] ? pokedex[pokemonName].canEvolve : false;
 
 }
 
@@ -1036,6 +1115,7 @@ function getMoveDetails(moveInfo, maxMon) {
         combinePledge: (moveName.includes(" Pledge") && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? moveInfo.find(".move-pledge").val() : 0,
         timesAffected: (defaultDetails.linearAddBP && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? ~~moveInfo.find(".move-linearAddedBP").val() : 0,
         usedOppMove: moveInfo.find(".move-opponent option:selected").text(),
+        getsStellarBoost: moveInfo.find(".move-stellar").prop("checked"),
     });
 }
 
@@ -1085,6 +1165,9 @@ function Field() {
     };
     this.clearWeather = function() {
         weather = "";
+    };
+    this.clearTerrain = function () {
+        terrain = "";
     };
     this.getSide = function (i) {
         return new Side(format, terrain, weather, isGravity, isSR[i], spikes[i], isReflect[i], isLightScreen[i], isForesight[i], isHelpingHand[i], isFriendGuard[i], isBattery[i], isProtect[i], isPowerSpot[i], isSteelySpirit[i], isNeutralizingGas, isGMaxField[i], isFlowerGiftSpD[i], isFlowerGiftAtk[i], isTailwind[i], isSaltCure[i], isAuroraVeil[i]);
@@ -1233,7 +1316,7 @@ $(".gen").change(function () {
             pokedex = (localStorage.getItem("dex") == "natdex") ? POKEDEX_SV_NATDEX :  POKEDEX_SV;
             setdex = SETDEX_SV;
             setdexCustom = SETDEX_CUSTOM_SV;
-            typeChart = TYPE_CHART_XY;
+            typeChart = TYPE_CHART_SV;
             moves = (localStorage.getItem("dex") == "natdex") ? MOVES_SV_NATDEX : MOVES_SV;
             items = (localStorage.getItem("dex") == "natdex") ? ITEMS_SV_NATDEX : ITEMS_SV;
             abilities = ABILITIES_SV;
@@ -1278,6 +1361,7 @@ $(".gen").change(function () {
     types.splice(types.indexOf('Typeless'), 1);
     var teraTypes = $.extend(true, [], types);
     if (gen >= 2) types.push('Typeless');
+    types.splice(types.indexOf('Stellar'), 1);
     var typeOptions = getSelectOptions(types);
     var teraTypeOptions = getSelectOptions(teraTypes);
     $("select.type1, select.move-type").find("option").remove().end().append(typeOptions);
@@ -1290,8 +1374,10 @@ $(".gen").change(function () {
     var itemOptions = getSelectOptions(items, true);
     $("select.item").find("option").remove().end().append("<option value=\"\">(none)</option>" + itemOptions);
 
-    $(".set-selector").val(getSetOptions()[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
-    $(".set-selector").change();
+    $("#p1 .set-selector").val(getSetOptions("#p1")[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
+    $("#p1 .set-selector").change();
+    $("#p2 .set-selector").val(getSetOptions("#p2")[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
+    $("#p2 .set-selector").change();
 });
 
 function clearField() {
@@ -1342,7 +1428,7 @@ function clearField() {
     $("#auroraVeilR").prop("checked", false);
 }
 
-function getSetOptions() {
+function getSetOptions(p) {
     var pokeNames, index;
     pokeNames = Object.keys(pokedex);
     index = pokeNames.length;
@@ -1359,14 +1445,15 @@ function getSetOptions() {
     pokeNames.sort();
     var setOptions = [];
     var idNum = 0;
+    var setdexUsed = $(p + " .set-toggle").prop("checked") && gen >= 5 ? setdexCustom : setdex;
     for (var i = 0; i < pokeNames.length; i++) {
         var pokeName = pokeNames[i];
         setOptions.push({
             pokemon: pokeName,
             text: pokeName
         });
-        if (pokeName in setdex) {
-            var setNames = Object.keys(setdex[pokeName]);
+        if (pokeName in setdexUsed) {
+            var setNames = Object.keys(setdexUsed[pokeName]);
             for (var j = 0; j < setNames.length; j++) {
                 var setName = setNames[j];
                 setOptions.push({
@@ -1418,16 +1505,13 @@ function getGen() {
     }
 }
 
-$(document).ready(function() {
-    getGen();
-    $(".terrain-trigger").bind("change keyup", getTerrainEffects);
-    $(".calc-trigger").bind("change keyup", calculate);
-    $(".set-selector").select2({
-        formatResult: function(object) {
+function setStartup(p) {
+    $(p + " .set-selector").select2({
+        formatResult: function (object) {
             return object.set ? ("&nbsp;&nbsp;&nbsp;" + object.set) : ("<b>" + object.text + "</b>");
         },
-        query: function(query) {
-            var setOptions = getSetOptions();
+        query: function (query) {
+            var setOptions = getSetOptions(p);
             var pageSize = 30;
             var results = [];
             for (var i = 0; i < setOptions.length; i++) {
@@ -1445,11 +1529,20 @@ $(document).ready(function() {
                 more: results.length >= query.page * pageSize
             });
         },
-        initSelection: function(element, callback) {
-            var data = getSetOptions()[gen > 3 ? 1 : gen === 1 ? 5 : 3];
+        initSelection: function (element, callback) {
+            var data = getSetOptions(p)[gen > 3 ? 1 : gen === 1 ? 5 : 3];
             callback(data);
         }
     });
+}
+
+$(document).ready(function () {
+    $(".stellar-btn").hide();
+    getGen();
+    $(".terrain-trigger").bind("change keyup", getTerrainEffects);
+    $(".calc-trigger").bind("change keyup", calculate);
+    setStartup("#p1");
+    setStartup("#p2");
     $(".move-selector").select2({
         dropdownAutoWidth:true,
         matcher: function(term, text) {
@@ -1472,6 +1565,8 @@ $(document).ready(function() {
             return text.toUpperCase().indexOf(term.toUpperCase()) === 0 || text.toUpperCase().indexOf(" " + term.toUpperCase()) >= 0;
         }
     });
-    $(".set-selector").val(getSetOptions()[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
-    $(".set-selector").change();
+    $("#p1 .set-selector").val(getSetOptions("#p1")[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
+    $("#p1 .set-selector").change();
+    $("#p2 .set-selector").val(getSetOptions("#p2")[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
+    $("#p2 .set-selector").change();
 });

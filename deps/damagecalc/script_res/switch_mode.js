@@ -72,6 +72,10 @@ $(function(){
 	});
 
 	//see $(".gen").change(function ()) in ap_calc.js for changing gen value in localStorage
+
+	$(".set-toggle").on("click", function () {
+		loadSets("#" + $(this).closest(".poke-info").prop("id"));
+    })
 })
 
 function loadTheme(color){
@@ -168,6 +172,7 @@ function loadDex(dexMode) {
 		types.splice(types.indexOf('Typeless'), 1);
 		var teraTypes = $.extend(true, [], types);
 		if (gen >= 2) types.push('Typeless');
+		types.splice(types.indexOf('Stellar'), 1);
 		var typeOptions = getSelectOptions(types);
 		var teraTypeOptions = getSelectOptions(teraTypes);
     }
@@ -181,6 +186,14 @@ function loadDex(dexMode) {
 	var itemOptions = getSelectOptions(items, true);
 	$("select.item").find("option").remove().end().append("<option value=\"\">(none)</option>" + itemOptions);
 
-	$(".set-selector").val(getSetOptions()[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
-	$(".set-selector").change();
+	$("#p1 .set-selector").val(getSetOptions("#p1")[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
+	$("#p1 .set-selector").change();
+	$("#p2 .set-selector").val(getSetOptions("#p2")[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
+	$("#p2 .set-selector").change();
+}
+
+function loadSets(p) {
+	setStartup(p)
+	$(p + " .set-selector").val(getSetOptions(p)[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
+	$(p + " .set-selector").change();
 }
