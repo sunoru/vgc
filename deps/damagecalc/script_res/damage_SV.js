@@ -17,6 +17,8 @@ function CALCULATE_ALL_MOVES_SV(p1, p2, field) {
     checkKlutz(p1);
     checkKlutz(p2);
     checkEvo(p1, p2);
+    checkParadoxAbilities(p1, field.getTerrain(), field.getWeather());
+    checkParadoxAbilities(p2, field.getTerrain(), field.getWeather());
     checkSeeds(p1, field.getTerrain());
     checkSeeds(p2, field.getTerrain());
     checkSwordShield(p1);
@@ -77,7 +79,7 @@ function GET_DAMAGE_SV(attacker, defender, move, field) {
 
     if (move.name == "Nature Power" && attacker.item !== 'Assault Vest')
         [move, moveDescName] = NaturePower(move, field, moveDescName);
-    else if (move.name == 'Me First' && !move.isMeFirst && attacker.item !== 'Assault Vest')
+    else if (move.name == 'Me First' && !move.isMeFirst)
         [move, moveDescName] = checkMeFirst(move, moveDescName);
 
     if (move.isZ || move.isSignatureZ)
