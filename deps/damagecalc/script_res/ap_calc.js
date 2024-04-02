@@ -7,14 +7,16 @@ var bounds = {
     "dvs":[0,15],
     "move-bp":[0,999]
 };
-isCrit = false;
-center_images = ["image_res/toge_normal.png", "image_res/toge_crit.png"]
-function checkCrit(crit) {
-    if(crit != isCrit) {
-        isCrit = crit;
-        $("#toge").attr("src", center_images[+isCrit])
-    }
-}
+
+//isCrit = false;
+//center_images = ["image_res/toge_normal.png", "image_res/toge_crit.png"]
+//function checkCrit(crit) {
+//    if(crit != isCrit) {
+//        isCrit = crit;
+//        $("#toge").attr("src", center_images[+isCrit])
+//    }
+//}
+
 for (var bounded in bounds) {
     if (bounds.hasOwnProperty(bounded)) {
         attachValidation(bounded, bounds[bounded][0], bounds[bounded][1]);
@@ -178,20 +180,37 @@ function teraStellarBtns(poke, isTera, isStellar) {
     }
 }
 
+function setHitsVal(poke, ab, item) {
+    var pokeMoveObjs = [poke.find(".move1"), poke.find(".move2"), poke.find(".move3"), poke.find(".move4")];
+    var moveData = [moves[pokeMoveObjs[0].children("select.move-selector").val()], moves[pokeMoveObjs[1].children("select.move-selector").val()],
+        moves[pokeMoveObjs[2].children("select.move-selector").val()], moves[pokeMoveObjs[3].children("select.move-selector").val()]];
+
+    for (var i = 0; i < 4; i++) {
+        var curHitBounds = moveData[i].hitRange;
+        if (curHitBounds && curHitBounds.length == 2) {
+            if (curHitBounds[0] === 2 && curHitBounds[1] === 5) {
+                pokeMoveObjs[i].children(".move-hits").val(ab === 'Skill Link' ? 5 : item === 'Loaded Dice' ? 4 : 3);
+            }
+            else if (curHitBounds[1] !== 6 && curHitBounds[1] !== 2) {
+                pokeMoveObjs[i].children(".move-hits").val(curHitBounds[1]);
+            }
+        }
+    }
+}
+
 var lastAura = [false, false, false]
 var manualProtoQuark;
 $(".ability").bind("keyup change", function () {
+    thisPoke = $(this).closest(".poke-info");
     autoSetNeutralGas();
 
-    $(this).closest(".poke-info").find(".move-hits").val($(this).val() === 'Skill Link' ? 5
-        : $(this).closest(".poke-info").find("select.item").val() === 'Loaded Dice' ? 4
-            : 3);
+    setHitsVal(thisPoke, $(this).val(), thisPoke.find("select.item").val());
 
     if ($(this).val() === "Supreme Overlord")
-        $(this).closest(".poke-info").find(".ability-supreme").show();
+        thisPoke.find(".ability-supreme").show();
     else
-        $(this).closest(".poke-info").find(".ability-supreme").hide();
-    $(this).closest(".poke-info").find(".ability-supreme").val(0);
+        thisPoke.find(".ability-supreme").hide();
+    thisPoke.find(".ability-supreme").val(0);
 
     autoSetAura()
     autoSetRuin()
@@ -201,32 +220,40 @@ $(".ability").bind("keyup change", function () {
     var ABILITY_TOGGLE_OFF = ['Flash Fire', 'Plus', 'Minus', 'Trace', 'Stakeout', 'Electromorphosis', 'Wind Power', 'Sand Spit', 'Seed Sower'];
     var ABILITY_TOGGLE_ON = gen >= 9 ? ['Intimidate', 'Slow Start', 'Protean', 'Libero', 'Intrepid Sword', 'Dauntless Shield', 'Supersweet Syrup'] : ['Intimidate', 'Slow Start'];
     if (ABILITY_TOGGLE_OFF.indexOf(ab) !== -1) {
-        $(this).closest(".poke-info").find(".abilityToggle").show();
-        $(this).closest(".poke-info").find(".abilityToggle").prop("checked", false);
+        thisPoke.find(".abilityToggle").show();
+        thisPoke.find(".abilityToggle").prop("checked", false);
     }
     else if (ABILITY_TOGGLE_ON.indexOf(ab) !== -1) {
-        $(this).closest(".poke-info").find(".abilityToggle").show();
-        $(this).closest(".poke-info").find(".abilityToggle").prop("checked", true);
+        thisPoke.find(".abilityToggle").show();
+        thisPoke.find(".abilityToggle").prop("checked", true);
     }
     else {
-        $(this).closest(".poke-info").find(".abilityToggle").hide();
+        thisPoke.find(".abilityToggle").hide();
     }
     var STAT_BOOST_VARY = ['Protosynthesis', 'Quark Drive'];
     if (STAT_BOOST_VARY.indexOf(ab) !== -1) {
-        $(this).closest(".poke-info").find(".ability-advanced").show();
-        $(this).closest(".poke-info").find(".ability-advanced").prop("checked", false);
+        thisPoke.find(".ability-advanced").show();
+        thisPoke.find(".ability-advanced").prop("checked", false);
     }
     else
-        $(this).closest(".poke-info").find(".ability-advanced").hide();
-    $(this).closest(".poke-info").find(".ability-proto-quark").hide();
+        thisPoke.find(".ability-advanced").hide();
+    thisPoke.find(".ability-proto-quark").hide();
     manualProtoQuark = false;
 });
 
 $("#p1 select.ability").bind("keyup change", function() {
     autosetWeather($(this).val(), 0, $("#p1").find(".abilityToggle").prop("checked"));
+    if ($(this).val() == 'Teraform Zero') {
+        removeWeather();
+        removeTerrain();
+    }
 });
 $("#p2 select.ability").bind("keyup change", function() {
     autosetWeather($(this).val(), 1, $("#p2").find(".abilityToggle").prop("checked"));
+    if ($(this).val() == 'Teraform Zero') {
+        removeWeather();
+        removeTerrain();
+    }
 });
 
 $("#p1 .abilityToggle").bind("keyup change", function () {
@@ -327,6 +354,10 @@ function autoSetTerrain() {
         $("input:radio[id='noterrain']").prop("checked", true);
 }
 
+function removeTerrain() {
+    $("input:radio[id='noterrain']").prop("checked", true);
+}
+
 function autosetWeather(ability, i, abOn) {
     var currentWeather = $("input:radio[name='weather']:checked").val();
     if (lastAutoWeather.indexOf(currentWeather) === -1 || currentWeather === "") {
@@ -336,16 +367,16 @@ function autosetWeather(ability, i, abOn) {
 
     var primalWeather = ["Harsh Sun", "Heavy Rain"];
     var autoWeatherAbilities = {
-            "Drought": "Sun",
-            "Drizzle": "Rain",
-            "Sand Stream": "Sand",
-            "Snow Warning": "Hail",
-            //"Sand Spit": "Sand",
-            "Desolate Land": "Harsh Sun",
-            "Primordial Sea": "Heavy Rain",
-            "Delta Stream": "Strong Winds",
-            "Orichalcum Pulse": "Sun",
-        };
+        "Drought": "Sun",
+        "Drizzle": "Rain",
+        "Sand Stream": "Sand",
+        "Snow Warning": "Hail",
+        //"Sand Spit": "Sand",
+        "Desolate Land": "Harsh Sun",
+        "Primordial Sea": "Heavy Rain",
+        "Delta Stream": "Strong Winds",
+        "Orichalcum Pulse": "Sun",
+    };
     var newWeather;
 
     if (gen >= 9) autoWeatherAbilities["Snow Warning"] = "Snow";
@@ -391,6 +422,10 @@ function autosetWeather(ability, i, abOn) {
     $("input:radio[name='weather'][value='" + newWeather + "']").prop("checked", true);
 }
 
+function removeWeather() {
+    $("input:radio[name='weather'][value='']").prop("checked", true);
+}
+
 function autoSetNeutralGas() {
     var ability1 = $("#p1 select.ability").val()
     var ability2 = $("#p2 select.ability").val()
@@ -399,25 +434,19 @@ function autoSetNeutralGas() {
     }
 }
 
-$("#p1 .item").bind("keyup change", function () {
-    $(this).closest(".poke-info").find(".move-hits").val($(this).closest(".poke-info").find("select.ability").val() === 'Skill Link' ? 5
-        : $(this).val() === 'Loaded Dice' ? 4
-            : 3);
-    autosetStatus("#p1", $(this).val());
-    autoSetType("#p1", $(this).val());
-});
-$("#p2 .item").bind("keyup change", function () {
-    $(this).closest(".poke-info").find(".move-hits").val($(this).closest(".poke-info").find("select.ability").val() === 'Skill Link' ? 5
-        : $(this).val() === 'Loaded Dice' ? 4
-            : 3);
-    autosetStatus("#p2", $(this).val());
-    autoSetType("#p2", $(this).val());
+$(".item").bind("keyup change", function () {
+    var thisMon = $(this).closest(".poke-info");
+    setHitsVal(thisMon, thisMon.find("select.ability").val(), $(this).val());
+    autosetStatus('#' + thisMon.attr('id'), $(this).val());
+    autoSetType('#' + thisMon.attr('id'), $(this).val());
 });
 
 function autoSetType(p, item) {
     var ab = $(p + " select.ability").val();
-    
-    if (ab == "RKS System") {
+    var name = $(p + " input.set-selector").val();
+    var pokName = name.substring(0, name.indexOf(" ("));
+
+    if (ab == "RKS System" && pokName == "Silvally") {
         if (item.indexOf("Memory") != -1) {
             $(p + " .type1").val(getMemoryType(item));
         }
@@ -425,10 +454,10 @@ function autoSetType(p, item) {
             $(p + " .type1").val('Normal');
         }
     }
-    else if (ab == "Multitype") {
+    else if (ab == "Multitype" && pokName == "Arceus") {
         if (item.indexOf("Plate") != -1)
             $(p + " .type1").val(getItemBoostType(item));
-        else if (item.indexOf("ium Z") != -1)
+        else if (item.indexOf("ium Z") != -1 && getZType(item) !== '')
             $(p + " .type1").val(getZType(item));
         else
             $(p + " .type1").val('Normal');
@@ -467,6 +496,75 @@ $(".status").bind("keyup change", function() {
     }
 });
 
+// auto-update move details on select
+$(".move-selector").change(function() {
+    var moveName = $(this).val();
+    var move = moves[moveName] || moves['(No Move)'];
+    var moveGroupObj = $(this).parent();
+    moveGroupObj.children(".move-bp").val(move.bp);
+    moveGroupObj.children(".move-type").val(move.type);
+    moveGroupObj.children(".move-cat").val(move.category);
+    moveGroupObj.children(".move-crit").prop("checked", move.alwaysCrit === true);
+
+    if (move.hitRange && move.hitRange.length == 2) {
+        showHits(move.hitRange, moveGroupObj);
+        //if (moveName == 'Dragon Darts' && $('#douswitch').is(":checked")) {
+        //    moveGroupObj.children(".move-hits").hide();
+        //}
+    }
+    else {
+        moveGroupObj.children(".move-hits").hide();
+    }
+
+    if (move.canDouble) moveGroupObj.children(".double-btn").show();
+    else moveGroupObj.children(".double-btn").hide();
+
+    if (move.linearAddBP) moveGroupObj.children(".move-linearAddedBP").show();
+    else moveGroupObj.children(".move-linearAddedBP").hide();
+
+    if (move.usesOppMoves) {    //for when the attacker's moves change
+        getOppMoves($(this).closest(".poke-info").attr("id"), moveGroupObj);
+        moveGroupObj.children(".move-opponent").show();
+    } else {
+        moveGroupObj.children(".move-opponent").hide();
+    }
+
+    if (move.isPledge) {
+        moveGroupObj.children(".move-pledge").show();
+        moveGroupObj.children(".move-pledge").val(moveName);
+    }
+    else moveGroupObj.children(".move-pledge").hide();
+
+    moveGroupObj.children(".move-z").prop("checked", false);
+
+    //SLOPPY WAY OF HANDLING
+    glaiveRushCheck(moveGroupObj);
+    getOppMoves($(this).closest(".poke-info").attr("id"));  //for when the defender's moves change
+});
+
+function showHits(hitBounds, moveGroupObj) {
+    var moveHits = moveGroupObj.children(".move-hits");
+    moveHits.find("option").hide();
+    moveHits.show();
+    for (var i = hitBounds[0]; i <= hitBounds[1]; i++) {
+        moveHits.find('option[value="' + i + '"]').show();
+    }
+    if (hitBounds[0] === 2 && hitBounds[1] === 5) {
+        moveHits.val(moveHits.closest(".poke-info").find("select.ability").val() === 'Skill Link' ? 5
+            : moveHits.closest(".poke-info").find("select.item").val() === 'Loaded Dice' ? 4
+                : 3);
+    }
+    else if (hitBounds[0] === 1 && hitBounds[1] === 2) {  //Use case only for Dragon Darts, for now.
+        moveHits.val(1);
+    }
+    else if (hitBounds[0] === 1 && hitBounds[1] === 6) {  //Use case only for Beat Up. Sorry non-VGC players, it'll be stuck as 4
+        moveHits.val(4);
+    }
+    else {
+        moveHits.val(hitBounds[1]);
+    }
+}
+
 //sloppy check for Glaive Rush checkbox
 function glaiveRushCheck(divValue) {    //divValue should accept any div class, it's just meant to be a quick way to find which Pokemon it's checking
     pInfo = $(divValue).closest(".poke-info");
@@ -482,67 +580,6 @@ function glaiveRushCheck(divValue) {    //divValue should accept any div class, 
         pInfo.find(".glaive-rush").prop("checked", false);
     }
 }
-
-// auto-update move details on select
-$(".move-selector").change(function() {
-    var moveName = $(this).val();
-    var move = moves[moveName] || moves['(No Move)'];
-    var moveGroupObj = $(this).parent();
-    moveGroupObj.children(".move-bp").val(move.bp);
-    moveGroupObj.children(".move-type").val(move.type);
-    moveGroupObj.children(".move-cat").val(move.category);
-    moveGroupObj.children(".move-crit").prop("checked", move.alwaysCrit === true);
-
-    if (move.isMultiHit) {
-        moveGroupObj.children(".move-hits").show();
-        moveGroupObj.children(".move-hits").val($(this).closest(".poke-info").find("select.ability").val() === 'Skill Link' ? 5
-            : $(this).closest(".poke-info").find("select.item").val() === 'Loaded Dice' ? 4
-            : 3);
-    } else {
-        moveGroupObj.children(".move-hits").hide();
-    }
-
-    if (move.isTenMultiHit) {
-        moveGroupObj.children(".move-10hits").show();
-        moveGroupObj.children(".move-10hits").val(10);
-    } else {
-        moveGroupObj.children(".move-10hits").hide();
-    }
-
-    if (move.canDouble) moveGroupObj.children(".double-btn").show();
-    else moveGroupObj.children(".double-btn").hide();
-
-    if (move.oneTwoHit) moveGroupObj.children(".move-hits2").show();
-    else moveGroupObj.children(".move-hits2").hide();
-
-    if (move.linearAddBP) moveGroupObj.children(".move-linearAddedBP").show();
-    else moveGroupObj.children(".move-linearAddedBP").hide();
-
-    if (move.usesOppMoves) {    //for when the attacker's moves change
-      getOppMoves($(this).closest(".poke-info").attr("id"), moveGroupObj);
-        moveGroupObj.children(".move-opponent").show();
-    } else {
-        moveGroupObj.children(".move-opponent").hide();
-    }
-
-    if (move.isTripleHit) {
-        moveGroupObj.children(".move-hits3").show();
-        moveGroupObj.children(".move-hits3").val(3);
-    }
-    else moveGroupObj.children(".move-hits3").hide();
-
-    if (moveName.includes(" Pledge")) {
-        moveGroupObj.children(".move-pledge").show();
-        moveGroupObj.children(".move-pledge").val(moveName);
-    }
-    else moveGroupObj.children(".move-pledge").hide();
-
-    moveGroupObj.children(".move-z").prop("checked", false);
-
-    //SLOPPY WAY OF HANDLING
-    glaiveRushCheck(moveGroupObj);
-    getOppMoves($(this).closest(".poke-info").attr("id"));  //for when the defender's moves change
-});
 
 function getOppMoves(pokID, moveGroupObj) {
     var oppMoveOptions;
@@ -593,6 +630,10 @@ $(".set-selector").change(function() {
     var pokemonName, setName;
     var DOU = !$('#douswitch').is(":checked");
     pokemonName = fullSetName.substring(0, fullSetName.indexOf(" ("));
+    if (pokemonName === 'Spamton')
+        run_spamton();
+    else if (pokemonName === 'The Noise')
+        run_noise();
     setName = fullSetName.substring(fullSetName.indexOf("(") + 1, fullSetName.lastIndexOf(")"));
     var pokemon = pokedex[pokemonName];
     if (pokemon) {
@@ -826,7 +867,7 @@ function calculate() {
         result.koChanceText = p1.moves[i].bp === 0 && p1.moves[i].category !== "Status" ? '<a href="https://www.youtube.com/watch?v=NFZjEgXIl1E&t=21s">how</a>'
                   : getKOChanceText(result.damage, p1.moves[i], p2, field.getSide(1), p1.ability === 'Bad Dreams');
         result.crit = p1.moves[i].isCrit
-        if(p1.moves[i].isMLG && !($("#p1").find(".move" + (i + 1)).find(".move-z").prop("checked"))){
+        if(p1.moves[i].isMLG && !($("#p1").find(".move" + (i + 1)).find(".move-z").prop("checked")) && !($("#p1").find(".max").prop("checked"))){
             result.koChanceText = "<a href = 'https://www.youtube.com/watch?v=KGzH7ZR4BXs&t=19s'>is it a one-hit KO?!</a>"; //dank memes
         }
         $(resultLocations[0][i].move + " + label").text(p1.moves[i].name.replace("Hidden Power", "HP"));
@@ -846,7 +887,7 @@ function calculate() {
         result.koChanceText = p2.moves[i].bp === 0 && p2.moves[i].category !== "Status" ? '<a href="https://www.youtube.com/watch?v=NFZjEgXIl1E&t=21s">how</a>'
                 : getKOChanceText(result.damage, p2.moves[i], p1, field.getSide(0), p2.ability === 'Bad Dreams');
         result.crit = p2.moves[i].isCrit
-        if (p2.moves[i].isMLG && !($("#p2").find(".move" + (i + 1)).find(".move-z").prop("checked"))){
+        if (p2.moves[i].isMLG && !($("#p2").find(".move" + (i + 1)).find(".move-z").prop("checked")) && !($("#p2").find(".max").prop("checked"))){
             result.koChanceText = "<a href = 'https://www.youtube.com/watch?v=KGzH7ZR4BXs&t=19s'>is it a one-hit KO?!</a>";
         }
         $(resultLocations[1][i].move + " + label").text(p2.moves[i].name.replace("Hidden Power", "HP"));
@@ -887,7 +928,7 @@ $(".result-move").change(function() {
             else {
                 $("#damageValues").text("(" + result.damage.join(", ") + ")");
             }
-            checkCrit(result.crit)
+            //checkCrit(result.crit)
         }
     }
 });
@@ -973,7 +1014,7 @@ function Pokemon(pokeInfo) {
         pokeInfo.find(".max").prop("disabled", false);
     }
 
-    //Check for Tera form (ability only for now, should probably be changed to a different form with Terapagos coming in the next DLC) edit: nope lol
+    //Check for Tera form
     if (this.name && this.name.indexOf('Ogerpon') !== -1) {
         var mask = pokeInfo.find("select.item").val().substring(0, pokeInfo.find("select.item").val().indexOf(" Mask"));
 
@@ -982,11 +1023,11 @@ function Pokemon(pokeInfo) {
                 : mask === 'Hearthflame' ? 'Fire'
                     : mask === 'Cornerstone' ? 'Rock'
                         : 'Grass';
-            //pokeInfo.find(".type1").val(pokedex['Ogerpon-' + mask].t1);
-            //pokeInfo.find(".type2").val(pokedex['Ogerpon-' + mask].t2);
             pokeInfo.find(".tera-type").val(maskTera);
             pokeInfo.find(".tera-type").prop("disabled", true);
             if (pokeInfo.find(".tera").prop("checked")) {
+                pokeInfo.find(".type1").val(pokedex[this.name].t1);
+                pokeInfo.find(".type2").val(pokedex[this.name].t2);
                 pokeInfo.find("select.ability").val("Embody Aspect");
                 pokeInfo.find("select.ability").trigger('change.select2');
             }
@@ -1020,6 +1061,8 @@ function Pokemon(pokeInfo) {
                     pokeInfo.find("select.ability").val(pokedex['Terapagos-Stellar'].ab);
                     pokeInfo.find("select.ability").trigger('change.select2');
                     terapagosCheck[pokeInfo.prop('id')] = true;
+                    removeWeather();
+                    removeTerrain();
                 }
                 pokeInfo.find(".forme").prop("disabled", true);
             }
@@ -1068,10 +1111,16 @@ function Pokemon(pokeInfo) {
     this.boosts = {};
     this.stats = {};
     this.evs = {};
+    if (gen >= 3) {
+        this.ivs = {};
+    }
     for (var i = 0; i < STATS.length; i++) {
         this.rawStats[STATS[i]] = ~~pokeInfo.find("." + STATS[i] + " .total").text();
         this.boosts[STATS[i]] = ~~pokeInfo.find("." + STATS[i] + " .boost").val();
         this.evs[STATS[i]] = ~~pokeInfo.find("." + STATS[i] + " .evs").val();
+        if (gen >= 3) {
+            this.ivs[STATS[i]] = ~~pokeInfo.find("." + STATS[i] + " .ivs").val();
+        }
     }
     this.nature = pokeInfo.find(".nature").val();
     this.ability = pokeInfo.find("select.ability").val();
@@ -1103,16 +1152,12 @@ function getMoveDetails(moveInfo, maxMon) {
         category: moveInfo.find(".move-cat").val(),
         isCrit: moveInfo.find(".move-crit").prop("checked"),
         isZ: moveInfo.find(".move-z").prop("checked"),
-        hits: (defaultDetails.isMultiHit && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? ~~moveInfo.find(".move-hits").val()
-            : (defaultDetails.isTenMultiHit && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? ~~moveInfo.find(".move-10hits").val()
-                : (defaultDetails.oneTwoHit && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? ~~moveInfo.find(".move-hits2").val()
-                    : (defaultDetails.isTwoHit && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? 2
-                        : (defaultDetails.isThreeHit && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? 3
-                            : (moveName == "Beat Up" && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? 4
-                            : 1,
+        hits: (defaultDetails.hitRange && !defaultDetails.isTripleHit && !moveInfo.find(".move-z").prop("checked") && !maxMon)
+            ? (defaultDetails.hitRange.length == 2 ? ~~moveInfo.find(".move-hits").val() : defaultDetails.hitRange)
+            : 1,
         isDouble: (defaultDetails.canDouble && !moveInfo.find(".move-z").prop("checked") && !maxMon && moveInfo.find(".move-double").prop("checked")) ? 1 : 0,
-        tripleHits: (defaultDetails.isTripleHit && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? ~~moveInfo.find(".move-hits3").val() : 0,
-        combinePledge: (moveName.includes(" Pledge") && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? moveInfo.find(".move-pledge").val() : 0,
+        tripleHits: (defaultDetails.isTripleHit && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? ~~moveInfo.find(".move-hits").val() : 0,
+        combinePledge: (defaultDetails.isPledge && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? moveInfo.find(".move-pledge").val() : 0,
         timesAffected: (defaultDetails.linearAddBP && !moveInfo.find(".move-z").prop("checked") && !maxMon) ? ~~moveInfo.find(".move-linearAddedBP").val() : 0,
         usedOppMove: moveInfo.find(".move-opponent option:selected").text(),
         getsStellarBoost: moveInfo.find(".move-stellar").prop("checked"),
@@ -1150,6 +1195,8 @@ function Field() {
     var isTailwind = [$("#tailwindL").prop("checked"), $("#tailwindR").prop("checked")];
     var isSaltCure = [$("#saltCureL").prop("checked"), $("#saltCureR").prop("checked")];
     var isAuroraVeil = [$("#auroraVeilL").prop("checked"), $("#auroraVeilR").prop("checked")];
+    var isSwamp = [$("#swampL").prop("checked"), $("#swampR").prop("checked")];
+    var isSeaFire = [$("#seaFireL").prop("checked"), $("#seaFireR").prop("checked")];
 
     this.getNeutralGas = function () {
         return isNeutralizingGas;
@@ -1163,6 +1210,9 @@ function Field() {
     this.getTerrain = function() {
         return terrain;
     };
+    this.getSwamp = function (i) {
+        return isSwamp[i];
+    }
     this.clearWeather = function() {
         weather = "";
     };
@@ -1170,11 +1220,11 @@ function Field() {
         terrain = "";
     };
     this.getSide = function (i) {
-        return new Side(format, terrain, weather, isGravity, isSR[i], spikes[i], isReflect[i], isLightScreen[i], isForesight[i], isHelpingHand[i], isFriendGuard[i], isBattery[i], isProtect[i], isPowerSpot[i], isSteelySpirit[i], isNeutralizingGas, isGMaxField[i], isFlowerGiftSpD[i], isFlowerGiftAtk[i], isTailwind[i], isSaltCure[i], isAuroraVeil[i]);
+        return new Side(format, terrain, weather, isGravity, isSR[i], spikes[i], isReflect[i], isLightScreen[i], isForesight[i], isHelpingHand[i], isFriendGuard[i], isBattery[i], isProtect[i], isPowerSpot[i], isSteelySpirit[i], isNeutralizingGas, isGMaxField[i], isFlowerGiftSpD[i], isFlowerGiftAtk[i], isTailwind[i], isSaltCure[i], isAuroraVeil[i], isSwamp[i], isSeaFire[i]);
     };
 }
 
-function Side(format, terrain, weather, isGravity, isSR, spikes, isReflect, isLightScreen, isForesight, isHelpingHand, isFriendGuard, isBattery, isProtect, isPowerSpot, isSteelySpirit, isNeutralizingGas, isGmaxField, isFlowerGiftSpD, isFlowerGiftAtk, isTailwind, isSaltCure, isAuroraVeil) {
+function Side(format, terrain, weather, isGravity, isSR, spikes, isReflect, isLightScreen, isForesight, isHelpingHand, isFriendGuard, isBattery, isProtect, isPowerSpot, isSteelySpirit, isNeutralizingGas, isGmaxField, isFlowerGiftSpD, isFlowerGiftAtk, isTailwind, isSaltCure, isAuroraVeil, isSwamp, isSeaFire) {
     this.format = format;
     this.terrain = terrain;
     this.weather = weather;
@@ -1197,6 +1247,8 @@ function Side(format, terrain, weather, isGravity, isSR, spikes, isReflect, isLi
     this.isTailwind = isTailwind;
     this.isSaltCure = isSaltCure;
     this.isAuroraVeil = isAuroraVeil;
+    this.isSwamp = isSwamp;
+    this.isSeaFire = isSeaFire;
 }
 
 var gen, pokedex, setdex, setdexCustom, typeChart, moves, abilities, items, STATS, calculateAllMoves, calcHP, calcStat;
@@ -1237,7 +1289,7 @@ $(".gen").change(function () {
         case 3: //Gen 3
             pokedex = POKEDEX_ADV;
             setdex = SETDEX_ADV;
-            setdexCustom = [];
+            setdexCustom = SETDEX_CUSTOM_ADV;
             typeChart = TYPE_CHART_GSC;
             moves = MOVES_ADV;
             items = ITEMS_ADV;
@@ -1250,7 +1302,7 @@ $(".gen").change(function () {
         case 4: //Gen 4
             pokedex = POKEDEX_DPP;
             setdex = SETDEX_DPP;
-            setdexCustom = [];
+            setdexCustom = SETDEX_CUSTOM_DPP;
             typeChart = TYPE_CHART_GSC;
             moves = MOVES_DPP;
             items = ITEMS_DPP;
@@ -1358,10 +1410,12 @@ $(".gen").change(function () {
         }
     }
     var types = Object.keys(typeChart);
-    types.splice(types.indexOf('Typeless'), 1);
+    if (types.indexOf('Typeless') !== -1)
+        types.splice(types.indexOf('Typeless'), 1);
     var teraTypes = $.extend(true, [], types);
     if (gen >= 2) types.push('Typeless');
-    types.splice(types.indexOf('Stellar'), 1);
+    if (types.indexOf('Stellar') !== -1)
+        types.splice(types.indexOf('Stellar'), 1);
     var typeOptions = getSelectOptions(types);
     var teraTypeOptions = getSelectOptions(teraTypes);
     $("select.type1, select.move-type").find("option").remove().end().append(typeOptions);
@@ -1426,6 +1480,10 @@ function clearField() {
     $("#saltCureR").prop("checked", false);
     $("#auroraVeilL").prop("checked", false);
     $("#auroraVeilR").prop("checked", false);
+    $("#swampL").prop("checked", false);
+    $("#swampR").prop("checked", false);
+    $("#seaFireL").prop("checked", false);
+    $("#seaFireR").prop("checked", false);
 }
 
 function getSetOptions(p) {
@@ -1537,6 +1595,8 @@ function setStartup(p) {
 }
 
 $(document).ready(function () {
+    checkaprilfools();
+    //console.log(SETDEX_VGC2023);
     $(".stellar-btn").hide();
     getGen();
     $(".terrain-trigger").bind("change keyup", getTerrainEffects);
@@ -1550,7 +1610,6 @@ $(document).ready(function () {
             return text.toUpperCase().indexOf(term.toUpperCase()) === 0 || text.toUpperCase().indexOf(" " + term.toUpperCase()) >= 0;
         }
     });
-    //SELECT2 CODE NEEDS TO BE CHANGED SO IT UPDATES WHEN CHANGED
     $(".ability").select2({
         dropdownAutoWidth: true,
         matcher: function (term, text) {

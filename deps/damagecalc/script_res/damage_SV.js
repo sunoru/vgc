@@ -39,7 +39,7 @@ function CALCULATE_ALL_MOVES_SV(p1, p2, field) {
     p1.stats[SD] = getModifiedStat(p1.rawStats[SD], p1.boosts[SD]);
     p1.stats[SP] = getModifiedStat(p1.rawStats[SP], p1.boosts[SP]);
     setHighestStat(p1, 0);
-    p1.stats[SP] = getFinalSpeed(p1, field.getWeather(), field.getTerrain(), field.getTailwind(0));
+    p1.stats[SP] = getFinalSpeed(p1, field.getWeather(), field.getTailwind(0), field.getSwamp(0), field.getTerrain());
     $(".p1-speed-mods").text(p1.stats[SP]);
     p2.stats[AT] = getModifiedStat(p2.rawStats[AT], p2.boosts[AT]);
     p2.stats[DF] = getModifiedStat(p2.rawStats[DF], p2.boosts[DF]);
@@ -47,7 +47,7 @@ function CALCULATE_ALL_MOVES_SV(p1, p2, field) {
     p2.stats[SD] = getModifiedStat(p2.rawStats[SD], p2.boosts[SD]);
     p2.stats[SP] = getModifiedStat(p2.rawStats[SP], p2.boosts[SP]);
     setHighestStat(p2, 1);
-    p2.stats[SP] = getFinalSpeed(p2, field.getWeather(), field.getTerrain(), field.getTailwind(1));
+    p2.stats[SP] = getFinalSpeed(p2, field.getWeather(), field.getTailwind(1), field.getSwamp(1), field.getTerrain());
     $(".p2-speed-mods").text(p2.stats[SP]);
     var side1 = field.getSide(1);
     var side2 = field.getSide(0);
@@ -70,11 +70,11 @@ function GET_DAMAGE_SV(attacker, defender, move, field) {
     var defIsGrounded = pIsGrounded(defender, field);
 
     checkMoveTypeChange(move, field, attacker);
-    checkConditionalPriority(move, field.terrain);
+    checkConditionalPriority(move, field.terrain, attacker.ability);
     checkConditionalSpread(move, field.terrain, attacker, attIsGrounded);
     checkContactOverride(move, attacker);
 
-    if (attacker.isDynamax)
+    if (attacker.isDynamax && gen === 8)    //without the gen check a Dynamaxed Pokemon can lead to an error switching between gen 8 and either 7 or 9
         [move, isQuarteredByProtect, moveDescName] = MaxMoves(move, attacker, isQuarteredByProtect, moveDescName, field);
 
     if (move.name == "Nature Power" && attacker.item !== 'Assault Vest')
@@ -116,8 +116,8 @@ function GET_DAMAGE_SV(attacker, defender, move, field) {
         [move, description, ateIzeBoosted] = ateIzeTypeChange(move, attacker, description);
     }
 
-    var typeEffect1 = getMoveEffectiveness(move, defender.type1, defender.type2, ["Scrappy", "Mind's Eye"].indexOf(attacker.ability) != -1 || field.isForesight, field.isGravity, defender.item, field.weather === "Strong Winds", defender.ability === 'Tera Shell' && defender.curHP === defender.maxHP, defender.isTerastalize);
-    var typeEffect2 = defender.type2 && defender.type2 !== defender.type1 && move.type !== 'Stellar' ? getMoveEffectiveness(move, defender.type2, defender.type1, ["Scrappy", "Mind's Eye"].indexOf(attacker.ability) != -1 || field.isForesight, field.isGravity, defender.item, field.weather === "Strong Winds", defender.ability === 'Tera Shell' && defender.curHP === defender.maxHP, defender.isTerastalize) : 1;
+    var typeEffect1 = getMoveEffectiveness(move, defender.type1, defender.type2, description, field.isForesight, ["Scrappy", "Mind's Eye"].indexOf(attacker.ability) != -1 ? attacker.ability : false, field.isGravity, defender.item, field.weather === "Strong Winds", defender.ability === 'Tera Shell' && defender.curHP === defender.maxHP, defender.isTerastalize);
+    var typeEffect2 = defender.type2 && defender.type2 !== defender.type1 && move.type !== 'Stellar' ? getMoveEffectiveness(move, defender.type2, defender.type1, description, field.isForesight, ["Scrappy", "Mind's Eye"].indexOf(attacker.ability) != -1 ? attacker.ability : false, field.isGravity, defender.item, field.weather === "Strong Winds", defender.ability === 'Tera Shell' && defender.curHP === defender.maxHP, defender.isTerastalize) : 1;
     var typeEffectiveness = typeEffect1 * typeEffect2;
     immuneBuildDesc = immunityChecks(move, attacker, defender, field, description, defAbility, typeEffectiveness);
     if (immuneBuildDesc !== -1) return immuneBuildDesc;
