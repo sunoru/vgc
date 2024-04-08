@@ -66,6 +66,11 @@ const essentialLinks: EssentialLinkProps[] = [
   //   to: '/scripts',
   // },
   {
+    title: 'Miscellaneous',
+    icon: 'miscellaneous_services',
+    to: '/misc',
+  },
+  {
     title: 'Settings',
     icon: 'settings',
     to: '/settings',
