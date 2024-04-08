@@ -2,8 +2,9 @@
   "packageManager": "yarn@4.0.2",
   "private": true,
   "workspaces": [
-    "frontend",
-    "vgc-tools"
+    "vgc-tools",
+    "backend",
+    "frontend"
   ],
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",

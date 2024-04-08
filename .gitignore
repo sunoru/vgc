@@ -43,3 +43,6 @@ build/
 !.yarn/versions
 
 .pnp.*
+
+.env
+.env.*
