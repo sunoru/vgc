@@ -14784,7 +14784,7 @@ var POKEDEX_SS_NATDEX = $.extend(true, {}, POKEDEX_SM, {
       "sd": 145,
       "sp": 128
     },
-    "w": 355,
+    "w": 785,
     "ab": "Dauntless Shield",
     "isAlternateForme": true
   },
@@ -15045,7 +15045,7 @@ var POKEDEX_SS_NATDEX = $.extend(true, {}, POKEDEX_SM, {
           "sp": 80
       },
       "w": 200.0,
-      "ab": "Dragon\'s Maw",
+      "ab": "Dragon's Maw",
   },
   "Glastrier": {
       "t1": "Ice",
