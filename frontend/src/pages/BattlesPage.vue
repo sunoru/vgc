@@ -1,5 +1,5 @@
 <template>
-  <page-base class="row items-top justify-evenly" title="Battles (WIP)">
+  <page-base class="row items-top justify-evenly" title="Battles (WIP and not working right now)">
     <div class="q-pa-md col">
       <q-expansion-item class="col" style="width: 100%" label="Actions" v-model="actionsExpanded">
         <q-splitter v-model="splitterModel" style="height: 748px; width: 100%">
@@ -172,8 +172,8 @@ const DefaultColumns: QTableProps['columns'] = [
       battle.userPlayer === PlayerNumber.Unknown
         ? 'N/A'
         : battle.userPlayer === battle.winner
-        ? 'Win'
-        : 'Lose',
+          ? 'Win'
+          : 'Lose',
   },
   {
     name: 'team1',

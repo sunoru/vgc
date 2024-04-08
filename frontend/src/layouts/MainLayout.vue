@@ -9,7 +9,6 @@
         <q-toggle label="Dark Mode" v-model="config.darkMode" color="black" />
 
         <q-btn flat stretch disable icon="login" label="Sign in" />
-
       </q-toolbar>
     </q-header>
 
@@ -46,7 +45,7 @@ const essentialLinks: EssentialLinkProps[] = [
     to: '/replay-importer',
   },
   {
-    title: 'Battles',
+    title: 'Battles (Not working rn)',
     caption: 'Manage & analyze saved battles',
     icon: 'view_list',
     to: '/battles',
