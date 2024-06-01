@@ -45,8 +45,6 @@ $(".max").bind("keyup change", function() {
 });
 $(".tera").bind("keyup change", function () {
     var poke = $(this).closest(".poke-info");
-    calcHP(poke);
-    calcStats(poke);
     teraStellarBtns(poke, $(this).prop("checked"), poke.find(".tera-type").val() === 'Stellar');
 });
 $(".nature").bind("keyup change", function() {
@@ -142,22 +140,42 @@ function calcEvTotal(poke) {
 function calcCurrentHP(poke, max, percent) {
     var current = Math.ceil(percent * max / 100);
     poke.find(".current-hp").val(current);
+    poke.find(".hp-bar").val(current);
 }
 function calcPercentHP(poke, max, current) {
     var percent = Math.floor(100 * current / max);
     poke.find(".percent-hp").val(percent);
 }
+function changeHPBarColor(bar, max, current) {
+    var percent = 100 * current / max;
+    var barColor = percent > 50 ? "#23b928" : percent > 20 ? "#fa9600" : "#ff503c";
+    bar.css("background", "linear-gradient(to right, " + barColor + " " + percent + "%, #606060 0%)");
+    var p = bar.closest(".poke-info").attr('id');
+    document.body.style.setProperty('--slider-color-' + p, barColor);
+}
+function updateHPBar(pokeObj, hpVal) {
+    pokeObj.find(".hp-bar").prop('max', pokeObj.find(".max-hp").text());
+    pokeObj.find(".hp-bar").val(hpVal);
+    changeHPBarColor(pokeObj.find(".hp-bar"), pokeObj.find(".max-hp").text(), pokeObj.find(".hp-bar").val());
+}
 $(".current-hp").keyup(function() {
     var max = $(this).parent().children(".max-hp").text();
     validate($(this), 0, max);
     var current = $(this).val();
+    $(this).parent().find(".hp-bar").val(current);
     calcPercentHP($(this).parent(), max, current);
+    changeHPBarColor($(this).parent().find(".hp-bar"), max, current);
 });
 $(".percent-hp").keyup(function() {
     var max = $(this).parent().children(".max-hp").text();
     validate($(this), 0, 100);
     var percent = $(this).val();
     calcCurrentHP($(this).parent(), max, percent);
+});
+$(".hp-bar").on("input", function () {
+    $(this).parent().find(".current-hp").val($(this).val());
+    $(this).parent().find(".current-hp").keyup();
+    changeHPBarColor($(this), $(this).parent().children(".max-hp").text(), $(this).val());
 });
 
 $(".tera-type").bind("keyup change", function () {
@@ -661,12 +679,27 @@ $(".set-selector").change(function() {
         var itemObj = pokeObj.find("select.item");
         if (pokemonName in setdex && setName in setdex[pokemonName]) {
             var set = setdex[pokemonName][setName];
-            if (setdexCustom !== [] && pokemonName in setdexCustom && setName in setdexCustom[pokemonName])
+            if ($.isEmptyObject(setdexCustom) == false && pokemonName in setdexCustom && setName in setdexCustom[pokemonName]
+                && LEFT_SIDEBAR_NAMES.indexOf(setName) == -1 && RIGHT_SIDEBAR_NAMES.indexOf(setName) == -1) {
                 $(this).closest(".poke-info").find(".setCalc").val(setName);
-            else
+                $(this).closest(".poke-info").find(".delset").show();
+            }
+            else {
                 $(this).closest(".poke-info").find(".setCalc").val("My Calc Set");
-            if(DOU) pokeObj.find(".level").val(100);
-            else pokeObj.find(".level").val(set.level);
+                $(this).closest(".poke-info").find(".delset").hide();
+            }
+            if (DOU) {
+                if (set.level && set.level != 50)
+                    pokeObj.find(".level").val(set.level);
+                else
+                    pokeObj.find(".level").val(100);
+            }
+            else {
+                if (gen <= 6 && set.level && set.level < 50)
+                    pokeObj.find(".level").val(set.level);
+                else
+                    pokeObj.find(".level").val(50);
+            }
             pokeObj.find(".hp .evs").val((set.evs && typeof set.evs.hp !== "undefined") ? set.evs.hp : 0);
             pokeObj.find(".hp .ivs").val((set.ivs && typeof set.ivs.hp !== "undefined") ? set.ivs.hp : 31);
             pokeObj.find(".hp .dvs").val((set.dvs && typeof set.dvs.hp !== "undefined") ? set.dvs.hp : 15);
@@ -774,11 +807,17 @@ $(".forme").change(function() {
     $(this).parent().siblings().find(".type2").val(typeof altForme.t2 != "undefined" ? altForme.t2 : "");
     $(this).parent().siblings().find(".weight").val(altForme.w);
     //$(this).parent().siblings().find(".canEvolve").val(altForme.canEvolve);
-    var STATS_WITH_HP = ["hp", "at", "df","sa","sd","sp"];
+    var STATS_WITH_HP = ["hp", "at", "df", "sa", "sd", "sp"];
+    var prevCurrHP = container.find(".current-hp").val(), prevMaxHP = container.find(".max-hp").text();
     for (var i = 0; i <STATS_WITH_HP.length; i++) {
         var baseStat = container.find("." + STATS_WITH_HP[i]).find(".base");
         baseStat.val(altForme.bs[STATS_WITH_HP[i]]);
         baseStat.keyup();
+    }
+    var newMaxHP = container.find(".max-hp").text();
+    if (prevMaxHP !== newMaxHP) {
+        container.find(".current-hp").val(Math.max(0, parseInt(prevCurrHP) + (parseInt(newMaxHP) - parseInt(prevMaxHP))));
+        container.find(".current-hp").keyup();
     }
 
     if (abilities.indexOf(altForme.ab) > -1) {
@@ -1016,7 +1055,8 @@ function Pokemon(pokeInfo) {
 
     //Check for Tera form
     if (this.name && this.name.indexOf('Ogerpon') !== -1) {
-        var mask = pokeInfo.find("select.item").val().substring(0, pokeInfo.find("select.item").val().indexOf(" Mask"));
+        var itemCheck = pokeInfo.find("select.item").val();
+        var mask = itemCheck !== null ? itemCheck.substring(0, itemCheck.indexOf(" Mask")) : '';
 
         if (this.name.indexOf(mask) !== -1) {
             var maskTera = mask === 'Wellspring' ? 'Water'
@@ -1044,6 +1084,12 @@ function Pokemon(pokeInfo) {
         pokeInfo.find(".tera-type").prop("disabled", true);
         if (this.name === 'Terapagos-Terastal') {
             pokeInfo.find(".tera").prop("disabled", false);
+            var notMaxHP = pokeInfo.find(".percent-hp").val() != "100";
+            var doChangeHP = false;
+            if (notMaxHP) {
+                var prevCurrHP = pokeInfo.find(".current-hp").val();
+                var prevMaxHP = pokeInfo.find(".max-hp").text();
+            }
             if (pokeInfo.find(".tera").prop("checked")) {
                 this.name = 'Terapagos-Stellar';
                 if (!terapagosCheck[pokeInfo.prop('id')]) {
@@ -1063,6 +1109,7 @@ function Pokemon(pokeInfo) {
                     terapagosCheck[pokeInfo.prop('id')] = true;
                     removeWeather();
                     removeTerrain();
+                    doChangeHP = true;
                 }
                 pokeInfo.find(".forme").prop("disabled", true);
             }
@@ -1083,8 +1130,17 @@ function Pokemon(pokeInfo) {
                     pokeInfo.find("select.ability").val(pokedex['Terapagos-Terastal'].ab);
                     pokeInfo.find("select.ability").trigger('change.select2');
                     terapagosCheck[pokeInfo.prop('id')] = false;
+                    doChangeHP = true;
                 }
                 pokeInfo.find(".forme").prop("disabled", false);
+            }
+            if (notMaxHP && doChangeHP) {
+                var max = parseInt(pokeInfo.find(".max-hp").text());
+                var current = parseInt(prevCurrHP) + (max - parseInt(prevMaxHP));
+                pokeInfo.find(".current-hp").val(Math.max(0, current));
+                pokeInfo.find(".hp-bar").val(current);
+                calcPercentHP(pokeInfo, max, current);
+                changeHPBarColor(pokeInfo.find(".hp-bar"), max, current);
             }
         }
         else {
@@ -1105,6 +1161,7 @@ function Pokemon(pokeInfo) {
     this.maxHP = ~~pokeInfo.find(".hp .total").text();
     this.curHP = ~~pokeInfo.find(".current-hp").val();
     this.HPEVs = ~~pokeInfo.find(".hp .evs").val();
+    this.HPIVs = ~~pokeInfo.find(".hp .ivs").val();
     this.isDynamax = pokeInfo.find(".max").prop("checked");
     this.isTerastalize = pokeInfo.find(".tera").prop("checked");
     this.rawStats = {};
@@ -1262,8 +1319,8 @@ $(".gen").change(function () {
     switch (gen) {
         case 1: //Gen 1
             pokedex = POKEDEX_RBY;
-            setdex = SETDEX_RBY;
-            setdexCustom = [];
+            //setdex = SETDEX_RBY;
+            //setdexCustom = [];
             typeChart = TYPE_CHART_RBY;
             moves = MOVES_RBY;
             items = [];
@@ -1275,8 +1332,8 @@ $(".gen").change(function () {
             break;
         case 2: //Gen 2
             pokedex = POKEDEX_GSC;
-            setdex = SETDEX_GSC;
-            setdexCustom = [];
+            //setdex = SETDEX_GSC;
+            //setdexCustom = [];
             typeChart = TYPE_CHART_GSC;
             moves = MOVES_GSC;
             items = ITEMS_GSC;
@@ -1288,8 +1345,8 @@ $(".gen").change(function () {
             break;
         case 3: //Gen 3
             pokedex = POKEDEX_ADV;
-            setdex = SETDEX_ADV;
-            setdexCustom = SETDEX_CUSTOM_ADV;
+            //setdex = SETDEX_ADV;
+            //setdexCustom = SETDEX_CUSTOM_ADV;
             typeChart = TYPE_CHART_GSC;
             moves = MOVES_ADV;
             items = ITEMS_ADV;
@@ -1301,8 +1358,8 @@ $(".gen").change(function () {
             break;
         case 4: //Gen 4
             pokedex = POKEDEX_DPP;
-            setdex = SETDEX_DPP;
-            setdexCustom = SETDEX_CUSTOM_DPP;
+            //setdex = SETDEX_DPP;
+            //setdexCustom = SETDEX_CUSTOM_DPP;
             typeChart = TYPE_CHART_GSC;
             moves = MOVES_DPP;
             items = ITEMS_DPP;
@@ -1314,8 +1371,8 @@ $(".gen").change(function () {
             break;
         case 5: //Gen 5
             pokedex = POKEDEX_BW;
-            setdex = SETDEX_BW;
-            setdexCustom = SETDEX_CUSTOM_BW;
+            //setdex = SETDEX_BW;
+            //setdexCustom = SETDEX_CUSTOM_BW;
             typeChart = TYPE_CHART_BW;
             moves = MOVES_BW;
             items = ITEMS_BW;
@@ -1327,8 +1384,8 @@ $(".gen").change(function () {
             break;
         case 6: //Gen 6
             pokedex = POKEDEX_XY;
-            setdex = SETDEX_XY;
-            setdexCustom = SETDEX_CUSTOM_XY;
+            //setdex = SETDEX_XY;
+            //setdexCustom = SETDEX_CUSTOM_XY;
             typeChart = TYPE_CHART_XY;
             moves = MOVES_XY;
             items = ITEMS_XY;
@@ -1340,8 +1397,8 @@ $(".gen").change(function () {
             break;
         case 7: //Gen 7
             pokedex = POKEDEX_SM;
-            setdex = SETDEX_SM;
-            setdexCustom = SETDEX_CUSTOM_SM;
+            //setdex = SETDEX_SM;
+            //setdexCustom = SETDEX_CUSTOM_SM;
             typeChart = TYPE_CHART_XY;
             moves = MOVES_SM;
             items = ITEMS_SM;
@@ -1353,8 +1410,8 @@ $(".gen").change(function () {
             break;
         case 8: //Gen 8 SwSh+BDSP
             pokedex = (localStorage.getItem("dex") == "natdex") ? POKEDEX_SS_NATDEX : POKEDEX_SS;
-            setdex = SETDEX_SS;
-            setdexCustom = SETDEX_CUSTOM_SS;
+            //setdex = SETDEX_SS;
+            //setdexCustom = SETDEX_CUSTOM_SS;
             typeChart = TYPE_CHART_XY;
             moves = (localStorage.getItem("dex") == "natdex") ? MOVES_SS_NATDEX : MOVES_SS;
             items = (localStorage.getItem("dex") == "natdex") ? ITEMS_SS_NATDEX : ITEMS_SS;
@@ -1366,8 +1423,8 @@ $(".gen").change(function () {
             break;
         case 9: //Gen 9 SV
             pokedex = (localStorage.getItem("dex") == "natdex") ? POKEDEX_SV_NATDEX :  POKEDEX_SV;
-            setdex = SETDEX_SV;
-            setdexCustom = SETDEX_CUSTOM_SV;
+            //setdex = SETDEX_SV;
+            //setdexCustom = SETDEX_CUSTOM_SV;
             typeChart = TYPE_CHART_SV;
             moves = (localStorage.getItem("dex") == "natdex") ? MOVES_SV_NATDEX : MOVES_SV;
             items = (localStorage.getItem("dex") == "natdex") ? ITEMS_SV_NATDEX : ITEMS_SV;
@@ -1378,9 +1435,14 @@ $(".gen").change(function () {
             calcStat = CALC_STAT_ADV;
             break;
     }
+    if (gen in ALL_SETDEX_CUSTOM)
+        setdexCustom = ALL_SETDEX_CUSTOM[gen];
+    else
+        setdexCustom = [];
     clearField();
     $(".gen-specific.g" + gen).show();
     $(".gen-specific").not(".g" + gen).hide();
+    loadSetdexScript();
     if (gen >= 8) {
         if (localStorage.getItem("dex") == "natdex") {
             for (i = 1; i <= 4; i++) {
@@ -1432,6 +1494,10 @@ $(".gen").change(function () {
     $("#p1 .set-selector").change();
     $("#p2 .set-selector").val(getSetOptions("#p2")[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
     $("#p2 .set-selector").change();
+    $(".sidebarMon").hide();
+    $(".sidebarAdd").show();
+    loadSidebar(1);
+    loadSidebar(2);
 });
 
 function clearField() {
@@ -1503,31 +1569,55 @@ function getSetOptions(p) {
     pokeNames.sort();
     var setOptions = [];
     var idNum = 0;
-    var setdexUsed = $(p + " .set-toggle").prop("checked") && gen >= 5 ? setdexCustom : setdex;
-    for (var i = 0; i < pokeNames.length; i++) {
-        var pokeName = pokeNames[i];
-        setOptions.push({
-            pokemon: pokeName,
-            text: pokeName
-        });
-        if (pokeName in setdexUsed) {
-            var setNames = Object.keys(setdexUsed[pokeName]);
-            for (var j = 0; j < setNames.length; j++) {
-                var setName = setNames[j];
+    var usesCustom = $(p + " .set-toggle").prop("checked") && gen >= 3;
+    var setdexUsed = usesCustom ? setdexCustom : setdex;
+    if (!usesCustom) {
+        for (var i = 0; i < pokeNames.length; i++) {
+            var pokeName = pokeNames[i];
+            setOptions.push({
+                pokemon: pokeName,
+                text: pokeName
+            });
+            if (pokeName in setdexUsed) {
+                var setNames = Object.keys(setdexUsed[pokeName]);
+                for (var j = 0; j < setNames.length; j++) {
+                    var setName = setNames[j];
+                    setOptions.push({
+                        pokemon: pokeName,
+                        set: setName,
+                        text: pokeName + " (" + setName + ")",
+                        id: pokeName + " (" + setName + ")"
+                    });
+                }
+            }
+            setOptions.push({
+                pokemon: pokeName,
+                set: "Blank Set",
+                text: pokeName + " (Blank Set)",
+                id: pokeName + " (Blank Set)"
+            });
+        }
+    }
+    else {
+        for (var i = 0; i < pokeNames.length; i++) {
+            var pokeName = pokeNames[i];
+            if (pokeName in setdexUsed) {
                 setOptions.push({
                     pokemon: pokeName,
-                    set: setName,
-                    text: pokeName + " (" + setName + ")",
-                    id: pokeName + " (" + setName + ")"
+                    text: pokeName
                 });
+                var setNames = Object.keys(setdexUsed[pokeName]);
+                for (var j = 0; j < setNames.length; j++) {
+                    var setName = setNames[j];
+                    setOptions.push({
+                        pokemon: pokeName,
+                        set: setName,
+                        text: pokeName + " (" + setName + ")",
+                        id: pokeName + " (" + setName + ")"
+                    });
+                }
             }
         }
-        setOptions.push({
-            pokemon: pokeName,
-            set: "Blank Set",
-            text: pokeName + " (Blank Set)",
-            id: pokeName + " (Blank Set)"
-        });
     }
     return setOptions;
 }
@@ -1628,4 +1718,6 @@ $(document).ready(function () {
     $("#p1 .set-selector").change();
     $("#p2 .set-selector").val(getSetOptions("#p2")[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
     $("#p2 .set-selector").change();
+    loadSidebar(1);
+    loadSidebar(2);
 });

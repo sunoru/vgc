@@ -1,9 +1,13 @@
+:root {
+    --slider-color-p1: #23b928;
+    --slider-color-p2: #23b928;
+}
 /* general page styling */
 body {
     font: 12px Verdana, sans-serif;
     background-color: #bbeedd;
     padding: 0 1em;
-    min-width: 100em;
+    min-width: 120em;
 }
 fieldset {
     float: left;
@@ -44,7 +48,7 @@ th {
 }
 .poke-info {
     /*width: 33.1em;*/
-    width: 30em;
+    width: 40em;
 }
 .field-info {
     width: 30em;
@@ -277,7 +281,43 @@ select.toxic-counter {
     background-position: -18px -4px;
 }
 
+.hp-bar {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: linear-gradient(to right, #23b928 100%, #606060 0%);
+    outline: none;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    cursor: pointer;
+}
+.hp-bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    /*cursor: pointer;*/
+}
+#p1 .hp-bar::-webkit-slider-thumb {
+    background: var(--slider-color-p1);
+}
+#p2 .hp-bar::-webkit-slider-thumb {
+    background: var(--slider-color-p2);
+}
+.hp-bar::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    /*cursor: pointer;*/
+}
+#p1 .hp-bar::-moz-range-thumb {
+    background: var(--slider-color-p1);
+}
 
+#p2 .hp-bar::-moz-range-thumb {
+    background: var(--slider-color-p2);
+}
 
 
 #autolevel {
@@ -333,7 +373,21 @@ select.toxic-counter {
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0px;
 }
-
+button.pkmnsc {
+    width: 60px;
+    min-height: 44px;
+    text-align: center;
+}
+button.trashsc, button.editsc {
+    width: 24px;
+    height: 24px;
+}
+button.addsc {
+    width: 114.25px;
+}
+button.pkmnsc, button.trashsc, button.editsc, button.addsc{
+    cursor: pointer;
+}
 
 #mainResult {
     visibility: visible;
