@@ -10,7 +10,7 @@
     "test": "echo \"No test specified\" && exit 0",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
-    "build": "tsup src/index.ts --minify"
+    "build": "tsc"
   },
   "dependencies": {
     "@discordeno/bot": "19.0.0-next.ff6dcb1",
@@ -18,7 +18,6 @@
     "hono": "^4.5.11"
   },
   "devDependencies": {
-    "tsup": "^8.2.4",
     "tsx": "^4.19.0",
     "typescript": "^5.5.4"
   }

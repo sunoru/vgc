@@ -8,7 +8,7 @@ const bot = createBot({
   intents: Intents.Guilds | Intents.GuildMessages, // Or other intents that you might needs.
   events: {
     ready: (data) => {
-      console.log(`The shard ${data.shardId} is ready!`)
+      console.log(`The shard ${data.shard} is ready!`)
     },
   },
 })
@@ -18,6 +18,7 @@ const bot = createBot({
 bot.events.messageCreate = (message) => {
   // Do stuff with the message object ...
   console.log(message.content)
+  console.log(message)
 }
 
 await bot.start()
