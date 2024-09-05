@@ -13,13 +13,13 @@
     "build": "tsup src/index.ts --minify"
   },
   "dependencies": {
-    "discordeno": "^18.0.1",
+    "discordeno": "19.0.0-next.faaa8af",
     "dotenv": "^16.4.5",
-    "hono": "^4.2.2"
+    "hono": "^4.5.11"
   },
   "devDependencies": {
-    "tsup": "^8.0.2",
-    "tsx": "^4.7.2",
-    "typescript": "^5.4.4"
+    "tsup": "^8.2.4",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
   }
 }
