@@ -9,15 +9,18 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
-    "dev": "yarn workspace vgc-tools dev & yarn workspace vgc dev",
-    "build": "yarn workspace vgc-tools build && yarn workspace vgc build"
+    "dev": "concurrently 'yarn workspace vgc-tools dev' 'npm:dev:api' 'yarn workspace vgc dev'",
+    "dev:api": "yarn workspace vgc-api dev",
+    "build": "yarn workspace vgc-tools build && yarn workspace vgc-api build && yarn workspace vgc build"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.4.0",
     "@typescript-eslint/parser": "^8.4.0",
+    "concurrently": "^8.2.2",
     "eslint": "^9.9.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-vue": "^9.28.0",
+    "globals": "^15.9.0",
     "prettier": "^3.3.3"
   }
 }

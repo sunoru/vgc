@@ -13,7 +13,7 @@
     "build": "tsup src/index.ts --minify"
   },
   "dependencies": {
-    "discordeno": "19.0.0-next.faaa8af",
+    "@discordeno/bot": "19.0.0-next.ff6dcb1",
     "dotenv": "^16.4.5",
     "hono": "^4.5.11"
   },

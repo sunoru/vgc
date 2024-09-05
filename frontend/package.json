@@ -18,7 +18,7 @@
     "pinia": "^2.2.2",
     "quasar": "^2.16.10",
     "vgc-tools": "workspace:^",
-    "vue": "^3.5.1",
+    "vue": "^3.5.2",
     "vue-i18n": "^9.14.0",
     "vue-router": "^4.4.3"
   },
