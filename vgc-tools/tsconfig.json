@@ -11,7 +11,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "outDir": "dist",
-    "typeRoots": ["node_modules/@types"]
+    "types": ["node"]
   },
   "include": ["src"]
 }
