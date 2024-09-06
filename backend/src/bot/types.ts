@@ -1,6 +1,3 @@
-import { Bot, Message } from '@discordeno/bot'
+import { Message } from 'discord.js'
 
-export type BotMessage = Message & {
-  bot: Bot
-}
-export type BotHandler = (message: BotMessage) => void | Promise<void>
+export type BotMessage = Message

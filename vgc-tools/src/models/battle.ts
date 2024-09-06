@@ -37,7 +37,8 @@ export class ParsedBattle {
       return this._formatid
     }
     if (this.platform === 'Showdown') {
-      return this.id.split('-')[0]
+      this._formatid = this.id.split('-')[0]
+      return this._formatid
     }
     return ''
   }
