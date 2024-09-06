@@ -37,7 +37,6 @@ const getOrCreateParsedPokemon = (
   sentOut: Map<PokemonDetails, ParsedPokemon>,
 ): ParsedPokemon => {
   if (sentOut.has(id)) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return sentOut.get(id)!
   }
   const poke = {
@@ -193,7 +192,7 @@ export const importReplay = async (
   if (url.endsWith('.log')) {
     url = url.slice(0, -4)
   }
-  const jsonURL = `${url}.json`
+  const jsonURL = new URL(`${url}.json`)
   const response = await fetch(jsonURL)
   const data = (await response.json()) as RemoteReplay
   const log = data.log
@@ -203,5 +202,6 @@ export const importReplay = async (
   parsed.format = data.format
   parsed.formatid = data.formatid
   parsed.rating = data.rating
+  parsed.log = log
   return parsed
 }

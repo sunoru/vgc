@@ -13,7 +13,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@discordeno/bot": "19.0.0-next.ff6dcb1",
+    "@discordeno/bot": "19.0.0-next.b1bfe94",
     "dotenv": "^16.4.5",
     "hono": "^4.5.11"
   },

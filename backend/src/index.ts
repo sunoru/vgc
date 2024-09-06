@@ -1,24 +1,19 @@
-import { createBot, Intents } from '@discordeno/bot'
-
 import dotenv from 'dotenv'
+import { Hono } from 'hono'
+
+import { setupBot } from './bot/setup.js'
+import { csrf } from 'hono/csrf'
+import { logger } from 'hono/logger'
+import { routes } from './routes/index.js'
+
 dotenv.config()
 
-const bot = createBot({
-  token: process.env.DISCORD_BOT_TOKEN!,
-  intents: Intents.Guilds | Intents.GuildMessages, // Or other intents that you might needs.
-  events: {
-    ready: (data) => {
-      console.log(`The shard ${data.shard} is ready!`)
-    },
-  },
-})
+const app = new Hono()
+app.use('*', csrf())
+app.use(logger())
+routes(app)
 
-// You can add events after the createBot call if you prefer
-
-bot.events.messageCreate = (message) => {
-  // Do stuff with the message object ...
-  console.log(message.content)
-  console.log(message)
+if (!process.env.DISABLE_BOT) {
+  const bot = setupBot()
+  await bot.start()
 }
-
-await bot.start()
