@@ -1,5 +1,5 @@
 {
-  "id": "54100fe2-5532-443a-93a3-609258dfb341",
+  "id": "4522d6f3-6656-4892-bbb0-c1882cdc324d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -50,17 +50,64 @@
           "primaryKey": true,
           "notNull": true
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
         "name": {
           "name": "name",
           "type": "varchar(64)",
           "primaryKey": false,
           "notNull": false
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "player_owner_id_user_id_fk": {
+          "name": "player_owner_id_user_id_fk",
+          "tableFrom": "player",
+          "tableTo": "user",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "player_username_unique": {
+          "name": "player_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "username"
+          ]
+        }
+      }
     },
     "public.player_to_team": {
       "name": "player_to_team",
@@ -119,6 +166,63 @@
       },
       "uniqueConstraints": {}
     },
+    "public.player_to_user": {
+      "name": "player_to_user",
+      "schema": "",
+      "columns": {
+        "player_id": {
+          "name": "player_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "player_to_user_player_id_player_id_fk": {
+          "name": "player_to_user_player_id_player_id_fk",
+          "tableFrom": "player_to_user",
+          "tableTo": "player",
+          "columnsFrom": [
+            "player_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "player_to_user_user_id_user_id_fk": {
+          "name": "player_to_user_user_id_user_id_fk",
+          "tableFrom": "player_to_user",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "player_to_user_player_id_user_id_pk": {
+          "name": "player_to_user_player_id_user_id_pk",
+          "columns": [
+            "player_id",
+            "user_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
     "public.poke": {
       "name": "poke",
       "schema": "",
@@ -129,9 +233,9 @@
           "primaryKey": true,
           "notNull": true
         },
-        "dex": {
-          "name": "dex",
-          "type": "integer",
+        "dex_id": {
+          "name": "dex_id",
+          "type": "varchar(64)",
           "primaryKey": false,
           "notNull": false
         },
@@ -139,43 +243,51 @@
           "name": "name",
           "type": "varchar(64)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "poke_name_unique": {
+          "name": "poke_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        }
+      }
     },
     "public.replay": {
       "name": "replay",
       "schema": "",
       "columns": {
-        "kid": {
-          "name": "kid",
+        "pk": {
+          "name": "pk",
           "type": "serial",
           "primaryKey": true,
           "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         },
         "id": {
           "name": "id",
           "type": "varchar(64)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "time": {
           "name": "time",
-          "type": "time",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
-        },
-        "platform": {
-          "name": "platform",
-          "type": "platform",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false
         },
         "url": {
           "name": "url",
@@ -187,68 +299,106 @@
           "name": "player1_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "player2_id": {
           "name": "player2_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "team1_id": {
           "name": "team1_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "team2_id": {
           "name": "team2_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "format_id": {
           "name": "format_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "rating1": {
           "name": "rating1",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "rating2": {
           "name": "rating2",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "rating": {
           "name": "rating",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "num_turns": {
           "name": "num_turns",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
-        },
-        "time_parsed": {
-          "name": "time_parsed",
-          "type": "time",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "winner": {
           "name": "winner",
           "type": "battle_player",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "team1_sent_out_pokes": {
+          "name": "team1_sent_out_pokes",
+          "type": "integer[6]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "team1_sent_out": {
+          "name": "team1_sent_out",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "team2_sent_out_pokes": {
+          "name": "team2_sent_out_pokes",
+          "type": "integer[6]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "team2_sent_out": {
+          "name": "team2_sent_out",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "tags": {
+          "name": "tags",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'"
+        },
+        "log": {
+          "name": "log",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {
@@ -302,6 +452,51 @@
           "columns": [
             {
               "expression": "team2_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "team1_sent_out_pokes_idx": {
+          "name": "team1_sent_out_pokes_idx",
+          "columns": [
+            {
+              "expression": "team1_sent_out_pokes",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "team2_sent_out_pokes_idx": {
+          "name": "team2_sent_out_pokes_idx",
+          "columns": [
+            {
+              "expression": "team2_sent_out_pokes",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "tags_idx": {
+          "name": "tags_idx",
+          "columns": [
+            {
+              "expression": "tags",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -458,6 +653,62 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
+    },
+    "public.user": {
+      "name": "user",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "discord_id": {
+          "name": "discord_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "user_discord_id_unique": {
+          "name": "user_discord_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "discord_id"
+          ]
+        },
+        "user_username_unique": {
+          "name": "user_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "username"
+          ]
+        }
+      }
     }
   },
   "enums": {
@@ -468,14 +719,6 @@
         "Unknown",
         "Player1",
         "Player2"
-      ]
-    },
-    "public.platform": {
-      "name": "platform",
-      "schema": "public",
-      "values": [
-        "Showdown",
-        "Console"
       ]
     }
   },

@@ -1,6 +1,6 @@
 import { ParsedBattle } from '../../models'
 
-import { Filter } from '../types'
+import { Filter } from '../types.js'
 
 export class FormatFilter extends Filter<[string[]]> {
   getArgs(battles: ParsedBattle[]) {

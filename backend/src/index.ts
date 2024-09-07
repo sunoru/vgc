@@ -5,6 +5,9 @@ import { csrf } from 'hono/csrf'
 import { logger } from 'hono/logger'
 import { routes } from './routes/index.js'
 import config from './config.js'
+import { setupDb } from './db/index.js'
+
+setupDb()
 
 const app = new Hono()
 app.use('*', csrf())

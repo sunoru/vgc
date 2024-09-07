@@ -1,25 +1,78 @@
+import { relations } from 'drizzle-orm'
 import {
+  bigint,
   foreignKey,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
   serial,
   text,
-  time,
+  timestamp,
   varchar,
 } from 'drizzle-orm/pg-core'
 
-export const player = pgTable('player', {
+export const user = pgTable('user', {
   id: serial('id').primaryKey(),
-  name: varchar('name', { length: 64 }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  name: varchar('name', { length: 64 }).notNull(),
+  discordId: bigint('discord_id', { mode: 'bigint' }).unique().notNull(),
+  discordUsername: varchar('username', { length: 64 }).unique().notNull(),
 })
 
+export const userRelations = relations(user, ({ many }) => ({
+  players: many(player),
+  playerToUser: many(playerToUser),
+}))
+
+export const player = pgTable('player', {
+  id: serial('id').primaryKey(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  name: varchar('name', { length: 64 }),
+  // showdown specific
+  // Only support the official server for now
+  username: varchar('username', { length: 64 }).unique(),
+  password: text('password'),
+  ownerId: integer('owner_id').references(() => user.id),
+})
+
+export const playerRelations = relations(player, ({ one, many }) => ({
+  owner: one(user, {
+    fields: [player.ownerId],
+    references: [user.id],
+  }),
+  playerToUser: many(playerToUser),
+  playerToTeam: many(playerToTeam),
+  replays: many(replay),
+}))
+
+export const playerToUser = pgTable(
+  'player_to_user',
+  {
+    playerId: integer('player_id').references(() => player.id),
+    userId: integer('user_id').references(() => user.id),
+  },
+  (table) => ({ pk: primaryKey({ columns: [table.playerId, table.userId] }) }),
+)
+
+export const playerToUserRelations = relations(playerToUser, ({ one }) => ({
+  player: one(player, {
+    fields: [playerToUser.playerId],
+    references: [player.id],
+  }),
+  user: one(user, {
+    fields: [playerToUser.userId],
+    references: [user.id],
+  }),
+}))
+
+// No validation is done so `Urshifu-*` and `Urshifu-Rapid-Strike` are both different entries.
 export const poke = pgTable('poke', {
   id: serial('id').primaryKey(),
-  dex: integer('dex'),
-  name: varchar('name', { length: 64 }),
+  dexId: varchar('dex_id', { length: 64 }),
+  name: varchar('name', { length: 64 }).notNull().unique(),
 })
 
 export const team = pgTable(
@@ -35,6 +88,11 @@ export const team = pgTable(
   }),
 )
 
+export const teamRelations = relations(team, ({ many }) => ({
+  playerToTeam: many(playerToTeam),
+  replays: many(replay),
+}))
+
 export const playerToTeam = pgTable(
   'player_to_team',
   {
@@ -46,7 +104,17 @@ export const playerToTeam = pgTable(
   }),
 )
 
-export const platformEnum = pgEnum('platform', ['Showdown', 'Console'])
+export const playerToTeamRelations = relations(playerToTeam, ({ one }) => ({
+  player: one(player, {
+    fields: [playerToTeam.playerId],
+    references: [player.id],
+  }),
+  team: one(team, {
+    fields: [playerToTeam.teamId],
+    references: [team.id],
+  }),
+}))
+
 export const battlePlayerEnum = pgEnum('battle_player', ['Unknown', 'Player1', 'Player2'])
 
 export const format = pgTable('format', {
@@ -55,25 +123,49 @@ export const format = pgTable('format', {
   name: varchar('name', { length: 64 }),
 })
 
+// Only showdown replay.
 export const replay = pgTable(
   'replay',
   {
-    kid: serial('kid').primaryKey(),
-    id: varchar('id', { length: 64 }).unique(),
-    time: time('time').defaultNow(),
-    platform: platformEnum('platform'),
+    pk: serial('pk').primaryKey(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    id: varchar('id', { length: 64 }).unique().notNull(),
+    time: timestamp('time').notNull().defaultNow(),
     url: text('url'),
-    player1Id: integer('player1_id').references(() => player.id),
-    player2Id: integer('player2_id').references(() => player.id),
-    team1Id: integer('team1_id').references(() => team.id),
-    team2Id: integer('team2_id').references(() => team.id),
-    formatId: integer('format_id').references(() => format.id),
-    rating1: integer('rating1'),
-    rating2: integer('rating2'),
-    rating: integer('rating'),
-    numTurns: integer('num_turns'),
-    timeParsed: time('time_parsed'),
-    winner: battlePlayerEnum('winner'),
+    player1Id: integer('player1_id')
+      .references(() => player.id)
+      .notNull(),
+    player2Id: integer('player2_id')
+      .references(() => player.id)
+      .notNull(),
+    team1Id: integer('team1_id')
+      .references(() => team.id)
+      .notNull(),
+    team2Id: integer('team2_id')
+      .references(() => team.id)
+      .notNull(),
+    formatId: integer('format_id')
+      .references(() => format.id)
+      .notNull(),
+    rating1: integer('rating1').notNull(),
+    rating2: integer('rating2').notNull(),
+    rating: integer('rating').notNull(),
+    numTurns: integer('num_turns').notNull(),
+    winner: battlePlayerEnum('winner').notNull(),
+    // Store poke IDs separately for easier querying
+    team1SentOutPokes: integer('team1_sent_out_pokes')
+      .references(() => poke.id)
+      .array(6)
+      .notNull(),
+    team1SentOut: jsonb('team1_sent_out').notNull(),
+    team2SentOutPokes: integer('team2_sent_out_pokes')
+      .references(() => poke.id)
+      .array(6)
+      .notNull(),
+    team2SentOut: jsonb('team2_sent_out').notNull(),
+    remarks: text('remarks').notNull().default(''),
+    tags: text('tags').array().notNull().default([]),
+    log: text('log').notNull(),
   },
   (table) => ({
     playerTeam1: foreignKey({
@@ -90,5 +182,27 @@ export const replay = pgTable(
     player2Idx: index('player2_idx').on(table.player2Id),
     team1Idx: index('team1_idx').on(table.team1Id),
     team2Idx: index('team2_idx').on(table.team2Id),
+    team1SentOutPokesIdx: index('team1_sent_out_pokes_idx').on(table.team1SentOutPokes),
+    team2SentOutPokesIdx: index('team2_sent_out_pokes_idx').on(table.team2SentOutPokes),
+    tagsIdx: index('tags_idx').on(table.tags),
   }),
 )
+
+export const replayRelations = relations(replay, ({ one }) => ({
+  player1: one(player, {
+    fields: [replay.player1Id],
+    references: [player.id],
+  }),
+  player2: one(player, {
+    fields: [replay.player2Id],
+    references: [player.id],
+  }),
+  team1: one(team, {
+    fields: [replay.team1Id],
+    references: [team.id],
+  }),
+  team2: one(team, {
+    fields: [replay.team2Id],
+    references: [team.id],
+  }),
+}))

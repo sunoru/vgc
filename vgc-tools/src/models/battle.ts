@@ -5,9 +5,9 @@ import { Player } from './player.js'
 export type Platform = 'Showdown' | 'Console'
 
 export enum PlayerNumber {
-  Unknown = 0,
-  Player1 = 1,
-  Player2 = 2,
+  Unknown = 'Unknown',
+  Player1 = 'Player1',
+  Player2 = 'Player2',
 }
 
 export interface ParsedPokemon {
@@ -22,10 +22,10 @@ export interface ParsedPokemon {
 }
 
 export class ParsedBattle {
-  public time = 0
-  public platform: Platform = 'Showdown'
   // replay.id for PS replays and UUID for other platforms
   public id = ''
+  public time = 0
+  public platform: Platform = 'Showdown'
   public url?: string
   public p1 = ''
   public p2 = ''

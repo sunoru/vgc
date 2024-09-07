@@ -1,4 +1,3 @@
-import type { Config } from 'drizzle-kit'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -24,13 +23,8 @@ const getDiscordBotConfig = () => {
 }
 
 const DB = {
-  schema: './db/schema.ts',
-  out: './db/migrations',
-  dialect: 'postgresql',
-  dbCredentials: {
-    url: getEnv('DATABASE_URL'),
-  },
-} satisfies Config
+  url: getEnv('DATABASE_URL'),
+}
 
 const config = {
   debug: getEnv('DEBUG', 'false') === 'true',

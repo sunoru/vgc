@@ -1,4 +1,5 @@
 export type * from '@pkmn/types'
+export * as data from './data/index.js'
 
 export * from './models/index.js'
 export * from './analytics/index.js'

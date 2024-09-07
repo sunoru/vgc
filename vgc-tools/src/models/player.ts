@@ -1,4 +1,4 @@
-import { ParsedPokemon } from './battle'
+import { ParsedPokemon } from './battle.js'
 
 export class Player {
   constructor(

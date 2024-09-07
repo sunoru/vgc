@@ -1,1 +1,1 @@
-export { getCPTiers } from './cp-tiers'
+export { getCPTiers } from './cp-tiers.js'

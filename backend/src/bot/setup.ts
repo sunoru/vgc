@@ -21,7 +21,6 @@ class Bot {
       console.log(`Logged in as ${client.user?.tag}!`)
     })
     client.on(Events.MessageCreate, async (message) => {
-      console.log('message', message)
       // Only support replay importing for messages
       await importReplayFromMessage(message)
     })

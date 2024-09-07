@@ -179,13 +179,16 @@ export const parseBattleLog = async (
 }
 
 export const importReplay = async (
-  idOrURL: string,
+  idOrURL: string | URL,
   options: ImportReplayOptions & { password?: string } = {},
 ): Promise<ParsedBattle> => {
   const password = options.password
-  let url = idOrURL.match(/^https?:\/\//i)
-    ? idOrURL
-    : `https://replay.pokemonshowdown.com/${idOrURL}${password ? `-${password}` : ''}`
+  let url =
+    idOrURL instanceof URL
+      ? idOrURL.href
+      : idOrURL.match(/^https?:\/\//i)
+        ? idOrURL
+        : `https://replay.pokemonshowdown.com/${idOrURL}${password ? `-${password}` : ''}`
   if (url.endsWith('.json')) {
     url = url.slice(0, -5)
   }
