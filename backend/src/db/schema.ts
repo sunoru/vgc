@@ -147,10 +147,10 @@ export const replay = pgTable(
     formatId: integer('format_id')
       .references(() => format.id)
       .notNull(),
-    rating1: integer('rating1').notNull(),
-    rating2: integer('rating2').notNull(),
-    rating: integer('rating').notNull(),
-    numTurns: integer('num_turns').notNull(),
+    rating1: integer('rating1'),
+    rating2: integer('rating2'),
+    rating: integer('rating'),
+    numTurns: integer('num_turns'),
     winner: battlePlayerEnum('winner').notNull(),
     // Store poke IDs separately for easier querying
     team1SentOutPokes: integer('team1_sent_out_pokes')
@@ -166,6 +166,9 @@ export const replay = pgTable(
     remarks: text('remarks').notNull().default(''),
     tags: text('tags').array().notNull().default([]),
     log: text('log').notNull(),
+    uploaderId: integer('uploader_id')
+      .references(() => user.id)
+      .notNull(),
   },
   (table) => ({
     playerTeam1: foreignKey({

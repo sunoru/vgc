@@ -1,5 +1,5 @@
 {
-  "id": "4522d6f3-6656-4892-bbb0-c1882cdc324d",
+  "id": "5754d1f1-0ac2-4a80-a610-208444ec72eb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -329,25 +329,25 @@
           "name": "rating1",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "rating2": {
           "name": "rating2",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "rating": {
           "name": "rating",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "num_turns": {
           "name": "num_turns",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "winner": {
           "name": "winner",
@@ -399,6 +399,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "uploader_id": {
+          "name": "uploader_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
@@ -567,6 +573,19 @@
           "tableTo": "format",
           "columnsFrom": [
             "format_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "replay_uploader_id_user_id_fk": {
+          "name": "replay_uploader_id_user_id_fk",
+          "tableFrom": "replay",
+          "tableTo": "user",
+          "columnsFrom": [
+            "uploader_id"
           ],
           "columnsTo": [
             "id"

@@ -1,6 +1,6 @@
 import { importReplay as importReplayImpl, ParsedBattle } from 'vgc-tools'
 import { BadRequest } from '../utils/errors.js'
-import { sleep } from '../utils/misc.js'
+import { nullOnZero, sleep } from '../utils/misc.js'
 import { db } from '../db/index.js'
 import { format, player, playerToTeam, poke, replay as replayTable, team } from '../db/schema.js'
 import { and, eq } from 'drizzle-orm'
@@ -64,7 +64,7 @@ export const getOrCreateFormat = async (key: string, name: string) => {
   return (await db.insert(format).values({ key, name }).returning())[0]
 }
 
-export const relatePlayerTeam = async (playerId: number, teamId: number) => {
+export const linkPlayerTeam = async (playerId: number, teamId: number) => {
   const existing = await db.query.playerToTeam.findFirst({
     where: and(eq(playerToTeam.playerId, playerId), eq(playerToTeam.teamId, teamId)),
   })
@@ -82,8 +82,8 @@ export const saveReplay = async (battle: ParsedBattle) => {
   const player2 = await getOrCreatePlayer(battle.p2)
   const team1 = await getOrCreateTeam(battle.team1)
   const team2 = await getOrCreateTeam(battle.team2)
-  await relatePlayerTeam(player1.id, team1.id)
-  await relatePlayerTeam(player2.id, team2.id)
+  await linkPlayerTeam(player1.id, team1.id)
+  await linkPlayerTeam(player2.id, team2.id)
   const format = await getOrCreateFormat(battle.format, battle.formatid)
   const replay = (
     await db
@@ -97,10 +97,10 @@ export const saveReplay = async (battle: ParsedBattle) => {
         team1Id: team1.id,
         team2Id: team2.id,
         formatId: format.id,
-        rating1: battle.rating1,
-        rating2: battle.rating2,
-        rating: battle.rating ?? battle.rating1,
-        numTurns: battle.numTurns ?? 0,
+        rating1: nullOnZero(battle.rating1),
+        rating2: nullOnZero(battle.rating2),
+        rating: nullOnZero(battle.rating),
+        numTurns: battle.numTurns === undefined ? null : battle.numTurns,
         winner: battle.winner,
         team1SentOutPokes: await getPokeIds(battle.team1SentOut.map((x) => x.id)),
         team1SentOut: battle.team1SentOut,
@@ -154,17 +154,21 @@ export const importReplay = async (urlString: string, remarks = ''): Promise<Imp
 // minInterval: minimum interval between imports in seconds
 export const importReplays = async (
   input: Array<{ url: string; remarks?: string }>,
-  options: { minInterval?: number } = {},
+  options: {
+    minInterval?: number
+    updateProgress?: (i: number, urlOrResult: string | ImportReplayResult) => void
+  } = {},
 ) => {
-  const { minInterval = 1 } = options
+  const { minInterval = 1, updateProgress = () => {} } = options
   const parsed: ImportReplayResult[] = []
+  let i = 0
   for (const { url, remarks } of input) {
-    try {
-      const p = sleep(minInterval * 1000)
-      const x = await importReplay(url, remarks)
-      parsed.push(x)
-      await p
-    } catch {}
+    updateProgress(i, url)
+    const p = sleep(minInterval * 1000)
+    const x = await importReplay(url, remarks)
+    parsed.push(x)
+    await p
+    updateProgress(i++, x)
   }
   return parsed
 }

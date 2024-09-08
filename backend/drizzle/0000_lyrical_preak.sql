@@ -51,10 +51,10 @@ CREATE TABLE IF NOT EXISTS "replay" (
 	"team1_id" integer NOT NULL,
 	"team2_id" integer NOT NULL,
 	"format_id" integer NOT NULL,
-	"rating1" integer NOT NULL,
-	"rating2" integer NOT NULL,
-	"rating" integer NOT NULL,
-	"num_turns" integer NOT NULL,
+	"rating1" integer,
+	"rating2" integer,
+	"rating" integer,
+	"num_turns" integer,
 	"winner" "battle_player" NOT NULL,
 	"team1_sent_out_pokes" integer[6] NOT NULL,
 	"team1_sent_out" jsonb NOT NULL,
@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS "replay" (
 	"remarks" text DEFAULT '' NOT NULL,
 	"tags" text[] DEFAULT '{}' NOT NULL,
 	"log" text NOT NULL,
+	"uploader_id" integer,
 	CONSTRAINT "replay_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint
@@ -137,6 +138,12 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "replay" ADD CONSTRAINT "replay_format_id_format_id_fk" FOREIGN KEY ("format_id") REFERENCES "public"."format"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "replay" ADD CONSTRAINT "replay_uploader_id_user_id_fk" FOREIGN KEY ("uploader_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

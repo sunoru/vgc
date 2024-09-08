@@ -48,7 +48,7 @@ export class ParsedBattle {
 
   public rating1 = 0
   public rating2 = 0
-  public rating?: number
+  public rating = 0
   public numTurns?: number
 
   public timeParsed = 0

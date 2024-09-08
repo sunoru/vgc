@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 
 const replays = new Hono()
 
+// TODO: implement
 replays.get('/', (c) => c.json({ message: 'Get all replays' }))
 
 replays.get('/:id', (c) => {

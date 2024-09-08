@@ -1,24 +1,12 @@
 import { PokemonDetails, PokemonIdent, Protocol } from '@pkmn/protocol'
 
 import { ParsedBattle, ParsedPokemon, PlayerNumber } from './models/index.js'
+import { fetchReplayData } from './showdown/replay.js'
 
 export interface ImportReplayOptions {
   remarks?: string
   tags?: string[]
   whichIsUserPlayer?: (p1: string, p2: string) => Promise<PlayerNumber>
-}
-
-export interface RemoteReplay {
-  id: string
-  format: string
-  players: string[]
-  log: string
-  uploadtime: number
-  views: number
-  formatid: string
-  rating: number
-  private: number
-  password: number | null
 }
 
 const isP1 = (p: string): boolean => {
@@ -179,25 +167,10 @@ export const parseBattleLog = async (
 }
 
 export const importReplay = async (
-  idOrURL: string | URL,
+  idOrUrl: string | URL,
   options: ImportReplayOptions & { password?: string } = {},
 ): Promise<ParsedBattle> => {
-  const password = options.password
-  let url =
-    idOrURL instanceof URL
-      ? idOrURL.href
-      : idOrURL.match(/^https?:\/\//i)
-        ? idOrURL
-        : `https://replay.pokemonshowdown.com/${idOrURL}${password ? `-${password}` : ''}`
-  if (url.endsWith('.json')) {
-    url = url.slice(0, -5)
-  }
-  if (url.endsWith('.log')) {
-    url = url.slice(0, -4)
-  }
-  const jsonURL = new URL(`${url}.json`)
-  const response = await fetch(jsonURL)
-  const data = (await response.json()) as RemoteReplay
+  const { url, data } = await fetchReplayData(idOrUrl, options.password)
   const log = data.log
   const parsed = await parseBattleLog(log, options)
   parsed.id = data.id
