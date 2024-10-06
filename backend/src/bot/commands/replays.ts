@@ -1,5 +1,6 @@
-import { importReplay } from '../../features/replays.js'
+import { importReplay } from '../../features/import-replay.js'
 import { BotMessage } from '../types.js'
+import { getOrCreateUser } from '../utils.js'
 
 export const splitRemarks = (input: string) => {
   input = input.trim()
@@ -19,12 +20,16 @@ export const importReplayFromMessage = async (message: BotMessage) => {
   } catch {
     return
   }
-  const { status } = await importReplay(url, remarks)
+  const user = await getOrCreateUser(message)
+  const { status } = await importReplay(url, remarks, user.id)
   if (status === 'success') {
+    console.log('Replay imported:', url)
     await message.react('✅')
   } else if (status === 'skipped') {
+    console.log('Replay skipped:', url)
     await message.react('⏭️')
   } else {
+    console.error('Failed to import replay:', url)
     await message.react('❌')
   }
 }

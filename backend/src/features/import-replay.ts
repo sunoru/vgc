@@ -74,7 +74,7 @@ export const linkPlayerTeam = async (playerId: number, teamId: number) => {
   await db.insert(playerToTeam).values({ playerId, teamId })
 }
 
-export const saveReplay = async (battle: ParsedBattle) => {
+export const saveReplay = async (battle: ParsedBattle, uploaderId?: number) => {
   if (battle.platform !== 'Showdown') {
     throw new BadRequest('Only Showdown replays are supported.')
   }
@@ -84,7 +84,7 @@ export const saveReplay = async (battle: ParsedBattle) => {
   const team2 = await getOrCreateTeam(battle.team2)
   await linkPlayerTeam(player1.id, team1.id)
   await linkPlayerTeam(player2.id, team2.id)
-  const format = await getOrCreateFormat(battle.format, battle.formatid)
+  const format = await getOrCreateFormat(battle.formatid, battle.format)
   const replay = (
     await db
       .insert(replayTable)
@@ -109,6 +109,7 @@ export const saveReplay = async (battle: ParsedBattle) => {
         remarks: battle.remarks,
         tags: battle.tags,
         log: battle.log ?? '',
+        uploaderId,
       })
       .returning()
   )[0]
@@ -121,7 +122,11 @@ export interface ImportReplayResult {
   battle?: ParsedBattle
 }
 
-export const importReplay = async (urlString: string, remarks = ''): Promise<ImportReplayResult> => {
+export const importReplay = async (
+  urlString: string,
+  remarks = '',
+  uploaderId?: number,
+): Promise<ImportReplayResult> => {
   let url: URL
   try {
     url = new URL(urlString)
@@ -137,7 +142,7 @@ export const importReplay = async (urlString: string, remarks = ''): Promise<Imp
     }
     const battle = await importReplayImpl(url, { remarks })
     battle.remarks = remarks
-    await saveReplay(battle)
+    await saveReplay(battle, uploaderId)
     return {
       status: 'success',
       battle,
@@ -157,15 +162,16 @@ export const importReplays = async (
   options: {
     minInterval?: number
     updateProgress?: (i: number, urlOrResult: string | ImportReplayResult) => void
+    uploaderId?: number
   } = {},
 ) => {
-  const { minInterval = 1, updateProgress = () => {} } = options
+  const { minInterval = 1, updateProgress = () => {}, uploaderId } = options
   const parsed: ImportReplayResult[] = []
   let i = 0
   for (const { url, remarks } of input) {
     updateProgress(i, url)
     const p = sleep(minInterval * 1000)
-    const x = await importReplay(url, remarks)
+    const x = await importReplay(url, remarks, uploaderId)
     parsed.push(x)
     await p
     updateProgress(i++, x)

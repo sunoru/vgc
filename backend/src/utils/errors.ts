@@ -10,13 +10,13 @@ export class HttpError extends HTTPException {
   }
 }
 
-const _createError = (status: StatusCode) =>
+const _createError = (status: StatusCode, defaultMessage: string) =>
   class extends HttpError {
-    constructor(messageOrOptions?: string | HTTPExceptionOptions) {
+    constructor(messageOrOptions: string | HTTPExceptionOptions = defaultMessage) {
       super(status, messageOrOptions)
     }
   }
 
-export const NotFound = _createError(404)
-export const BadRequest = _createError(400)
-export const Unauthorized = _createError(401)
+export const NotFound = _createError(404, 'Not found')
+export const BadRequest = _createError(400, 'Bad request')
+export const Unauthorized = _createError(401, 'Unauthorized')

@@ -25,6 +25,7 @@ export const user = pgTable('user', {
 export const userRelations = relations(user, ({ many }) => ({
   players: many(player),
   playerToUser: many(playerToUser),
+  replays: many(replay),
 }))
 
 export const player = pgTable('player', {
@@ -166,9 +167,7 @@ export const replay = pgTable(
     remarks: text('remarks').notNull().default(''),
     tags: text('tags').array().notNull().default([]),
     log: text('log').notNull(),
-    uploaderId: integer('uploader_id')
-      .references(() => user.id)
-      .notNull(),
+    uploaderId: integer('uploader_id').references(() => user.id),
   },
   (table) => ({
     playerTeam1: foreignKey({
@@ -207,5 +206,9 @@ export const replayRelations = relations(replay, ({ one }) => ({
   team2: one(team, {
     fields: [replay.team2Id],
     references: [team.id],
+  }),
+  uploader: one(user, {
+    fields: [replay.uploaderId],
+    references: [user.id],
   }),
 }))

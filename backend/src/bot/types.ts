@@ -1,3 +1,3 @@
-import { Message } from 'discord.js'
+import { ChatInputCommandInteraction, Message, SlashCommandBuilder } from 'discord.js'
 
 export type BotMessage = Message

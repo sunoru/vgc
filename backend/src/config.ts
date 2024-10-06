@@ -11,16 +11,13 @@ const getEnv = (key: string, defaultValue?: string): string => {
   throw new Error(`Missing environment variable: ${key}`)
 }
 
-const getDiscordBotConfig = () => {
-  return getEnv('DISABLE_BOT', 'false') === 'true'
-    ? null
-    : {
-        token: getEnv('DISCORD_BOT_TOKEN'),
-        clientId: getEnv('DISCORD_CLIENT_ID', ''),
-        clientSecret: getEnv('DISCORD_CLIENT_SECRET', ''),
-        redirectUri: getEnv('DISCORD_REDIRECT_URI', ''),
-      }
-}
+const PORT = parseInt(getEnv('PORT', '3000'))
+
+const getDiscordConfig = () => ({
+  botToken: getEnv('DISCORD_BOT_TOKEN', ''),
+  clientId: getEnv('DISCORD_CLIENT_ID', ''),
+  clientSecret: getEnv('DISCORD_CLIENT_SECRET', ''),
+})
 
 const DB = {
   url: getEnv('DATABASE_URL'),
@@ -28,9 +25,10 @@ const DB = {
 
 const config = {
   debug: getEnv('DEBUG', 'false') === 'true',
-  port: parseInt(getEnv('PORT', '3000')),
+  port: PORT,
+  baseUrl: getEnv('BASE_URL', `http://localhost:${PORT}`),
   db: DB,
-  discordBot: getDiscordBotConfig(),
+  discord: getDiscordConfig(),
 }
 
 export default config

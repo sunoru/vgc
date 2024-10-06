@@ -1,6 +1,7 @@
 import { importReplayFromMessage } from './commands/replays.js'
 import config from '../config.js'
 import { Client, Events, GatewayIntentBits, Partials } from 'discord.js'
+import { handleCommand } from './commands/index.js'
 
 class Bot {
   public client: Client
@@ -21,8 +22,13 @@ class Bot {
       console.log(`Logged in as ${client.user?.tag}!`)
     })
     client.on(Events.MessageCreate, async (message) => {
+      if (message.interactionMetadata) return
       // Only support replay importing for messages
       await importReplayFromMessage(message)
+    })
+    client.on(Events.InteractionCreate, async (interaction) => {
+      if (!interaction.isChatInputCommand()) return
+      await handleCommand(interaction)
     })
     this.client = client
   }
@@ -32,9 +38,10 @@ class Bot {
 }
 
 export const setupBot = () => {
-  if (!config.discordBot) {
+  const { botToken } = config.discord
+  if (!botToken) {
     throw new Error('Bot is disabled')
   }
-  const bot = new Bot(config.discordBot.token)
+  const bot = new Bot(botToken)
   return bot
 }

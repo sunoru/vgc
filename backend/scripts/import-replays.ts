@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs'
-import { importReplays } from '../src/features/replays.js'
+import { importReplays } from '../src/features/import-replay.js'
 import { splitRemarks } from '../src/bot/commands/replays.js'
 import { setupDb } from '../src/db/index.js'
 

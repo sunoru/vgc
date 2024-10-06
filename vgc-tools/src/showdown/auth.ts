@@ -1,13 +1,16 @@
 const ACTION_API_URL = 'https://play.pokemonshowdown.com/~~showdown/action.php'
 
 export const login = async (username: string, password: string) => {
-  const formData = new FormData()
-  formData.append('act', 'login')
-  formData.append('name', username)
-  formData.append('pass', password)
   const res = await fetch(ACTION_API_URL, {
-    body: formData,
+    body: new URLSearchParams({
+      act: 'login',
+      name: username,
+      pass: password,
+    }),
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
   })
   const cookies = res.headers.getSetCookie()
   if (res.status !== 200 || cookies.length === 0) {
