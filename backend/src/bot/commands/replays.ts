@@ -1,5 +1,5 @@
+import { Message } from 'discord.js'
 import { importReplay } from '../../features/import-replay.js'
-import { BotMessage } from '../types.js'
 import { getOrCreateUser } from '../utils.js'
 
 export const splitRemarks = (input: string) => {
@@ -8,7 +8,7 @@ export const splitRemarks = (input: string) => {
   return i >= 0 ? { url: input.slice(0, i), remarks: input.slice(i + 1) } : { url: input, remarks: '' }
 }
 
-export const importReplayFromMessage = async (message: BotMessage) => {
+export const importReplayFromMessage = async (message: Message<boolean>) => {
   // Silently ignore unrelated messages
   const lines = message.content.trim().split('\n', 2)
   if (lines.length !== 1) {

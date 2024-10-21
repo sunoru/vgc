@@ -1,7 +1,14 @@
 {
+  "name": "vgc-dev",
+  "dockerComposeFile": ["../docker-compose.yml", "./docker-compose.dev.yml"],
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "shutdownAction": "stopCompose",
   "customizations": {
     "codespaces": {
       "repositories": {}
     }
-  }
+  },
+  "runServices": ["app", "db"],
+  "onCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}"
 }

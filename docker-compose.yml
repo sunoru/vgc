@@ -1,0 +1,38 @@
+---
+services:
+  db:
+    container_name: vgc-db
+    restart: always
+    image: postgres:15-alpine
+    mem_limit: 512mb
+    shm_size: 256mb
+    networks:
+      - internal_network
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+    volumes:
+      - ./.docker-data/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+
+  app:
+    container_name: vgc-app
+    image: node:20-alpine
+    restart: always
+    mem_limit: 1024mb
+    env_file: .env.production
+    command: yarn build && yarn start
+    networks:
+      - external_network
+      - internal_network
+    depends_on:
+      - db
+    volumes:
+      - .:/vgc
+    ports:
+      - 8000:8000
+
+networks:
+  external_network:
+  internal_network:
+    internal: true

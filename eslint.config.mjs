@@ -55,7 +55,7 @@ export default [
       sourceType: 'commonjs',
 
       parserOptions: {
-        parser: '/Users/si/donotbackup/pro/vgc/node_modules/@typescript-eslint/parser/dist/index.js',
+        parser: '/workspaces/vgc/node_modules/@typescript-eslint/parser/dist/index.js',
         extraFileExtensions: ['.vue'],
       },
     },
