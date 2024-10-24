@@ -99,6 +99,27 @@ export const parseBattleLog = async (
       const [, pos, id] = args
       const poke = getOrCreateParsedPokemon(id, isP1(pos) ? team1SentOut : team2SentOut)
       currentPokemons[pos] = poke
+    } else if (type === 'swap') {
+      const [, pos1, pos2] = args
+      const num = parseInt(pos2)
+      let pos2actual
+      if (isNaN(num)) {
+        pos2actual = pos2 as PokemonIdent
+      } else {
+        if (num > 1) {
+          throw new Error(`Invalid swap position: ${pos2}`)
+        }
+        const pos2Key = num === 0 ? pos1.slice(0, 2) + 'a' : pos1.slice(0, 2) + 'b'
+        pos2actual = Object.keys(currentPokemons).find((x) => x.startsWith(pos2Key))! as PokemonIdent
+      }
+      const poke1 = currentPokemons[pos1]
+      const poke2 = currentPokemons[pos2actual]
+      delete currentPokemons[pos1]
+      delete currentPokemons[pos2actual]
+      const pos1New = pos2actual.slice(0, 3) + pos1.slice(3) as PokemonIdent
+      const pos2New = pos1.slice(0, 3) + pos2actual.slice(3) as PokemonIdent
+      currentPokemons[pos1New] = poke1
+      currentPokemons[pos2New] = poke2
     } else if (type === '-ability') {
       const [, pos, ability] = args
       currentPokemons[pos].ability = ability
