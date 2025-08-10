@@ -4,7 +4,10 @@ services:
     image: mcr.microsoft.com/devcontainers/javascript-node:20-bullseye
     command: sleep infinity
     mem_limit: 4096mb
+    restart: no
     environment:
       - DEBUG=true
     volumes:
       - ..:/workspaces:cached
+  db:
+    restart: no
