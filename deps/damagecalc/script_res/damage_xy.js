@@ -44,13 +44,15 @@ function CALCULATE_ALL_MOVES_XY(p1, p2, field) {
 
 function GET_DAMAGE_XY(attacker, defender, move, field) {
     var moveDescName = move.name;
+    var isMeFirst = false;
+
+    if (move.name == 'Me First')
+        [move, moveDescName, isMeFirst] = checkMeFirst(move, moveDescName);
 
     checkMoveTypeChange(move, field, attacker);
 
     if (move.name == "Nature Power" && attacker.item !== 'Assault Vest')
         [move, moveDescName] = NaturePower(move, field, moveDescName);
-    else if (move.name == 'Me First' && !move.isMeFirst)
-        [move, moveDescName] = checkMeFirst(move, moveDescName);
 
     attacker_name = attacker.name;
     defender_name = defender.name;
@@ -88,7 +90,7 @@ function GET_DAMAGE_XY(attacker, defender, move, field) {
     setDamageBuildDesc = setDamage(move, attacker, defender, description, false, field);
     if (setDamageBuildDesc !== -1) return setDamageBuildDesc;
 
-    if (move.hits > 1) {
+    if (move.hitRange) {
         description.hits = move.hits;
     }
     var turnOrder = attacker.stats[SP] > defender.stats[SP] ? "FIRST" : "LAST";
@@ -102,7 +104,7 @@ function GET_DAMAGE_XY(attacker, defender, move, field) {
     [basePower, description] = basePowerFunc(move, description, turnOrder, attacker, defender, field, attIsGrounded, defIsGrounded, defAbility);
 
     var bpMods;
-    [bpMods, description, move] = calcBPMods(attacker, defender, field, move, description, ateIzeBoosted, basePower, attIsGrounded, defIsGrounded, turnOrder, defAbility);
+    [bpMods, description, move] = calcBPMods(attacker, defender, field, move, description, ateIzeBoosted, basePower, attIsGrounded, defIsGrounded, turnOrder, defAbility, isMeFirst);
 
     basePower = Math.max(1, pokeRound(basePower * chainMods(bpMods) / 0x1000));
 

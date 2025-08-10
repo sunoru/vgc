@@ -76,6 +76,23 @@ $(function(){
 	$(".set-toggle").on("click", function () {
 		loadSets("#" + $(this).closest(".poke-info").prop("id"));
 	});
+
+	//GEN 7 SET TEMP
+	$("#gen7sets").on("click", function () {
+		if ($(this).is(":checked")) {
+			COMPONENTS[7][0] = SETDEX_TT2019;
+			tempSetName = "Abomasnow (Default Set)";
+		}
+		else {
+			COMPONENTS[7][0] = SETDEX_GEN7;
+			tempSetName = "Abomasnow (Mega Hard TR)";		//Yes tempSetName is lazy but it's only temporary so it's fine
+		}
+		loadSetdexScript();
+		if (!$("#p1" + " .set-toggle").prop("checked"))
+			loadPreset("#p1", tempSetName);
+		if (!$("#p2" + " .set-toggle").prop("checked"))
+			loadPreset("#p2", tempSetName);
+	});
 })
 
 function loadTheme(color){
@@ -188,10 +205,7 @@ function loadDex(dexMode) {
 	var itemOptions = getSelectOptions(items, true);
 	$("select.item").find("option").remove().end().append("<option value=\"\">(none)</option>" + itemOptions);
 
-	$("#p1 .set-selector").val(getSetOptions("#p1")[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
-	$("#p1 .set-selector").change();
-	$("#p2 .set-selector").val(getSetOptions("#p2")[gen > 3 ? 1 : gen === 1 ? 5 : 3].id);
-	$("#p2 .set-selector").change();
+	resetSetSelectors();
 }
 
 function loadSets(p) {
